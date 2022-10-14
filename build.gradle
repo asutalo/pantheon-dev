@@ -1,23 +1,34 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
-group 'com.eu.atit'
+subprojects {
+    group 'com.eu.atit'
 
-compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
+    apply plugin: 'java-library'
 
-project.ext.setProperty("release.disableChecks", "true")
-project.ext.setProperty("release.pushTagsOnly", "true")
+    repositories {
+        mavenCentral()
+    }
 
-dependencies {
-}
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
 
-test {
-    useJUnitPlatform()
+    project.ext.setProperty("release.disableChecks", "true")
+    project.ext.setProperty("release.pushTagsOnly", "true")
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+        testImplementation 'org.mockito:mockito-core:4.8.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 wrapper {
-    gradleVersion = "7.4.1"
+    gradleVersion = "7.5.2"
     distributionType = Wrapper.DistributionType.ALL
 }

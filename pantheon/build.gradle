@@ -1,20 +1,3 @@
-plugins {
-    id 'java-library'
-}
-
-group 'com.eu.atit'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     api 'com.google.inject:guice:5.1.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
-}
-
-test {
-    useJUnitPlatform()
 }

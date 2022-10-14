@@ -1,31 +1,7 @@
-plugins {
-    id 'java-library'
-}
-
-group 'com.eu.atit'
-
-repositories {
-    mavenCentral()
-}
-
-compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
-
-project.ext.setProperty("release.disableChecks", "true")
-project.ext.setProperty("release.pushTagsOnly", "true")
-
 dependencies {
     api project(':pantheon')
-    api 'mysql:mysql-connector-java:8.0.28'
+    api 'mysql:mysql-connector-java:8.0.30'
 
-    api 'com.google.protobuf:protobuf-java:3.20.1'
+    api 'com.google.protobuf:protobuf-java:3.21.7'
     //to override the version in mysql connector which has vulnerabilities
-
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.5.1'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.5.1'
-}
-
-test {
-    useJUnitPlatform()
 }
