@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'java'
 }
 
 group 'com.eu.atit'
@@ -11,7 +11,6 @@ project.ext.setProperty("release.disableChecks", "true")
 project.ext.setProperty("release.pushTagsOnly", "true")
 
 dependencies {
-
 }
 
 test {
@@ -19,6 +18,6 @@ test {
 }
 
 wrapper {
-    gradleVersion = "7.5.1"
+    gradleVersion = "7.4.1"
     distributionType = Wrapper.DistributionType.ALL
 }
