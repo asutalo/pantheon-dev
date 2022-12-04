@@ -4,4 +4,4 @@ include 'pantheon-ioc-server'
 include 'pantheon-mysql'
 include 'pantheon-json'
 include 'mortgage-tracker-backend'
-
+include 'student-service'
