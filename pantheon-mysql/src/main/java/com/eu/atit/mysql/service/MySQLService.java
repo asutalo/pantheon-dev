@@ -213,7 +213,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(servingType);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(servingType);
 
-        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(specificFieldValueSetters);
+        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName, specificFieldValueSetters);
 
         fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.getVariableName(), primaryKeyFieldMySqlValue);
         nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> fieldMySqlValueMap.put(fieldMySqlValue.getVariableName(), fieldMySqlValue));

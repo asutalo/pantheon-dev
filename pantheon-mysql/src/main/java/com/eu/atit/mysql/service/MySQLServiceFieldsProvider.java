@@ -154,4 +154,13 @@ class MySQLServiceFieldsProvider {
 
         return columnsAndAliases;
     }
+
+    public <T> ArrayList<Pair<String, String>> getColumnsAndAliases(String tableName, List<SpecificFieldValueSetter<T>> specificFieldValueSetters) {
+        ArrayList<Pair<String, String>> columnsAndAliases = new ArrayList<>();
+        for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
+            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableName));
+        }
+
+        return columnsAndAliases;
+    }
 }

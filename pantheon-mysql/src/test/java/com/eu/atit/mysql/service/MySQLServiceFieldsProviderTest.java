@@ -115,12 +115,13 @@ class MySQLServiceFieldsProviderTest {
 
     @Test
     void getColumnsAndAliases() {
+        String someTable = "someTable";
         SpecificFieldValueSetter mockSpecificFieldValueSetter = mock(SpecificFieldValueSetter.class);
         Pair<String, String> mockPair = mock(Pair.class);
         Pair<String, String> mockOtherPair = mock(Pair.class);
-        when(mockSpecificFieldValueSetter.fieldNameAndAlias()).thenReturn(mockPair).thenReturn(mockOtherPair);
+        when(mockSpecificFieldValueSetter.fieldNameAndAlias(someTable)).thenReturn(mockPair).thenReturn(mockOtherPair);
 
-        Assertions.assertEquals(List.of(mockPair, mockOtherPair), mySQLServiceFieldsProvider.getColumnsAndAliases(List.of(mockSpecificFieldValueSetter, mockSpecificFieldValueSetter)));
+        Assertions.assertEquals(List.of(mockPair, mockOtherPair), mySQLServiceFieldsProvider.getColumnsAndAliases(someTable, List.of(mockSpecificFieldValueSetter, mockSpecificFieldValueSetter)));
     }
 
     private int countFields(Map<String, FieldValueSetter<TestTarget>> actual) {

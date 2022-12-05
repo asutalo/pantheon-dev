@@ -93,7 +93,7 @@ class MySQLServiceTest {
         verify(mockMySQLServiceFieldsProvider).getPrimaryKeyFieldMySqlValue(SOME_CLASS);
         verify(mockMySQLServiceFieldsProvider).getTableName(SOME_CLASS);
         verify(mockMySQLServiceFieldsProvider).getNonPrimaryFieldValueSetterMap(SOME_CLASS);
-        verify(mockMySQLServiceFieldsProvider).getColumnsAndAliases(someSpecificFieldValueSetters);
+        verify(mockMySQLServiceFieldsProvider).getColumnsAndAliases(SOME_TABLE, someSpecificFieldValueSetters);
         verifyNoMoreInteractions(mockMySQLServiceFieldsProvider);
 
         Map<String, FieldMySqlValue<Object>> fieldMySqlValueMap = mySQLService.getFieldMySqlValueMap();
