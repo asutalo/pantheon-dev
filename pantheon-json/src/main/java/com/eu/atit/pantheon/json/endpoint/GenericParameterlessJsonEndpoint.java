@@ -50,9 +50,9 @@ public class GenericParameterlessJsonEndpoint<T, Q> extends GenericJsonEndpoint<
         T instance = service.instanceOfT(requestBody);
 
         try {
-            T savedUser = service.save(instance);
+            service.save(instance);
 
-            Pair<String, String> locationPair = getLocation(savedUser);
+            Pair<String, String> locationPair = getLocation(instance);
 
             new HashMap<>();
 

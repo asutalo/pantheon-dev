@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataService<T, Q> extends Service {
-    T update(T toUpdate) throws Exception;
+    void update(T toUpdate) throws Exception;
 
-    T save(T toSave) throws Exception;
+    void save(T toSave) throws Exception;
 
     void delete(T toDelete) throws Exception;
 

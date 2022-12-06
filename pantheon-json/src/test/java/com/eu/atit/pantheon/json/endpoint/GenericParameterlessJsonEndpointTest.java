@@ -28,10 +28,7 @@ import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.LOCATION;
 import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -97,13 +94,12 @@ class GenericParameterlessJsonEndpointTest {
     }
 
     @Test
-    void post() throws Exception {
+    void post() {
         String someLocation = "location";
         String expectedLocation = SOME_LOCATION + "/" + someLocation;
         Pair<String, String> locationPair = new Pair<>(someLocation, SOME_STRING);
 
         when(mockDataAccessService.instanceOfT(SOME_REQUEST_BODY)).thenReturn(mockObject);
-        when(mockDataAccessService.save(mockObject)).thenReturn(mockObject);
 
         doReturn(locationPair).when(genericParameterlessJsonEndpoint).getLocation(mockObject);
         doReturn(SOME_OTHER_STRING).when(genericParameterlessJsonEndpoint).withBracers(SOME_STRING);
@@ -124,7 +120,7 @@ class GenericParameterlessJsonEndpointTest {
 
     @Test
     void post_throwsExceptionWhenServiceThrows() throws Exception {
-        when(mockDataAccessService.save(any())).thenThrow(RuntimeException.class);
+        doThrow(RuntimeException.class).when(mockDataAccessService).save(any());
 
         Assertions.assertThrows(InternalServerErrorException.class, () -> genericParameterlessJsonEndpoint.post(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class)));
     }

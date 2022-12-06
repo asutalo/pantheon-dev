@@ -51,7 +51,7 @@ class MySqlClientTest {
         List<Map<String, Object>> expected = List.of();
         doReturn(expected).when(spy).execute(any(), any());
 
-        List<Map<String, Object>> actual = spy.prepAndExecuteSelectQuery(mockQueryBuilder);
+        List<Map<String, Object>> actual = spy.executeSelectQuery(mockQueryBuilder);
 
         verify(spy).execute(eq(mockQueryBuilder), any(SelectQueryResultProcessor.class));
         assertEquals(expected, actual);
@@ -64,7 +64,7 @@ class MySqlClientTest {
         int expected = 1;
         doReturn(expected).when(spy).execute(any(), any());
 
-        int actual = spy.prepAndExecuteInsertQuery(mockQueryBuilder);
+        int actual = spy.executeInsertQuery(mockQueryBuilder);
 
         verify(spy).execute(eq(mockQueryBuilder), any(InsertQueryResultProcessorFunction.class));
         assertEquals(expected, actual);
@@ -78,7 +78,7 @@ class MySqlClientTest {
 
         doReturn(expected).when(spy).execute(any(), any());
 
-        int actual = spy.prepAndExecuteOtherDmlQuery(mockQueryBuilder);
+        int actual = spy.executeOtherDmlQuery(mockQueryBuilder);
 
         verify(spy).execute(eq(mockQueryBuilder), any(OtherDmlQueryResultProcessorFunction.class));
         assertEquals(expected, actual);

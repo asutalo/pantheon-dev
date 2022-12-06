@@ -50,13 +50,13 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private FieldValueSetter<T> primaryKeyFieldValueSetter;
     private String tableName;
 
-    public MySQLService(DataClient mySqlClient, TypeLiteral<T> typeLiteral) {
+    MySQLService(DataClient mySqlClient, TypeLiteral<T> typeLiteral) {
         this.mySqlClient = (MySqlClient) mySqlClient;
         this.servingType = (Class<T>) typeLiteral.getType();
     }
 
     @Override
-    public T update(T toUpdate) throws SQLException {
+    public void update(T toUpdate) throws SQLException {
         LinkedList<MySqlValue> mySqlValues = mySqlValues(toUpdate);
 
         QueryBuilder queryBuilder = new QueryBuilder();
@@ -64,24 +64,22 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         queryBuilder.where();
         queryBuilder.keyIsVal(primaryKeyFieldMySqlValue.apply(toUpdate));
 
-        if (mySqlClient.prepAndExecuteOtherDmlQuery(queryBuilder) > 0) {
-            return toUpdate;
-        } else {
+        if (mySqlClient.executeOtherDmlQuery(queryBuilder) <= 0) {
             throw new RuntimeException("Update failed");
         }
     }
 
     @Override
-    public T save(T toSave) throws SQLException {
+    public void save(T toSave) throws SQLException {
         LinkedList<MySqlValue> mySqlValues = mySqlValues(toSave);
 
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.insert(tableName, mySqlValues);
 
-        int insertId = mySqlClient.prepAndExecuteInsertQuery(queryBuilder);
+        int insertId = mySqlClient.executeInsertQuery(queryBuilder);
 
         primaryKeyFieldValueSetter.accept(toSave, insertId);
-        return toSave;
+        System.out.println(toSave);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         queryBuilder.where();
         queryBuilder.keyIsVal(primaryKeyFieldMySqlValue.apply(toDelete));
 
-        if (mySqlClient.prepAndExecuteOtherDmlQuery(queryBuilder) == 0) {
+        if (mySqlClient.executeOtherDmlQuery(queryBuilder) == 0) {
             throw new RuntimeException("Deletion failed");
         }
     }
@@ -108,7 +106,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     @Override
     public T get(QueryBuilder filteredSelect) throws SQLException, IllegalStateException {
-        List<Map<String, Object>> resultSet = mySqlClient.prepAndExecuteSelectQuery(filteredSelect);
+        List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
 
         if (resultSet.size() == 1) {
             return fullInstanceOfT(resultSet.get(0));
@@ -131,7 +129,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     @Override
     public List<T> getAll(QueryBuilder filteredSelect) throws SQLException {
-        List<Map<String, Object>> resultSet = mySqlClient.prepAndExecuteSelectQuery(filteredSelect);
+        List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
         List<T> elements = new LinkedList<>();
 
         for (Map<String, Object> row : resultSet) {
@@ -204,7 +202,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return mySqlValues;
     }
 
-    public void init(MySQLServiceFieldsProvider mySQLServiceFieldsProvider) {
+    void init(MySQLServiceFieldsProvider mySQLServiceFieldsProvider) {
         mySQLServiceFieldsProvider.validateClass(servingType);
         tableName = mySQLServiceFieldsProvider.getTableName(servingType);
         instantiator = mySQLServiceFieldsProvider.getInstantiator(servingType);

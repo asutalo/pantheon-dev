@@ -3,7 +3,7 @@ package com.eu.atit.student.service.model;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 
-public final class Type {
+public class Type {
     @MySqlField(type = MysqlType.INT, primary = true)
     private Integer id;
     @MySqlField(type = MysqlType.VARCHAR)
@@ -13,6 +13,7 @@ public final class Type {
         this.name = name;
     }
 
+    //mandatory empty constructor
     private Type(){}
 
     @Override

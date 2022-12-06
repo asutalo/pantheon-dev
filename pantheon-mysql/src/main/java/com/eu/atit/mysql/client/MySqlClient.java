@@ -27,15 +27,15 @@ public class MySqlClient implements DataClient {
 
     }
 
-    public List<Map<String, Object>> prepAndExecuteSelectQuery(QueryBuilder queryBuilder) throws SQLException {
+    public List<Map<String, Object>> executeSelectQuery(QueryBuilder queryBuilder) throws SQLException {
         return execute(queryBuilder, selectQueryResultProcessor);
     }
 
-    public int prepAndExecuteInsertQuery(QueryBuilder queryBuilder) throws SQLException {
+    public int executeInsertQuery(QueryBuilder queryBuilder) throws SQLException {
         return execute(queryBuilder, insertQueryResultProcessorFunction);
     }
 
-    public int prepAndExecuteOtherDmlQuery(QueryBuilder queryBuilder) throws SQLException {
+    public int executeOtherDmlQuery(QueryBuilder queryBuilder) throws SQLException {
         return execute(queryBuilder, otherDmlQueryResultProcessorFunction);
     }
 

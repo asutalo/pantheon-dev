@@ -2,12 +2,9 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
-import com.eu.atit.pantheon.service.Service;
-import com.eu.atit.pantheon.service.ServiceProviderRegistry;
 import com.eu.atit.student.service.model.Type;
 import com.google.inject.TypeLiteral;
 
-import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -18,36 +15,32 @@ public class Main {
     static final String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
 
     public static void main(String[] args) throws SQLException {
-        System.out.println("Hello world!");
-
         LinkedList<String> dbParams = new LinkedList<>(List.of("student_service", "student_service_user", "devuser", "student_service_user@localhost"));
 
-        MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams)));
+        MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
+        MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
         MySQLService<Type> typeMySQLService = (MySQLService<Type>) mySQLServiceProvider.provide(TypeLiteral.get(Type.class));
 
+        //fetch all
         System.out.println(typeMySQLService.getAll());
 
+        //create and insert new
         Type newType = new Type("testType");
-
-        Type savedType = typeMySQLService.save(newType);
-
+        typeMySQLService.save(newType);
         System.out.println(typeMySQLService.getAll());
 
-        typeMySQLService.delete(savedType);
-
+        //delete by reference
+        typeMySQLService.delete(newType);
         System.out.println(typeMySQLService.getAll());
 
+        //create, insert new, and delete by filtering
         Type otherNewType = new Type("testTypeDeleteById");
-
-        Type otherSavedType = typeMySQLService.save(otherNewType);
-
-        System.out.println(typeMySQLService.getAll());
-
-        typeMySQLService.delete(typeMySQLService.get(Map.of("id", otherSavedType.id())));
+        typeMySQLService.save(otherNewType);
 
         System.out.println(typeMySQLService.getAll());
 
-
+        typeMySQLService.delete(typeMySQLService.get(Map.of("id", otherNewType.id())));
+        System.out.println(typeMySQLService.getAll());
     }
 }

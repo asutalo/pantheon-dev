@@ -121,7 +121,7 @@ class GenericParameterisedJsonEndpointTest {
 
     @Test
     void put_throwsExceptionWhenServiceThrows() throws Exception {
-        when(mockDataAccessService.update(any())).thenThrow(RuntimeException.class);
+        doThrow(RuntimeException.class).when(mockDataAccessService).update(any());
 
         Assertions.assertThrows(UnprocessableEntityException.class, () -> genericParameterisedJsonEndpoint.put(EMPTY_MAP, EMPTY_MAP, mock(Headers.class)));
     }

@@ -130,7 +130,7 @@ class MySQLServiceTest {
             final List<Map<String, Object>> someSingleRowResult = List.of(Map.of("SomeString", "someVal"));
 
             when(mockInstantiator.get()).thenReturn(mockObject);
-            when(mockMySqlClient.prepAndExecuteSelectQuery(mockQueryBuilder)).thenReturn(someSingleRowResult);
+            when(mockMySqlClient.executeSelectQuery(mockQueryBuilder)).thenReturn(someSingleRowResult);
 
             mySQLService().get(mockQueryBuilder);
 
@@ -141,7 +141,7 @@ class MySQLServiceTest {
         @Test
         void shouldThrowExceptionWhenSelectReturnsNoElements() throws SQLException {
             List<Map<String, Object>> noRowsResult = List.of();
-            when(mockMySqlClient.prepAndExecuteSelectQuery(mockQueryBuilder)).thenReturn(noRowsResult);
+            when(mockMySqlClient.executeSelectQuery(mockQueryBuilder)).thenReturn(noRowsResult);
 
             Assertions.assertThrows(IllegalStateException.class, () -> mySQLService().get(mockQueryBuilder));
 
@@ -152,7 +152,7 @@ class MySQLServiceTest {
         @Test
         void shouldThrowExceptionWhenSelectReturnsMoreThanOneElement() throws SQLException {
             List<Map<String, Object>> multipleRows = List.of(Map.of(), Map.of());
-            when(mockMySqlClient.prepAndExecuteSelectQuery(mockQueryBuilder)).thenReturn(multipleRows);
+            when(mockMySqlClient.executeSelectQuery(mockQueryBuilder)).thenReturn(multipleRows);
 
             Assertions.assertThrows(IllegalStateException.class, () -> mySQLService().get(mockQueryBuilder));
 
@@ -234,13 +234,13 @@ class MySQLServiceTest {
             int expectedNumberOfSetterOperations = expectedNumberOfElements * someSpecificFieldValueSetters.size();
 
             when(mockInstantiator.get()).thenReturn(mockObject).thenReturn(mockObject);
-            when(mockMySqlClient.prepAndExecuteSelectQuery(any())).thenReturn(multipleRows);
+            when(mockMySqlClient.executeSelectQuery(any())).thenReturn(multipleRows);
 
             MySQLService<Object> mySQLService = mySQLService();
 
             mySQLService.getAll();
 
-            verify(mockMySqlClient).prepAndExecuteSelectQuery(mySQLService.filteredSelect());
+            verify(mockMySqlClient).executeSelectQuery(mySQLService.filteredSelect());
             verify(mockInstantiator, times(expectedNumberOfElements)).get();
             verify(mockSpecificFieldValueSetter, times(expectedNumberOfSetterOperations)).accept(eq(mockObject), any());
         }
@@ -253,11 +253,11 @@ class MySQLServiceTest {
             int expectedNumberOfSetterOperations = expectedNumberOfElements * someSpecificFieldValueSetters.size();
 
             when(mockInstantiator.get()).thenReturn(mockObject).thenReturn(mockObject);
-            when(mockMySqlClient.prepAndExecuteSelectQuery(mockQueryBuilder)).thenReturn(multipleRows);
+            when(mockMySqlClient.executeSelectQuery(mockQueryBuilder)).thenReturn(multipleRows);
 
             mySQLService().getAll(mockQueryBuilder);
 
-            verify(mockMySqlClient).prepAndExecuteSelectQuery(mockQueryBuilder);
+            verify(mockMySqlClient).executeSelectQuery(mockQueryBuilder);
             verify(mockInstantiator, times(expectedNumberOfElements)).get();
             verify(mockSpecificFieldValueSetter, times(expectedNumberOfSetterOperations)).accept(eq(mockObject), any());
         }
@@ -270,7 +270,7 @@ class MySQLServiceTest {
         @Test
         void shouldDeleteSpecifiedElement() throws SQLException {
             when(mockFieldMySqlValue.apply(mockObject)).thenReturn(mockMySqlValue);
-            when(mockMySqlClient.prepAndExecuteOtherDmlQuery(any())).thenReturn(1);
+            when(mockMySqlClient.executeOtherDmlQuery(any())).thenReturn(1);
 
             QueryBuilder expectedQueryBuilder = new QueryBuilder();
             expectedQueryBuilder.delete();
@@ -280,13 +280,13 @@ class MySQLServiceTest {
 
             mySQLService().delete(mockObject);
 
-            verify(mockMySqlClient).prepAndExecuteOtherDmlQuery(expectedQueryBuilder);
+            verify(mockMySqlClient).executeOtherDmlQuery(expectedQueryBuilder);
         }
 
         @Test
         void shouldThrowExceptionWhenNothingIsDeleted() throws SQLException {
             when(mockFieldMySqlValue.apply(mockObject)).thenReturn(mockMySqlValue);
-            when(mockMySqlClient.prepAndExecuteOtherDmlQuery(any())).thenReturn(0);
+            when(mockMySqlClient.executeOtherDmlQuery(any())).thenReturn(0);
 
             Assertions.assertThrows(RuntimeException.class, () -> mySQLService().delete(mockObject));
         }
@@ -299,15 +299,15 @@ class MySQLServiceTest {
         @Test
         void shouldSaveAnElement() throws SQLException {
             int someInsertId = 1;
-            when(mockMySqlClient.prepAndExecuteInsertQuery(any())).thenReturn(someInsertId);
+            when(mockMySqlClient.executeInsertQuery(any())).thenReturn(someInsertId);
             when(mockFieldMySqlValue.apply(mockObject)).thenReturn(mockMySqlValue).thenReturn(mockMySqlValue);
 
             LinkedList<MySqlValue> expectedMySqlValues = new LinkedList<>(List.of(mockMySqlValue, mockMySqlValue));
             QueryBuilder expectedQueryBuilder = new QueryBuilder();
             expectedQueryBuilder.insert(SOME_TABLE, expectedMySqlValues);
 
-            Assertions.assertNotNull(mySQLService().save(mockObject));
-            verify(mockMySqlClient).prepAndExecuteInsertQuery(expectedQueryBuilder);
+            mySQLService().save(mockObject);
+            verify(mockMySqlClient).executeInsertQuery(expectedQueryBuilder);
         }
     }
 
@@ -323,16 +323,16 @@ class MySQLServiceTest {
             expectedQueryBuilder.where();
             expectedQueryBuilder.keyIsVal(mockMySqlValue);
 
-            when(mockMySqlClient.prepAndExecuteOtherDmlQuery(any())).thenReturn(1);
+            when(mockMySqlClient.executeOtherDmlQuery(any())).thenReturn(1);
 
-            Assertions.assertNotNull(mySQLService().update(mockObject));
-            verify(mockMySqlClient).prepAndExecuteOtherDmlQuery(expectedQueryBuilder);
+            mySQLService().update(mockObject);
+            verify(mockMySqlClient).executeOtherDmlQuery(expectedQueryBuilder);
         }
 
         @Test
         void shouldThrowExceptionWhenNoElementUpdated() throws SQLException {
             when(mockFieldMySqlValue.apply(mockObject)).thenReturn(mockMySqlValue).thenReturn(mockMySqlValue).thenReturn(mockMySqlValue);
-            when(mockMySqlClient.prepAndExecuteOtherDmlQuery(any())).thenReturn(0);
+            when(mockMySqlClient.executeOtherDmlQuery(any())).thenReturn(0);
 
             Assertions.assertThrows(RuntimeException.class, () -> mySQLService().update(mockObject));
         }

@@ -87,7 +87,7 @@ public class QueryBuilder {
         for (QueryPart queryPart : queryParts) {
             queryPart.apply(preparedStatement);
         }
-
+        System.out.println("prepped: " + preparedStatement);
         return preparedStatement;
     }
 
