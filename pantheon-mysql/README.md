@@ -1,7 +1,21 @@
 # Pantheon MySQL
 
-Started off as a utility library for building and executing queries. Over time it got expanded to integrate
-with [Pantheon](https://github.com/asutalo/pantheon).
+Started off as a utility library for building and executing queries. Over time, it grew into a quasi mySQL ORM extension
+of [Pantheon](https://github.com/asutalo/pantheon) that can be combined with its frontend components or used on its own.
+
+# Table of Contents
+
+* [MySQLService](#MySQLService)
+    * [Usage](#Usage)
+        * [Instantiation](#Instantiation)
+        * [Annotations](#Annotations)
+        * [Code Example](#Code-Example)
+    * [Nesting](#Nesting)
+* [MySqlClient](#MySqlClient)
+* [QueryBuilder](#QueryBuilder)
+* [Alternative to MySqlService](#Alternative-to-MySqlService)
+* [Example without transactions](#Example-without-transactions)
+* [Example with transactions](#Example-with-transactions)
 
 # MySQLService
 
@@ -190,12 +204,12 @@ The `QueryBuilder` allows you to construct SQL queries in a way that is easy to 
 Most importantly, it provides you with the actual query by creating a `PreparedStatement` which should offer basic
 protection from SQLInjection.
 
-# Alternative to the generic MySqlService
+# Alternative to MySqlService
 
 In case you'd like to use your own service implementation you can use the `MySqlClient` directly in combination with
 the `QueryBuilder`, both of which are described above.
 
-## Alternative example without transactions
+## Example without transactions
 
 ```java
 import com.eu.atit.mysql.client.Connector;
@@ -251,7 +265,7 @@ public class MainQueryBuilder {
 }
 ```
 
-## Alternative example with transactions
+## Example with transactions
 
 ```java
 import com.eu.atit.mysql.client.Connector;
