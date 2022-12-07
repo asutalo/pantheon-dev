@@ -140,7 +140,7 @@ clause.
 
 ## Alternative
 
-In case you'd like to use your own implementation you can use the `MySqlClient` directly in combination with the `QueryBuilder`.
+In case you'd like to use your own service implementation you can use the `MySqlClient` directly in combination with the `QueryBuilder`, both of which are described below.
 
 # MySqlClient
 
@@ -150,4 +150,17 @@ The client provided by this library consumes the queries provided via the `Query
 * insert
 * other DML (i.e. update/delete)
 
-Each of the executions uses the provided `QueryBuilder` to construct and execute a prepared statement.[](https://)
+Each of the executions uses the provided `QueryBuilder` to construct and execute a prepared statement.
+
+
+Additionally it allows you to start, finish, and rollback transactions in needed. Starting a transaction provides you with an instance of a `Connection` that can be passed into the overloads of the methods above. 
+
+# QueryBuilder
+
+The `QueryBuilder` allows you to construct SQL queries in a way that is easy to unit test. It supports:
+
+* select, insert, update, and delete statements
+* column aliasing
+* filtering using **and** keyword
+
+Most importantly, it provides you with the actual query via creating a `PreparedStatement` which should offer basic protection from SQLInjection.
