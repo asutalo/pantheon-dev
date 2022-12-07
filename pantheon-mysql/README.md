@@ -13,7 +13,7 @@ API endpoints but can also be accessed without other Pantheon libraries.
 
 
 | Method         | Params                      | Description                                                                                                                                                                                                  |
-| -------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|----------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | get            | Map filter                  | The map parameter should contain columns which you want to filter on and the values you're filtering for. Will return a single object or throw an exception.                                                 |
 | get            | QueryBuilder filter         | Executes the provided query from the builder and returns a single object or throws an exception. Essentially converts query results into the desired object.                                                 |
 | getAll         |                             | Gets all objects of a given type from the DB.                                                                                                                                                                |
