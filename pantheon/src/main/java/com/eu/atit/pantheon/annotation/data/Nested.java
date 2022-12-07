@@ -6,4 +6,6 @@ public @interface Nested {
     boolean inward() default false;
 
     String link() default "";
+
+    boolean eager() default false;
 }

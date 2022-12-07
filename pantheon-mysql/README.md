@@ -11,7 +11,6 @@ API endpoints but can also be accessed without other Pantheon libraries.
 
 ## Usage
 
-
 | Method         | Params                      | Description                                                                                                                                                                                                  |
 |----------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | get            | Map filter                  | The map parameter should contain columns which you want to filter on and the values you're filtering for. Will return a single object or throw an exception.                                                 |
@@ -32,6 +31,33 @@ yourself with an instance of the `MySQLService` connected to the type of the obj
 ServiceProvider will instantiate and initialise the generic MySQLService for you.
 
 ### Annotations
+
+The way the generic MySQLService works is by reading your domain class and identifying appropriate annotations
+describing each of the fields in it.
+
+Supported annotations and their values:
+
+* @MySqlField
+    * MysqlType type - used to describe the mapping between Java variable types and what they actually are in the DB
+      table. This is mandatory as it is required for PreparedStatements to work.
+    * String column - defaults to `""`. This represents the name of the column in your table. If not specified then the
+      MySQLService will use the name of the variable to fetch the value from DB.
+    * boolean primary - defaults to `false`. Used to identify a primary key, It is mandatory to have one variable marked
+      as primary key.
+* @Nested
+    * This annotation is actually provided by *Pantheon* itself, and is used to mark a field as a custom class,
+      indicating a nested object is present.
+    * boolean outward - defaults to `false`. Marks the relationship as outward, meaning that the nested object, or
+      rather its table is being referenced by the parent object. For example a *User* table would have a foreign key
+      *role_id* pointing to another table, *Role*. This is effectively a `N:1` relationship type.
+    * boolean inward - defaults to `false`. An inward relationship means that the nested object actually contains a
+      foreign key pointing to the parent class. For example a *Citizen* owns a *Driving License* but the *Driving
+      License* table is the one that has the foreign key *citizen_id*. This is essentially representing a 1:1
+      relationship.
+    * String link - defaults to `""`. Used to provide a name of the foreign key. If not provided the MySQLService will
+      default it to *TargetTable_primaryKey* where the PK is identified by the annotation mentioned above.
+    * boolean eager - defaults to false. Specifies if the entire nested object should be fetched or just the column
+      marked as primary key.
 
 ### Code Example
 
@@ -130,17 +156,20 @@ Fetching nested objects is provided mainly to allow for quick means of filtering
 it contains downstream in a way that requires fewer calls to the DB.
 
 For example fetching all Users who have deactivated their accounts could be done by fetching AccountType where
-type=deactivated
-to get the ID of that particular type followed by fetching Users where accountType_id = deactivated_id.
+type=deactivated to get the ID of that particular type followed by fetching Users where accountType_id = deactivated_id.
 
 The limited nesting support provided by the generic service allows for the same to be achieved by doing a get request
-for Users
-with a filter that states accountType.type = deactivated which will produce a single query utilising a join and a where
-clause.
+for Users with a filter that states accountType.type = deactivated which will produce a single query utilising a join
+and a where clause.
+
+Fetching nested objects is by default ***lazy*** and will only fetch the *primary key* values. Eager fetching is
+configurable but `not recommended` unless you are certain that you will not be fetching *many* objects as it might/will
+lead to memory issues, especially when fetching a N:N relationship.
 
 # MySqlClient
 
-The client provided by this library consumes the queries provided via the `QueryBuilder`. It supports execution of three types of operations:
+The client provided by this library consumes the queries provided via the `QueryBuilder`. It supports execution of three
+types of operations:
 
 * select
 * insert
@@ -148,7 +177,8 @@ The client provided by this library consumes the queries provided via the `Query
 
 Each of the executions uses the provided `QueryBuilder` to construct and execute a prepared statement.
 
-Additionally, it allows you to start, finish, and rollback transactions if needed. Starting a transaction provides you with an instance of a `Connection` that can be passed into the overloads of the methods above.
+Additionally, it allows you to start, finish, and rollback transactions if needed. Starting a transaction provides you
+with an instance of a `Connection` that can be passed into the overloads of the methods above.
 
 # QueryBuilder
 
@@ -157,11 +187,13 @@ The `QueryBuilder` allows you to construct SQL queries in a way that is easy to 
 * select all, select with column aliasing, insert, update, and delete statements
 * filtering using **and** keyword
 
-Most importantly, it provides you with the actual query by creating a `PreparedStatement` which should offer basic protection from SQLInjection.
+Most importantly, it provides you with the actual query by creating a `PreparedStatement` which should offer basic
+protection from SQLInjection.
 
 # Alternative to the generic MySqlService
 
-In case you'd like to use your own service implementation you can use the `MySqlClient` directly in combination with the `QueryBuilder`, both of which are described above.
+In case you'd like to use your own service implementation you can use the `MySqlClient` directly in combination with
+the `QueryBuilder`, both of which are described above.
 
 ## Alternative example without transactions
 
@@ -182,7 +214,7 @@ public class MainQueryBuilder {
 
     public static void main(String[] args) throws SQLException {
         LinkedList<String> dbParams = new LinkedList<>(List.of("some_db_name", "some_db_user", "some_Password", "some_db_user@localhost"));
-      
+
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
 
         System.out.println("selected all: " + dataClient.executeSelectQuery(selectAll()));
@@ -240,7 +272,7 @@ public class MainQueryBuilderTransactionary {
 
     public static void main(String[] args) throws SQLException {
         LinkedList<String> dbParams = new LinkedList<>(List.of("some_db_name", "some_db_user", "some_Password", "some_db_user@localhost"));
-      
+
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
 
         Connection connection = dataClient.startTransaction();
