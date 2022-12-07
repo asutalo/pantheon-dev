@@ -44,12 +44,12 @@ class QueryBuilderTest {
     private MySqlValue mockMySqlValue;
 
     @Test
-    void buildSelectQuery() {
+    void buildSelectAllQuery() {
         String expectedQuery = String.format("SELECT * FROM %s %s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE, SOME_WHERE_KEY, SOME_OTHER_KEY);
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select();
+        queryBuilder.selectAll();
         queryBuilder.from(SOME_TABLE);
         queryBuilder.where();
         queryBuilder.keyIsVal(mockMySqlValue);
@@ -138,6 +138,7 @@ class QueryBuilderTest {
         Assertions.assertEquals(expectedQuery, queryBuilder.buildQueryString());
     }
 
+    @SuppressWarnings("MagicConstant")
     @Test
     void buildStatement() throws SQLException {
         QueryPart mockQueryPart = mock(QueryPart.class);
@@ -156,11 +157,11 @@ class QueryBuilderTest {
     @Test
     void equals() {
         QueryBuilder queryBuilder1 = new QueryBuilder();
-        queryBuilder1.select();
+        queryBuilder1.selectAll();
         queryBuilder1.from(SOME_TABLE);
 
         QueryBuilder queryBuilder2 = new QueryBuilder();
-        queryBuilder2.select();
+        queryBuilder2.selectAll();
         queryBuilder2.from(SOME_TABLE);
 
         Assertions.assertEquals(queryBuilder1, queryBuilder2);
@@ -169,12 +170,12 @@ class QueryBuilderTest {
     @Test
     void equalsReturnsFalseWhenOrderOfApplicationDiffers() {
         QueryBuilder correct = new QueryBuilder();
-        correct.select();
+        correct.selectAll();
         correct.from(SOME_TABLE);
 
         QueryBuilder incorrect = new QueryBuilder();
         incorrect.from(SOME_TABLE);
-        incorrect.select();
+        incorrect.selectAll();
 
         Assertions.assertNotEquals(correct, incorrect);
     }
@@ -182,7 +183,7 @@ class QueryBuilderTest {
     @Test
     void hashcode() {
         QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select();
+        queryBuilder.selectAll();
         queryBuilder.from(SOME_TABLE);
 
         Assertions.assertEquals(queryBuilder.hashCode(), queryBuilder.hashCode());
