@@ -17,8 +17,8 @@ public class QueryBuilder {
     private final List<QueryPart> queryParts = new LinkedList<>();
     private int paramIndex = 0;
 
-    public void select() {
-        queryParts.add(new Select());
+    public void selectAll() {
+        queryParts.add(new SelectAll());
     }
 
     public void select(ArrayList<Pair<String, String>> columnsAndAliases) {

@@ -1,6 +1,6 @@
 package com.eu.atit.mysql.query;
 
-public class Select extends KeyWord implements QueryPart {
+public class SelectAll extends KeyWord implements QueryPart {
     static final String SELECT = "SELECT *";
 
     @Override

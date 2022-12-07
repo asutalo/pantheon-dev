@@ -11,20 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-class SelectTest {
+class SelectAllTest {
     private static final String SOME_QUERY = "SOME_QUERY";
 
     @Test
     void apply() {
-        String expectedQuery = SOME_QUERY + Select.SELECT;
+        String expectedQuery = SOME_QUERY + SelectAll.SELECT;
 
-        assertEquals(expectedQuery, new Select().apply(SOME_QUERY));
+        assertEquals(expectedQuery, new SelectAll().apply(SOME_QUERY));
     }
 
     @Test
     void applyOnPreparedStatement() throws SQLException {
         PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
-        new Select().apply(mockPreparedStatement);
+        new SelectAll().apply(mockPreparedStatement);
 
         verifyNoInteractions(mockPreparedStatement);
     }
@@ -32,22 +32,22 @@ class SelectTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     void isKeyWord() {
-        Select select = new Select();
-        assertTrue(select instanceof KeyWord);
+        SelectAll selectAll = new SelectAll();
+        assertTrue(selectAll instanceof KeyWord);
     }
 
     @Test
     void equals() {
-        Select select1 = new Select();
-        Select select2 = new Select();
+        SelectAll selectAll1 = new SelectAll();
+        SelectAll selectAll2 = new SelectAll();
 
-        Assertions.assertEquals(select1, select2);
+        Assertions.assertEquals(selectAll1, selectAll2);
     }
 
     @Test
     void hashcode() {
-        Select select = new Select();
+        SelectAll selectAll = new SelectAll();
 
-        Assertions.assertEquals(select.hashCode(), select.hashCode());
+        Assertions.assertEquals(selectAll.hashCode(), selectAll.hashCode());
     }
 }
