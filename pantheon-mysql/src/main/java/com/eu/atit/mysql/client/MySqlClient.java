@@ -39,6 +39,14 @@ public class MySqlClient implements DataClient {
         return execute(queryBuilder, otherDmlQueryResultProcessorFunction);
     }
 
+    public int executeInsertQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, insertQueryResultProcessorFunction, connection);
+    }
+
+    public int executeOtherDmlQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, otherDmlQueryResultProcessorFunction, connection);
+    }
+
     <T> T execute(QueryBuilder queryBuilder, Function<PreparedStatement, T> preparedStatementExecutor) throws SQLException {
         Connection connection = connector.connect();
         T queryResults = execute(queryBuilder, preparedStatementExecutor, connection);

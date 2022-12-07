@@ -70,7 +70,7 @@ public class QueryBuilder {
         return separator;
     }
 
-    public String buildQueryString() {
+    String buildQueryString() {
         String query = "";
         for (QueryPart queryPart : queryParts) {
             query = queryPart.apply(query);
@@ -87,7 +87,6 @@ public class QueryBuilder {
         for (QueryPart queryPart : queryParts) {
             queryPart.apply(preparedStatement);
         }
-        System.out.println("prepped: " + preparedStatement);
         return preparedStatement;
     }
 

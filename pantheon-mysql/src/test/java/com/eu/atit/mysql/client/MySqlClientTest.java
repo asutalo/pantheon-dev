@@ -85,6 +85,33 @@ class MySqlClientTest {
     }
 
     @Test
+    void prepAndExecuteInsertQuery_InsertQueryResultProcessorFunction_withConnection() throws SQLException {
+        MySqlClient spy = spy(mySqlClient);
+
+        int expected = 1;
+        doReturn(expected).when(spy).execute(any(), any(), any());
+
+        int actual = spy.executeInsertQuery(mockQueryBuilder, mockConnection);
+
+        verify(spy).execute(eq(mockQueryBuilder), any(InsertQueryResultProcessorFunction.class), eq(mockConnection));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void prepAndExecuteOtherDmlQuery_OtherDmlQueryResultProcessorFunction_withConnection() throws SQLException {
+        MySqlClient spy = spy(mySqlClient);
+
+        int expected = 1;
+
+        doReturn(expected).when(spy).execute(any(), any(), any());
+
+        int actual = spy.executeOtherDmlQuery(mockQueryBuilder, mockConnection);
+
+        verify(spy).execute(eq(mockQueryBuilder), any(OtherDmlQueryResultProcessorFunction.class), eq(mockConnection));
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void execute_shouldPrepQueryAndExecuteWithProvidedFunction() throws SQLException {
         when(mockConnector.connect()).thenReturn(mockConnection);
         when(mockQueryBuilder.prepareStatement(mockConnection)).thenReturn(mockPreparedStatement);
