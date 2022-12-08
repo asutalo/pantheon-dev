@@ -50,6 +50,9 @@ public class QueryBuilder {
     public void and() {
         queryParts.add(new And());
     }
+    public void join(String targetTableName, String targetId, String sourceTableName, String sourceId) {
+        queryParts.add(new Join(targetTableName, targetId, sourceTableName, sourceId));
+    }
 
     public void keyIsVal(MySqlValue value) {
         queryParts.add(new KeyVal(value.getMysqlType(), value.getKey(), value.getValue(), getSeparator(), getCurrentIndex()));
@@ -87,6 +90,8 @@ public class QueryBuilder {
         for (QueryPart queryPart : queryParts) {
             queryPart.apply(preparedStatement);
         }
+
+        System.out.println("prepped: " + preparedStatement);
         return preparedStatement;
     }
 

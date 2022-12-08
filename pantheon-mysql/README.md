@@ -200,6 +200,8 @@ The `QueryBuilder` allows you to construct SQL queries in a way that is easy to 
 
 * select all, select with column aliasing, insert, update, and delete statements
 * filtering using **and** keyword
+* `FROM` and `JOIN` keywords will use the provided table name to alias the table itself and allow you to alias the
+  columns you are selecting where needed, i.e. SELECT tableX.id FROM tableX `tableX`
 
 Most importantly, it provides you with the actual query by creating a `PreparedStatement` which should offer basic
 protection from SQLInjection.
