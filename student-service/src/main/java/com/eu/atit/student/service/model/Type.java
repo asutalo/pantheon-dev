@@ -1,6 +1,7 @@
 package com.eu.atit.student.service.model;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 public class Type {
@@ -26,5 +27,9 @@ public class Type {
 
     public Integer id() {
         return id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

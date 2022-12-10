@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.mysql.service.ColumnNameAndAlias;
 import com.eu.atit.pantheon.helper.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class QueryBuilderTest {
     @Test
     void buildSelectAllQuery() {
         String someOtherTable = "someOtherTable";
-        String expectedQuery = String.format("SELECT * FROM %s %s JOIN %s %s ON %s.%s = %s.%s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE, someOtherTable, someOtherTable, someOtherTable, SOME_KEY, SOME_TABLE, SOME_OTHER_KEY, SOME_WHERE_KEY, SOME_OTHER_KEY);
+        String expectedQuery = String.format("SELECT *%nFROM %s %s%nJOIN %s %s ON %s.%s = %s.%s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE.toLowerCase(), someOtherTable, someOtherTable.toLowerCase(), someOtherTable, SOME_KEY, SOME_TABLE, SOME_OTHER_KEY, SOME_WHERE_KEY, SOME_OTHER_KEY);
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
@@ -67,9 +68,9 @@ class QueryBuilderTest {
         String SOME_ALIAS = "someAlias";
         String SOME_OTHER_ALIAS = "someOtherAlias";
 
-        ArrayList<Pair<String, String>> someColumnsAndAliases = new ArrayList<>(List.of(new Pair<>(SOME_KEY, SOME_ALIAS), new Pair<>(SOME_OTHER_KEY, SOME_OTHER_ALIAS)));
+        ArrayList<ColumnNameAndAlias> someColumnsAndAliases = new ArrayList<>(List.of(new ColumnNameAndAlias(SOME_KEY, SOME_ALIAS), new ColumnNameAndAlias(SOME_OTHER_KEY, SOME_OTHER_ALIAS)));
 
-        String expectedQuery = String.format("SELECT %s AS %s, %s AS %s FROM %s %s WHERE %s = ? AND %s = ?;", SOME_KEY, SOME_ALIAS, SOME_OTHER_KEY, SOME_OTHER_ALIAS, SOME_TABLE, SOME_TABLE, SOME_WHERE_KEY, SOME_OTHER_KEY);
+        String expectedQuery = String.format("SELECT%n%s AS %s, %s AS %s%nFROM %s %s WHERE %s = ? AND %s = ?;", SOME_KEY, SOME_ALIAS, SOME_OTHER_KEY, SOME_OTHER_ALIAS, SOME_TABLE, SOME_TABLE.toLowerCase(), SOME_WHERE_KEY, SOME_OTHER_KEY);
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
@@ -124,7 +125,7 @@ class QueryBuilderTest {
 
     @Test
     void buildDeleteQuery() {
-        String expectedQuery = String.format("DELETE FROM %s %s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE, SOME_WHERE_KEY, SOME_OTHER_KEY);
+        String expectedQuery = String.format("DELETE%nFROM %s %s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE.toLowerCase(), SOME_WHERE_KEY, SOME_OTHER_KEY);
 
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 

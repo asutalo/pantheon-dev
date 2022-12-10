@@ -54,6 +54,9 @@ class MySQLServiceTest {
     private SpecificFieldValueSetter<Object> mockSpecificFieldValueSetter;
 
     @Mock
+    private JoinInfo mockJoinInfo;
+
+    @Mock
     private MySqlValue mockMySqlValue;
 
     @Mock
@@ -63,10 +66,12 @@ class MySQLServiceTest {
     private Object mockObject;
 
     private LinkedList<SpecificFieldValueSetter<Object>> someSpecificFieldValueSetters;
+    private List<JoinInfo> someJoinInfos;
 
     @BeforeEach
     void setUp() {
         someSpecificFieldValueSetters = new LinkedList<>(List.of(mockSpecificFieldValueSetter, mockSpecificFieldValueSetter));
+        someJoinInfos = List.of(mockJoinInfo, mockJoinInfo);
 
         when(mockMySQLServiceFieldsProvider.getTableName(SOME_CLASS)).thenReturn(SOME_TABLE);
         when(mockMySQLServiceFieldsProvider.getInstantiator(any())).thenReturn(mockInstantiator);
@@ -76,12 +81,13 @@ class MySQLServiceTest {
 
         when(mockMySQLServiceFieldsProvider.getSpecificFieldValueSetters(any())).thenReturn(someSpecificFieldValueSetters);
         when(mockMySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(any())).thenReturn(new LinkedList<>(List.of(mockFieldMySqlValue, mockFieldMySqlValue)));
-        when(mockFieldMySqlValue.getVariableName()).thenReturn(SOME_VAR).thenReturn(SOME_OTHER_VAR);
+        when(mockFieldMySqlValue.alias()).thenReturn(SOME_VAR).thenReturn(SOME_OTHER_VAR);
     }
 
     @Test
     void shouldInitializeViaTheProvider() {
         when(mockMySQLServiceFieldsProvider.getSpecificFieldValueSetters(any())).thenReturn(someSpecificFieldValueSetters);
+        when(mockMySQLServiceFieldsProvider.getJoinInfos(any())).thenReturn(someJoinInfos);
 
         MySQLService<Object> mySQLService = mySQLService();
 
@@ -93,7 +99,9 @@ class MySQLServiceTest {
         verify(mockMySQLServiceFieldsProvider).getPrimaryKeyFieldMySqlValue(SOME_CLASS);
         verify(mockMySQLServiceFieldsProvider).getTableName(SOME_CLASS);
         verify(mockMySQLServiceFieldsProvider).getNonPrimaryFieldValueSetterMap(SOME_CLASS);
-        verify(mockMySQLServiceFieldsProvider).getColumnsAndAliases(SOME_TABLE, someSpecificFieldValueSetters);
+        verify(mockMySQLServiceFieldsProvider).getColumnsAndAliases(SOME_TABLE.toLowerCase(), someSpecificFieldValueSetters, someJoinInfos);
+        verify(mockMySQLServiceFieldsProvider).getSpecificNestedFieldValueSetters(SOME_CLASS);
+        verify(mockMySQLServiceFieldsProvider).getJoinInfos(SOME_CLASS);
         verifyNoMoreInteractions(mockMySQLServiceFieldsProvider);
 
         Map<String, FieldMySqlValue<Object>> fieldMySqlValueMap = mySQLService.getFieldMySqlValueMap();

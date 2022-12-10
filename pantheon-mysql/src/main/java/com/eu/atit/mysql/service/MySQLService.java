@@ -4,44 +4,26 @@ import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.mysql.query.QueryBuilder;
 import com.eu.atit.pantheon.client.data.DataClient;
-import com.eu.atit.pantheon.helper.Pair;
 import com.eu.atit.pantheon.service.data.DataService;
 import com.google.inject.TypeLiteral;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private final Class<T> servingType;
     private Instantiator<T> instantiator;
     private FieldMySqlValue<T> primaryKeyFieldMySqlValue;
-    //todo fieldMySqlValueMap needs to include all nested fields' values
+
     private final Map<String, FieldMySqlValue<T>> fieldMySqlValueMap = new HashMap<>(); //will include primary key
-    /*
-    * used to build update/insert query from concrete POJO
-    * todo for nested inserts/updated delegate downstream from getter.apply(pojo)
-    *  new type of FieldMySqlValue required to accommodate
-    *  should be given by that POJOs fields provider and stored in this same list
-    *  remove reference to MYSQL in base function
-    * */
+
     private List<FieldMySqlValue<T>> nonPrimaryKeyFieldMySqlValues;
     /*
     * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
     * */
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
-    private ArrayList<Pair<String, String>> columnsAndAliases;
-    /*
-    * used to set values on a newly created pojo
-    * todo same as above but more tricky
-    *  essentially the accept should accept the whole results map which sucks
-    *  should then defer to the DataService for that object type to actually perform the insertion
-    *  main issue this particular FieldValueSetter should be tied to foreign key but return a POJO instead....
-    * */
+    private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
+    private ArrayList<ColumnNameAndAlias> columnsAndAliases;
     private Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
     private final MySqlClient mySqlClient;
     /*
@@ -49,6 +31,9 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     * */
     private FieldValueSetter<T> primaryKeyFieldValueSetter;
     private String tableName;
+
+    //full traversal down all EAGER nested classes
+    private List<JoinInfo> joinInfos;
 
     MySQLService(DataClient mySqlClient, TypeLiteral<T> typeLiteral) {
         this.mySqlClient = (MySqlClient) mySqlClient;
@@ -97,9 +82,17 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     @Override
     public QueryBuilder filteredSelect() {
+
+        //todo convert into 2 functions to avoid if check
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.select(columnsAndAliases);
         queryBuilder.from(tableName);
+
+        if(!joinInfos.isEmpty()){
+            for (JoinInfo joinInfo : joinInfos) {
+                queryBuilder.join(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
+            }
+        }
 
         return queryBuilder;
     }
@@ -184,11 +177,16 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return queryBuilder;
     }
 
-    private T fullInstanceOfT(Map<String, Object> row) {
+     T fullInstanceOfT(Map<String, Object> row) {
         T instance = instantiator.get();
 
         specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));
 
+        if(!specificNestedFieldValueSetters.isEmpty()){
+            for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : specificNestedFieldValueSetters) {
+                specificNestedFieldValueSetter.accept(instance, row);
+            }
+        }
         return instance;
     }
 
@@ -210,16 +208,34 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(servingType);
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(servingType);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(servingType);
+        specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(servingType);
+        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(servingType);
 
-        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName, specificFieldValueSetters);
+        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
 
-        fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.getVariableName(), primaryKeyFieldMySqlValue);
-        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> fieldMySqlValueMap.put(fieldMySqlValue.getVariableName(), fieldMySqlValue));
+        fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
+        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> fieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
 
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(servingType);
     }
 
-    ArrayList<Pair<String, String>> columnsAndAliases() {
+    FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue() {
+        return primaryKeyFieldMySqlValue;
+    }
+
+    List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters() {
+        return specificFieldValueSetters;
+    }
+
+    String getTableName() {
+        return tableName;
+    }
+
+    ArrayList<ColumnNameAndAlias> columnsAndAliases() {
         return columnsAndAliases;
+    }
+
+    List<JoinInfo> getJoinInfos() {
+        return joinInfos;
     }
 }

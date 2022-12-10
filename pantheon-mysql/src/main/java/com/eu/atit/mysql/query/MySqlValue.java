@@ -40,12 +40,31 @@ public class MySqlValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         MySqlValue that = (MySqlValue) o;
-        return paramIndex == that.paramIndex && mysqlType == that.mysqlType && Objects.equals(key, that.key) && Objects.equals(value, that.value);
+
+        if (paramIndex != that.paramIndex) return false;
+        if (mysqlType != that.mysqlType) return false;
+        if (!Objects.equals(key, that.key)) return false;
+        return Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mysqlType, key, value, paramIndex);
+        int result = mysqlType != null ? mysqlType.hashCode() : 0;
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + paramIndex;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "MySqlValue{" +
+                "mysqlType=" + mysqlType +
+                ", key='" + key + '\'' +
+                ", value=" + value +
+                ", paramIndex=" + paramIndex +
+                '}';
     }
 }

@@ -20,7 +20,7 @@ class JoinTest {
     @Test
     void apply() {
         String query = "query";
-        String expectedQuery = query + Join.JOIN + "someTable someTable" + Join.ON + "someTable.someKey" + Join.EQUALS + "someOtherTable.someOtherKey";
+        String expectedQuery = query + Join.JOIN + "someTable sometable" + Join.ON + "someTable.someKey" + Join.EQUALS + "someOtherTable.someOtherKey";
 
         assertEquals(expectedQuery, join.apply(query));
     }

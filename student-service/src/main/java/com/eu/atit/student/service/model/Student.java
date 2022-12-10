@@ -10,9 +10,11 @@ public final class Student {
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
-    @Nested(outward = true, link = "type_id")
+    @Nested(outward = true)
     private Type type;
-//    private Diploma diploma;
+
+    @Nested(inward = true)
+    private Diploma diploma;
 //    private List<Course> courses;
 
 //    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
@@ -23,12 +25,14 @@ public final class Student {
 //        this.courses = courses;
 //    }
 
+
     @Override
     public String toString() {
         return "Student{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", type=" + type +
+                ", diploma=" + diploma +
                 '}';
     }
 }

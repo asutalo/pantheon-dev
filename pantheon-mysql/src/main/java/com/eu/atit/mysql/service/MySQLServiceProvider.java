@@ -13,7 +13,7 @@ public class MySQLServiceProvider extends DataServiceProvider {
     @Override
     public MySQLService<?> provide(TypeLiteral<?> servingType) {
         MySQLService<?> mySQLService = mySQLService(servingType);
-        mySQLService.init(new MySQLServiceFieldsProvider());
+        mySQLService.init(new MySQLServiceFieldsProvider(this));
         return mySQLService;
     }
 

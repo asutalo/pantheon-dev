@@ -1,18 +1,18 @@
 package com.eu.atit.mysql.query;
 
-import com.eu.atit.pantheon.helper.Pair;
+import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class SelectWithAliases extends KeyWord implements QueryPart {
-    static final String SELECT = "SELECT ";
+    static final String SELECT = "SELECT" + System.lineSeparator();
     static final String AS = " AS ";
     static final String SEPARATOR = ", ";
-    private final List<Pair<String, String>> columnsAndAliases;
+    private final List<ColumnNameAndAlias> columnsAndAliases;
 
-    public SelectWithAliases(List<Pair<String, String>> columnsAndAliases) {
+    public SelectWithAliases(List<ColumnNameAndAlias> columnsAndAliases) {
         this.columnsAndAliases = new ArrayList<>(columnsAndAliases);
     }
 
@@ -20,19 +20,19 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     public String apply(String query) {
         StringBuilder selectionStringBuilder = new StringBuilder(query.concat(SELECT));
 
-        Pair<String, String> columnAndAlias = columnsAndAliases.get(0);
+        ColumnNameAndAlias columnAndAlias = columnsAndAliases.get(0);
 
-        selectionStringBuilder.append(columnAndAlias.left());
+        selectionStringBuilder.append(columnAndAlias.fieldName());
         selectionStringBuilder.append(AS);
-        selectionStringBuilder.append(columnAndAlias.right());
+        selectionStringBuilder.append(columnAndAlias.alias());
 
         columnsAndAliases.remove(0);
 
-        for (Pair<String, String> cAndA : columnsAndAliases) {
+        for (ColumnNameAndAlias cAndA : columnsAndAliases) {
             selectionStringBuilder.append(SEPARATOR);
-            selectionStringBuilder.append(cAndA.left());
+            selectionStringBuilder.append(cAndA.fieldName());
             selectionStringBuilder.append(AS);
-            selectionStringBuilder.append(cAndA.right());
+            selectionStringBuilder.append(cAndA.alias());
         }
         return selectionStringBuilder.toString();
     }

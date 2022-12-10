@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.mysql.service.ColumnNameAndAlias;
 import com.eu.atit.pantheon.helper.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class SelectWithAliasesTest {
     private static final String SOME_OTHER_COL = "someOtherCol";
     private static final String SOME_OTHER_ALIAS = "someOtherAlias";
 
-    private static final ArrayList<Pair<String, String>> SOME_COLUMNS_AND_ALIASES = new ArrayList<>(List.of(new Pair<>(SOME_COL, SOME_ALIAS), new Pair<>(SOME_OTHER_COL, SOME_OTHER_ALIAS)));
+    private static final ArrayList<ColumnNameAndAlias> SOME_COLUMNS_AND_ALIASES = new ArrayList<>(List.of(new ColumnNameAndAlias(SOME_COL, SOME_ALIAS), new ColumnNameAndAlias(SOME_OTHER_COL, SOME_OTHER_ALIAS)));
 
     @Test
     void apply() {

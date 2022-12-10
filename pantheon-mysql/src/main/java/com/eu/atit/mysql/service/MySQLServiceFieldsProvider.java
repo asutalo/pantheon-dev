@@ -1,7 +1,8 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
-import com.eu.atit.pantheon.helper.Pair;
+import com.eu.atit.pantheon.annotation.data.Nested;
+import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -16,6 +17,12 @@ class MySQLServiceFieldsProvider {
     static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
     static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
     static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor";
+    static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
+    private final MySQLServiceProvider mySQLServiceProvider;
+
+    public MySQLServiceFieldsProvider(MySQLServiceProvider mySQLServiceProvider) {
+        this.mySQLServiceProvider = mySQLServiceProvider;
+    }
 
     <T> String getTableName(Class<T> tClass) {
         return tClass.getSimpleName();
@@ -37,13 +44,13 @@ class MySQLServiceFieldsProvider {
         for (Field field : getDeclaredSqlFields(tClass)) {
             field.setAccessible(true);
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-
+            String tableName = getTableName(tClass).toLowerCase();
             if (!mySqlFieldInfo.primary()) {
                 String fieldName = mySqlFieldInfo.column();
                 if (fieldName.isBlank()) {
-                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type()));
+                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type(), tableName));
                 } else {
-                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName));
+                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName, tableName));
                 }
             }
         }
@@ -51,9 +58,55 @@ class MySQLServiceFieldsProvider {
         return getters;
     }
 
+    public <T> List<JoinInfo> getJoinInfos(Class<T> tClass) {
+        List<JoinInfo> joinInfos = new ArrayList<>();
+
+        for (Field field : getDeclaredNestedFields(tClass)) {
+            Nested nestingInfo = field.getAnnotation(Nested.class);
+            String link = nestingInfo.link();
+            MySQLService<?> nestedService = mySQLServiceProvider.provide(TypeLiteral.get(field.getType()));
+
+            if (nestingInfo.outward()==nestingInfo.inward()){
+                throw new RuntimeException(NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR);
+            }
+
+            String foreignKey;
+
+
+            String targetTableLowercase = nestedService.getTableName().toLowerCase();
+            List<ColumnNameAndAlias> columnNameAndAliases = nestedService.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
+            if(nestingInfo.outward()){
+                if (link.isBlank()) {
+                    foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName();
+                } else {
+                    foreignKey = link;
+                }
+
+                joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableName(tClass).toLowerCase(), foreignKey, columnNameAndAliases));
+            }
+
+            if (nestingInfo.inward()){
+                if (link.isBlank()) {
+                    foreignKey = tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
+                } else {
+                    foreignKey = link;
+                }
+
+                joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+            }
+
+            if(nestingInfo.eager()){
+                joinInfos.addAll(nestedService.getJoinInfos());
+            }
+        }
+
+
+        return joinInfos;
+    }
+
     <T> List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters(Class<T> tClass) {
         List<SpecificFieldValueSetter<T>> setters = new ArrayList<>();
-        String tableName = getTableName(tClass);
+        String tableName = getTableName(tClass).toLowerCase();
         for (Field field : getDeclaredSqlFields(tClass)) {
             field.setAccessible(true);
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
@@ -69,6 +122,16 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
+    public <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass) {
+        List<SpecificNestedFieldValueSetter<T>> setters = new ArrayList<>();
+        for (Field field : getDeclaredNestedFields(tClass)) {
+            field.setAccessible(true);
+            setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(field.getType()))));
+        }
+
+        return setters;
+    }
+
     <T> FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
         for (Field field : getDeclaredSqlFields(tClass)) {
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
@@ -77,10 +140,11 @@ class MySQLServiceFieldsProvider {
                 field.setAccessible(true);
 
                 String fieldName = mySqlFieldInfo.column();
+                String tableName = getTableName(tClass).toLowerCase();
                 if (fieldName.isBlank()) {
-                    return new FieldMySqlValue<>(field, mySqlFieldInfo.type());
+                    return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), tableName);
                 } else {
-                    return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName);
+                    return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName, tableName);
                 }
             }
         }
@@ -127,6 +191,10 @@ class MySQLServiceFieldsProvider {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
     }
 
+    private <T> List<Field> getDeclaredNestedFields(Class<T> tClass) {
+        return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null).collect(Collectors.toList());
+    }
+
     <T> Map<String, FieldValueSetter<T>> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
         Map<String, FieldValueSetter<T>> map = new HashMap<>();
 
@@ -146,19 +214,14 @@ class MySQLServiceFieldsProvider {
         return map;
     }
 
-    public <T> ArrayList<Pair<String, String>> getColumnsAndAliases(List<SpecificFieldValueSetter<T>> specificFieldValueSetters) {
-        ArrayList<Pair<String, String>> columnsAndAliases = new ArrayList<>();
+    public <T> ArrayList<ColumnNameAndAlias> getColumnsAndAliases(String tableName, List<SpecificFieldValueSetter<T>> specificFieldValueSetters, List<JoinInfo> joinInfos) {
+        ArrayList<ColumnNameAndAlias> columnsAndAliases = new ArrayList<>();
         for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
-            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias());
+            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias2(tableName));
         }
 
-        return columnsAndAliases;
-    }
-
-    public <T> ArrayList<Pair<String, String>> getColumnsAndAliases(String tableName, List<SpecificFieldValueSetter<T>> specificFieldValueSetters) {
-        ArrayList<Pair<String, String>> columnsAndAliases = new ArrayList<>();
-        for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
-            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableName));
+        for (JoinInfo joinInfo : joinInfos) {
+            columnsAndAliases.addAll(joinInfo.fieldNameAndAliases());
         }
 
         return columnsAndAliases;

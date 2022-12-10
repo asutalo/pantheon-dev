@@ -44,6 +44,10 @@ class SpecificFieldValueSetter<T> implements BiConsumer<T, Map<String, Object>> 
         return new Pair<>(tableName + "." + fieldName, aliasFieldName);
     }
 
+    ColumnNameAndAlias fieldNameAndAlias2(String tableName) {
+        return new ColumnNameAndAlias(tableName + "." + fieldName, aliasFieldName);
+    }
+
     private String alias(String fieldName, String tableName) {
         return tableName.concat("_").concat(fieldName);
     }

@@ -19,7 +19,7 @@ class FromTest {
 
     @Test
     void apply() {
-        String expectedQuery = SOME_QUERY + FROM + SOME_TABLE + SPACE + SOME_TABLE;
+        String expectedQuery = SOME_QUERY + FROM + SOME_TABLE + SPACE + SOME_TABLE.toLowerCase();
 
         assertEquals(expectedQuery, from().apply(SOME_QUERY));
     }

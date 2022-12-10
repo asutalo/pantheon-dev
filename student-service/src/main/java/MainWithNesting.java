@@ -1,7 +1,7 @@
 import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.query.QueryBuilder;
-import com.eu.atit.pantheon.helper.Pair;
+import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ public class MainWithNesting {
 
     private static QueryBuilder selectAll() {
         QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select(new ArrayList<>(List.of(new Pair<>("student.name", "student_name"), new Pair<>("type.name", "type_name"))));
+        queryBuilder.select(new ArrayList<>(List.of(new ColumnNameAndAlias("student.name", "student_name"), new ColumnNameAndAlias("type.name", "type_name"))));
         queryBuilder.from("student");
         queryBuilder.join("type", "id", "student", "id");
         return queryBuilder;

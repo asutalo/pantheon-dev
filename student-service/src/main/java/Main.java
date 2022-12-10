@@ -2,6 +2,7 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
+import com.eu.atit.student.service.model.Student;
 import com.eu.atit.student.service.model.Type;
 import com.google.inject.TypeLiteral;
 
@@ -20,6 +21,15 @@ public class Main {
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
         MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
+        MySQLService<Student> studentMySQLService = (MySQLService<Student>) mySQLServiceProvider.provide(TypeLiteral.get(Student.class));
+
+        studentMySQLService.getAll().forEach(System.out::println);
+
+
+//        typeExamples(mySQLServiceProvider);
+    }
+
+    private static void typeExamples(MySQLServiceProvider mySQLServiceProvider) throws SQLException {
         MySQLService<Type> typeMySQLService = (MySQLService<Type>) mySQLServiceProvider.provide(TypeLiteral.get(Type.class));
 
         //fetch all
@@ -29,6 +39,10 @@ public class Main {
         Type newType = new Type("testType");
         typeMySQLService.save(newType);
         System.out.println(typeMySQLService.getAll());
+
+        //update new row
+        newType.setName("new type name");
+        typeMySQLService.update(newType);
 
         //delete by reference
         typeMySQLService.delete(newType);
@@ -40,7 +54,7 @@ public class Main {
 
         System.out.println(typeMySQLService.getAll());
 
-        typeMySQLService.delete(typeMySQLService.get(Map.of("id", otherNewType.id())));
+        typeMySQLService.delete(typeMySQLService.get(Map.of("type.id", otherNewType.id())));
         System.out.println(typeMySQLService.getAll());
     }
 }

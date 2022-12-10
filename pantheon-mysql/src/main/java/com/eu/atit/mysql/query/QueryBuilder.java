@@ -1,6 +1,6 @@
 package com.eu.atit.mysql.query;
 
-import com.eu.atit.pantheon.helper.Pair;
+import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +21,8 @@ public class QueryBuilder {
         queryParts.add(new SelectAll());
     }
 
-    public void select(ArrayList<Pair<String, String>> columnsAndAliases) {
+
+    public void select(ArrayList<ColumnNameAndAlias> columnsAndAliases) {
         queryParts.add(new SelectWithAliases(columnsAndAliases));
     }
 
