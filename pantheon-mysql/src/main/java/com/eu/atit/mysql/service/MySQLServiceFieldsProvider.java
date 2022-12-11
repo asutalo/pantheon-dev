@@ -71,7 +71,12 @@ class MySQLServiceFieldsProvider {
 
 
             String targetTableLowercase = nestedService.getTableName().toLowerCase();
-            List<ColumnNameAndAlias> columnNameAndAliases = nestedService.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
+            List<ColumnNameAndAlias> columnNameAndAliases;
+            if(nestingInfo.eager()){
+                columnNameAndAliases = nestedService.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
+            } else {
+                columnNameAndAliases = List.of(nestedService.getPrimaryKeyValueSetter().fieldNameAndAlias2(targetTableLowercase));
+            }
             if(nestingInfo.outward()){
                 if (link.isBlank()) {
                     foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName();

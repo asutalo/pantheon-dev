@@ -22,16 +22,16 @@ public class Main {
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
         MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
-        MySQLService<Student> studentMySQLService = (MySQLService<Student>) mySQLServiceProvider.provide(TypeLiteral.get(Student.class));
+//        MySQLService<Student> studentMySQLService = (MySQLService<Student>) mySQLServiceProvider.provide(TypeLiteral.get(Student.class));
 
-        studentMySQLService.getAll().forEach(System.out::println);
+//        studentMySQLService.getAll().forEach(System.out::println);
 
         MySQLService<Diploma> diplomaMySQLService = (MySQLService<Diploma>) mySQLServiceProvider.provide(TypeLiteral.get(Diploma.class));
-
+//
         diplomaMySQLService.getAll().forEach(System.out::println);
-
-
-        typeExamples(mySQLServiceProvider);
+//
+//
+//        typeExamples(mySQLServiceProvider);
     }
 
     private static void typeExamples(MySQLServiceProvider mySQLServiceProvider) throws SQLException {

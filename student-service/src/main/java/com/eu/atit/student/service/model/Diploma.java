@@ -7,10 +7,8 @@ import com.mysql.cj.MysqlType;
 
 public final class Diploma {
     @MySqlField(type = MysqlType.INT, primary = true)
-
     private int id;
     @MySqlField(type = MysqlType.BOOLEAN)
-
     private Boolean obtained;
 
     @Nested(outward = true)

@@ -42,6 +42,10 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         this.servingType = (Class<T>) typeLiteral.getType();
     }
 
+    SpecificFieldValueSetter<T> getPrimaryKeyValueSetter() {
+        return primaryKeyValueSetter;
+    }
+
     @Override
     public void update(T toUpdate) throws SQLException {
         LinkedList<MySqlValue> mySqlValues = mySqlValues(toUpdate);

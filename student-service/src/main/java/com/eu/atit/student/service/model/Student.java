@@ -4,13 +4,13 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
-public final class Student {
+public class Student {
     @MySqlField(type = MysqlType.INT, primary = true)
     private int id;
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
-    @Nested(outward = true)
+    @Nested(outward = true, eager = true)
     private Type type;
 
     @Nested(inward = true)
