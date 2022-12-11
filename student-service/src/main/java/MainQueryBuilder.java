@@ -13,18 +13,33 @@ public class MainQueryBuilder {
     static final String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
 
     public static void main(String[] args) throws SQLException {
-        LinkedList<String> dbParams = new LinkedList<>(List.of("some_db_name", "some_db_user", "some_Password", "some_db_user@localhost"));
+        LinkedList<String> dbParams = new LinkedList<>(List.of("student_service", "student_service_user", "devuser", "student_service_user@localhost"));
 
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
 
-        System.out.println("selected all: " + dataClient.executeSelectQuery(selectAll()));
 
-        int insertedId = dataClient.executeInsertQuery(insertNewElement());
-        System.out.println("inserted new element with id:" + insertedId);
-        System.out.println("selected all after insert: " + dataClient.executeSelectQuery(selectAll()));
+        //select *
+        //from student
+        //join student_course sc on student.id = sc.student_id
+        //join course c on c.id = sc.course_id;
 
-        dataClient.executeOtherDmlQuery(deleteById(insertedId));
-        System.out.println("selected all after delete: " + dataClient.executeSelectQuery(selectAll()));
+        QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.selectAll();
+        queryBuilder.from("student");
+        queryBuilder.join("student_course", "student_id", "student", "id");
+        queryBuilder.join("course", "id", "student_course", "course_id");
+
+        System.out.println(dataClient.executeSelectQuery(queryBuilder));
+
+
+//        System.out.println("selected all: " + dataClient.executeSelectQuery(selectAll()));
+//
+//        int insertedId = dataClient.executeInsertQuery(insertNewElement());
+//        System.out.println("inserted new element with id:" + insertedId);
+//        System.out.println("selected all after insert: " + dataClient.executeSelectQuery(selectAll()));
+//
+//        dataClient.executeOtherDmlQuery(deleteById(insertedId));
+//        System.out.println("selected all after delete: " + dataClient.executeSelectQuery(selectAll()));
     }
 
     private static QueryBuilder deleteById(int insertedId) {
