@@ -4,7 +4,6 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
-import java.util.Objects;
 
 public final class Diploma {
     @MySqlField(type = MysqlType.INT, primary = true)
@@ -12,7 +11,7 @@ public final class Diploma {
     private int id;
     @MySqlField(type = MysqlType.BOOLEAN)
 
-    private boolean obtained;
+    private Boolean obtained;
 
     @Nested(outward = true)
     private Student student;
@@ -22,6 +21,7 @@ public final class Diploma {
         return "Diploma{" +
                 "id=" + id +
                 ", obtained=" + obtained +
+                ", student=" + student +
                 '}';
     }
 }

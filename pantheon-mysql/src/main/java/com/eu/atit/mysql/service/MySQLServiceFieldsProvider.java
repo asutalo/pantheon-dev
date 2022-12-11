@@ -6,11 +6,7 @@ import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class MySQLServiceFieldsProvider {
@@ -60,6 +56,7 @@ class MySQLServiceFieldsProvider {
 
     public <T> List<JoinInfo> getJoinInfos(Class<T> tClass) {
         List<JoinInfo> joinInfos = new ArrayList<>();
+        List<JoinInfo> uniqueJoinInfos = new ArrayList<>();
 
         for (Field field : getDeclaredNestedFields(tClass)) {
             Nested nestingInfo = field.getAnnotation(Nested.class);
@@ -95,9 +92,30 @@ class MySQLServiceFieldsProvider {
                 joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
             }
 
-            if(nestingInfo.eager()){
-                joinInfos.addAll(nestedService.getJoinInfos());
+            List<JoinInfo> nestedJoins = nestedService.getJoinInfos();
+            if (nestedJoins != null)
+                joinInfos.addAll(nestedJoins);
+
+
+            for (int i = 0; i < joinInfos.size(); i++) {
+                JoinInfo checking = joinInfos.get(i);
+                boolean unique = true;
+                for (int j = 1; j < joinInfos.size()-1; j++) {
+                    JoinInfo against = joinInfos.get(j);
+                    String checkingSource = checking.sourceTableName().toLowerCase().concat(".").concat(checking.sourceId());
+                    String againstTarget = against.targetTableLowercase().concat(".").concat(against.targetId());
+
+                    if (checkingSource.equals(againstTarget)){
+                        unique = false;
+                        break;
+                    }
+                }
+
+                if (unique) {
+                    uniqueJoinInfos.add(checking);
+                }
             }
+
         }
 
 
@@ -120,6 +138,28 @@ class MySQLServiceFieldsProvider {
         }
 
         return setters;
+    }
+
+    <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
+        SpecificFieldValueSetter<T> setter = null;
+        String tableName = getTableName(tClass).toLowerCase();
+        for (Field field : getDeclaredSqlFields(tClass)) {
+            field.setAccessible(true);
+            MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+
+            if (mySqlFieldInfo.primary()){
+                String fieldName = mySqlFieldInfo.column();
+                if (fieldName.isBlank()) {
+                    setter = (new SpecificFieldValueSetter<>(field, tableName));
+                } else {
+                    setter = (new SpecificFieldValueSetter<>(field, fieldName, tableName));
+                }
+
+                break;
+            }
+        }
+
+        return setter;
     }
 
     public <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass) {

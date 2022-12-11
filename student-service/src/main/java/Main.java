@@ -2,6 +2,7 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
+import com.eu.atit.student.service.model.Diploma;
 import com.eu.atit.student.service.model.Student;
 import com.eu.atit.student.service.model.Type;
 import com.google.inject.TypeLiteral;
@@ -25,8 +26,12 @@ public class Main {
 
         studentMySQLService.getAll().forEach(System.out::println);
 
+        MySQLService<Diploma> diplomaMySQLService = (MySQLService<Diploma>) mySQLServiceProvider.provide(TypeLiteral.get(Diploma.class));
 
-//        typeExamples(mySQLServiceProvider);
+        diplomaMySQLService.getAll().forEach(System.out::println);
+
+
+        typeExamples(mySQLServiceProvider);
     }
 
     private static void typeExamples(MySQLServiceProvider mySQLServiceProvider) throws SQLException {

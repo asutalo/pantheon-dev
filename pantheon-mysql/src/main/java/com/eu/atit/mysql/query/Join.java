@@ -23,7 +23,7 @@ public class Join extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(JOIN).concat(targetTableName).concat(SPACE).concat(targetTableNameLowercase).concat(ON).concat(targetTableName).concat(DOT).concat(targetId).concat(EQUALS).concat(sourceTableName).concat(DOT).concat(sourceId);
+        return query.concat(JOIN).concat(targetTableName).concat(SPACE).concat(targetTableNameLowercase).concat(ON).concat(targetTableNameLowercase).concat(DOT).concat(targetId).concat(EQUALS).concat(sourceTableName).concat(DOT).concat(sourceId);
     }
 
     @Override

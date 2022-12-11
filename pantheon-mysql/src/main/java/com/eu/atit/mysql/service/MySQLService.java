@@ -4,6 +4,7 @@ import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.mysql.query.QueryBuilder;
 import com.eu.atit.pantheon.client.data.DataClient;
+import com.eu.atit.pantheon.helper.Pair;
 import com.eu.atit.pantheon.service.data.DataService;
 import com.google.inject.TypeLiteral;
 
@@ -22,6 +23,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
     * */
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
+    private SpecificFieldValueSetter<T> primaryKeyValueSetter;
     private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
     private ArrayList<ColumnNameAndAlias> columnsAndAliases;
     private Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
@@ -89,8 +91,17 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         queryBuilder.from(tableName);
 
         if(!joinInfos.isEmpty()){
+            List<String> mixes = new ArrayList<>();
             for (JoinInfo joinInfo : joinInfos) {
-                queryBuilder.join(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
+
+                String x = joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId())) + " = " + joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId());
+                String y = joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId()) + " = " + joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId()));
+
+                if (!mixes.contains(x) && !mixes.contains(y)) {
+                    mixes.add(x);
+                    mixes.add(y);
+                    queryBuilder.join(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
+                }
             }
         }
 
@@ -203,6 +214,13 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return instance;
     }
 
+     T primaryInstanceOfT(Map<String, Object> row) {
+        T instance = instantiator.get();
+
+         primaryKeyValueSetter.accept(instance, row);
+        return instance;
+    }
+
     Map<String, FieldMySqlValue<T>> getFieldMySqlValueMap() {
         return fieldMySqlValueMap;
     }
@@ -221,6 +239,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(servingType);
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(servingType);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(servingType);
+        primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(servingType);
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(servingType);
         joinInfos = mySQLServiceFieldsProvider.getJoinInfos(servingType);
 
