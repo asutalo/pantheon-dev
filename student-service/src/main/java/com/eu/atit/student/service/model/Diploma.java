@@ -14,8 +14,8 @@ public final class Diploma {
 
     private boolean obtained;
 
-//    @Nested(outward = true)
-//    private Student student;
+    @Nested(outward = true)
+    private Student student;
 
     @Override
     public String toString() {

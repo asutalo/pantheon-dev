@@ -184,7 +184,20 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
         if(!specificNestedFieldValueSetters.isEmpty()){
             for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : specificNestedFieldValueSetters) {
-                specificNestedFieldValueSetter.accept(instance, row);
+                specificNestedFieldValueSetter.accept(instance, row, new ArrayList<>(List.of(servingType)));
+            }
+        }
+        return instance;
+    }
+
+     T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
+        T instance = instantiator.get();
+
+        specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));
+
+        if(!specificNestedFieldValueSetters.isEmpty()){
+            for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : specificNestedFieldValueSetters) {
+                specificNestedFieldValueSetter.accept(instance, row, observedClasses);
             }
         }
         return instance;

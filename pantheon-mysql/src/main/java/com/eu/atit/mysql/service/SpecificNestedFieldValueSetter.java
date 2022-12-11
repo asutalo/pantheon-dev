@@ -1,12 +1,10 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.pantheon.helper.Pair;
-
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
-class SpecificNestedFieldValueSetter<T> implements BiConsumer<T, Map<String, Object>> {
+class SpecificNestedFieldValueSetter<T> {
     private final FieldValueSetter<T> fieldValueSetter;
     private final MySQLService<?> service;
 
@@ -15,8 +13,10 @@ class SpecificNestedFieldValueSetter<T> implements BiConsumer<T, Map<String, Obj
         this.service = service;
     }
 
-    @Override
-    public void accept(T setFieldOn, Map<String, Object> row) {
-        fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row));
+    public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
+        if (!observedClasses.contains(fieldValueSetter.getField().getType())){
+            observedClasses.add(fieldValueSetter.getField().getType());
+            fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row, observedClasses));
+        }
     }
 }
