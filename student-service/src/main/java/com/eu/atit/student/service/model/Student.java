@@ -4,6 +4,8 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
+import java.util.List;
+
 public class Student {
     @MySqlField(type = MysqlType.INT, primary = true)
     private int id;
@@ -13,9 +15,11 @@ public class Student {
     @Nested(outward = true, eager = true)
     private Type type;
 
-    @Nested(inward = true)
+    @Nested(inward = true, eager = true)
     private Diploma diploma;
-//    private List<Course> courses;
+
+    @Nested(connection = "student_course", from = "student_id", to = "course_id", eager = true)
+    private List<Course> courses;
 
 //    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
 //        this.id = id;
@@ -33,6 +37,7 @@ public class Student {
                 ", name='" + name + '\'' +
                 ", type=" + type +
                 ", diploma=" + diploma +
+                ", courses=" + courses +
                 '}';
     }
 }

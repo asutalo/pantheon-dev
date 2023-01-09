@@ -11,7 +11,7 @@ public final class Diploma {
     @MySqlField(type = MysqlType.BOOLEAN)
     private Boolean obtained;
 
-    @Nested(outward = true)
+    @Nested(outward = true, eager = true)
     private Student student;
 
     @Override

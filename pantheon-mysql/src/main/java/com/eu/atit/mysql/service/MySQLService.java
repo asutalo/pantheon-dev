@@ -10,6 +10,7 @@ import com.google.inject.TypeLiteral;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private final Class<T> servingType;
@@ -23,6 +24,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
     * */
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
+    private List<SpecificFieldValueOverride<T>> specificFieldValueOverrides;
     private SpecificFieldValueSetter<T> primaryKeyValueSetter;
     private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
     private ArrayList<ColumnNameAndAlias> columnsAndAliases;
@@ -112,6 +114,29 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return queryBuilder;
     }
 
+    public QueryBuilder filteredSelectFunctional() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.select(columnsAndAliases);
+        queryBuilder.from(tableName);
+
+        if(!joinInfos.isEmpty()){
+            List<String> mixes = new ArrayList<>();
+            for (JoinInfo joinInfo : joinInfos) {
+
+                String x = joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId())) + " = " + joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId());
+                String y = joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId()) + " = " + joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId()));
+
+                if (!mixes.contains(x) && !mixes.contains(y)) {
+                    mixes.add(x);
+                    mixes.add(y);
+                    queryBuilder.join(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
+                }
+            }
+        }
+
+        return queryBuilder;
+    }
+
     @Override
     public T get(QueryBuilder filteredSelect) throws SQLException, IllegalStateException {
         List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
@@ -144,7 +169,30 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
             elements.add(fullInstanceOfT(row));
         }
 
-        return elements;
+        Map<Object, List<T>> collect = elements.stream().collect(Collectors.groupingBy(x -> {
+            try {
+                return primaryKeyFieldValueSetter.getField().get(x);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        List<T> elements2 = new LinkedList<>();
+
+
+        for (List<T> ts : collect.values()) {
+            T original = ts.get(0);
+
+            for (T t : ts) {
+                for (SpecificFieldValueOverride<T> specificFieldValueOverride : specificFieldValueOverrides) {
+                    specificFieldValueOverride.accept(original, t);
+                }
+            }
+
+            elements2.add(original);
+        }
+
+        return elements2;
     }
 
     @Override
@@ -243,10 +291,11 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(servingType);
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(servingType);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(servingType);
+        specificFieldValueOverrides = mySQLServiceFieldsProvider.getSpecificFieldValueOverrides(servingType);
+        primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(servingType);
         primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(servingType);
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(servingType);
         joinInfos = mySQLServiceFieldsProvider.getJoinInfos(servingType);
-
         columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
 
         fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
@@ -273,5 +322,9 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     List<JoinInfo> getJoinInfos() {
         return joinInfos;
+    }
+
+    Class<T> getServingType() {
+        return servingType;
     }
 }

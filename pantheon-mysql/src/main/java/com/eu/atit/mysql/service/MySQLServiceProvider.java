@@ -28,6 +28,17 @@ public class MySQLServiceProvider extends DataServiceProvider {
         return cachedService;
     }
 
+    public MySQLService<?> provide(TypeLiteral<?> servingType, Boolean b) {
+        MySQLService<?> cachedService = mySQLServiceMap.get(servingType);
+        if (cachedService ==null) {
+            cachedService = mySQLService(servingType);
+            mySQLServiceMap.put(servingType, cachedService);
+        }
+        cachedService.init(new MySQLServiceFieldsProvider(this));
+
+        return cachedService;
+    }
+
     MySQLService<?> mySQLService(TypeLiteral<?> dataType) {
         return new MySQLService<>(dataClient, dataType);
     }

@@ -6,6 +6,8 @@ import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,14 +58,22 @@ class MySQLServiceFieldsProvider {
 
     public <T> List<JoinInfo> getJoinInfos(Class<T> tClass) {
         List<JoinInfo> joinInfos = new ArrayList<>();
-        List<JoinInfo> uniqueJoinInfos = new ArrayList<>();
 
         for (Field field : getDeclaredNestedFields(tClass)) {
             Nested nestingInfo = field.getAnnotation(Nested.class);
             String link = nestingInfo.link();
-            MySQLService<?> nestedService = mySQLServiceProvider.provide(TypeLiteral.get(field.getType()));
+            MySQLService<?> nestedService;
 
-            if (nestingInfo.outward()==nestingInfo.inward()){
+            Type genericType = field.getGenericType();
+            boolean isList = genericType.getTypeName().contains("List");
+            if(isList){
+                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                nestedService = mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument));
+            } else {
+                nestedService = mySQLServiceProvider.provide(TypeLiteral.get(field.getType()));
+            }
+
+            if (nestingInfo.connection().isEmpty() && nestingInfo.outward()==nestingInfo.inward()){
                 throw new RuntimeException(NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR);
             }
 
@@ -72,55 +82,47 @@ class MySQLServiceFieldsProvider {
 
             String targetTableLowercase = nestedService.getTableName().toLowerCase();
             List<ColumnNameAndAlias> columnNameAndAliases;
+
             if(nestingInfo.eager()){
                 columnNameAndAliases = nestedService.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
             } else {
                 columnNameAndAliases = List.of(nestedService.getPrimaryKeyValueSetter().fieldNameAndAlias2(targetTableLowercase));
             }
-            if(nestingInfo.outward()){
-                if (link.isBlank()) {
-                    foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName();
-                } else {
-                    foreignKey = link;
+
+            if(!isList){
+                if(nestingInfo.outward()){
+                    if (link.isBlank()) {
+                        foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName();
+                    } else {
+                        foreignKey = link;
+                    }
+
+                    joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableName(tClass).toLowerCase(), foreignKey, columnNameAndAliases));
                 }
 
-                joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableName(tClass).toLowerCase(), foreignKey, columnNameAndAliases));
-            }
+                if (nestingInfo.inward()){
+                    if (link.isBlank()) {
+                        foreignKey = tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
+                    } else {
+                        foreignKey = link;
+                    }
 
-            if (nestingInfo.inward()){
-                if (link.isBlank()) {
-                    foreignKey = tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
-                } else {
-                    foreignKey = link;
+                    joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
                 }
+            } else {
+                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                String connection = nestingInfo.connection().isEmpty()?getTableName(tClass).toLowerCase().concat("_".concat(targetTableLowercase)):nestingInfo.connection();
+                String fk = nestingInfo.from().isEmpty()?actualTypeArgument.getTypeName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName():nestingInfo.from();
+                String fk2 = nestingInfo.to().isEmpty()?tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName():nestingInfo.to();
 
-                joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+                joinInfos.add(new JoinInfo(connection, connection, fk, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+                JoinInfo e = new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), connection, fk2, columnNameAndAliases);
+                joinInfos.add(e);
             }
 
             List<JoinInfo> nestedJoins = nestedService.getJoinInfos();
             if (nestedJoins != null)
                 joinInfos.addAll(nestedJoins);
-
-
-            for (int i = 0; i < joinInfos.size(); i++) {
-                JoinInfo checking = joinInfos.get(i);
-                boolean unique = true;
-                for (int j = 1; j < joinInfos.size()-1; j++) {
-                    JoinInfo against = joinInfos.get(j);
-                    String checkingSource = checking.sourceTableName().toLowerCase().concat(".").concat(checking.sourceId());
-                    String againstTarget = against.targetTableLowercase().concat(".").concat(against.targetId());
-
-                    if (checkingSource.equals(againstTarget)){
-                        unique = false;
-                        break;
-                    }
-                }
-
-                if (unique) {
-                    uniqueJoinInfos.add(checking);
-                }
-            }
-
         }
 
 
@@ -143,6 +145,28 @@ class MySQLServiceFieldsProvider {
         }
 
         return setters;
+    }
+
+    <T> List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides(Class<T> tClass) {
+        List<SpecificFieldValueOverride<T>> overrides = new ArrayList<>();
+        String tableName = getTableName(tClass).toLowerCase();
+        for (Field field : getDeclaredSqlFields(tClass)) {
+            field.setAccessible(true);
+            MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+
+            String fieldName = mySqlFieldInfo.column();
+            if (fieldName.isBlank()) {
+                overrides.add(new SpecificFieldValueOverride<>(field, tableName));
+            } else {
+                overrides.add(new SpecificFieldValueOverride<>(field, fieldName, tableName));
+            }
+        }
+        for (Field field : getDeclaredNestedFields(tClass)) {
+            field.setAccessible(true);
+                overrides.add(new SpecificFieldValueOverride<>(field, tableName));
+        }
+
+        return overrides;
     }
 
     <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
@@ -171,7 +195,27 @@ class MySQLServiceFieldsProvider {
         List<SpecificNestedFieldValueSetter<T>> setters = new ArrayList<>();
         for (Field field : getDeclaredNestedFields(tClass)) {
             field.setAccessible(true);
-            setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(field.getType()))));
+            Type genericType = field.getGenericType();
+            if(genericType.getTypeName().contains("List")){
+                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument))));
+            } else {
+                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(field.getType()))));
+            }
+        }
+
+        return setters;
+    }
+
+    public <T> List<SpecificNestedListFieldValueSetter<T>> getSpecificNestedListFieldValueSetters(Class<T> tClass) {
+        List<SpecificNestedListFieldValueSetter<T>> setters = new ArrayList<>();
+        for (Field field : getDeclaredNestedFields(tClass)) {
+            field.setAccessible(true);
+            Type genericType = field.getGenericType();
+            if(genericType.getTypeName().contains("List")){
+                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument))));
+            }
         }
 
         return setters;

@@ -2,6 +2,7 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
+import com.eu.atit.student.service.examples.UsingMySQLService;
 import com.eu.atit.student.service.model.Diploma;
 import com.eu.atit.student.service.model.Student;
 import com.eu.atit.student.service.model.Type;
@@ -20,18 +21,33 @@ public class Main {
         LinkedList<String> dbParams = new LinkedList<>(List.of("student_service", "student_service_user", "devuser", "student_service_user@localhost"));
 
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
-        MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
-//        MySQLService<Student> studentMySQLService = (MySQLService<Student>) mySQLServiceProvider.provide(TypeLiteral.get(Student.class));
+        UsingMySQLService usingMySQLService = new UsingMySQLService(dataClient);
+        System.out.println("------------------------------------------");
+        usingMySQLService.printAll(TypeLiteral.get(Student.class));
+        System.out.println("------------------------------------------");
+        usingMySQLService.printAll(TypeLiteral.get(Diploma.class));
+        System.out.println("------------------------------------------");
+        usingMySQLService.printAll(TypeLiteral.get(Type.class));
+        System.out.println("------------------------------------------");
 
-//        studentMySQLService.getAll().forEach(System.out::println);
+        Type newType = new Type("testType");
+        usingMySQLService.save(newType);
 
-        MySQLService<Diploma> diplomaMySQLService = (MySQLService<Diploma>) mySQLServiceProvider.provide(TypeLiteral.get(Diploma.class));
-//
-        diplomaMySQLService.getAll().forEach(System.out::println);
-//
-//
-//        typeExamples(mySQLServiceProvider);
+
+        newType.setName("new type name");
+        usingMySQLService.update(newType);
+
+        usingMySQLService.delete(newType);
+
+        //create, insert new, and delete by filtering
+        Type otherNewType = new Type("testTypeDeleteById");
+        usingMySQLService.save(otherNewType);
+
+        usingMySQLService.printAll(TypeLiteral.get(Type.class));
+        usingMySQLService.delete(usingMySQLService.get(Map.of("type.id", otherNewType.id()), TypeLiteral.get(Type.class)));
+
+        usingMySQLService.printAll(TypeLiteral.get(Type.class));
     }
 
     private static void typeExamples(MySQLServiceProvider mySQLServiceProvider) throws SQLException {

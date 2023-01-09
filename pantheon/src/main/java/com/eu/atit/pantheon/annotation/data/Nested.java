@@ -15,4 +15,8 @@ public @interface Nested {
     String link() default "";
 
     boolean eager() default false;
+
+    String connection() default "";
+    String from() default "";
+    String to() default "";
 }
