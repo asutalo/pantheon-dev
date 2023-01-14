@@ -68,9 +68,9 @@ class MySQLServiceFieldsProvider {
             boolean isList = genericType.getTypeName().contains("List");
             if(isList){
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                nestedService = mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument));
+                nestedService = mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument));
             } else {
-                nestedService = mySQLServiceProvider.provide(TypeLiteral.get(field.getType()));
+                nestedService = mySQLServiceProvider.provideNoCache(TypeLiteral.get(field.getType()));
             }
 
             if (nestingInfo.connection().isEmpty() && nestingInfo.outward()==nestingInfo.inward()){
@@ -198,9 +198,9 @@ class MySQLServiceFieldsProvider {
             Type genericType = field.getGenericType();
             if(genericType.getTypeName().contains("List")){
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument))));
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument))));
             } else {
-                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(field.getType()))));
+                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(field.getType()))));
             }
         }
 
@@ -214,7 +214,7 @@ class MySQLServiceFieldsProvider {
             Type genericType = field.getGenericType();
             if(genericType.getTypeName().contains("List")){
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provide(TypeLiteral.get(actualTypeArgument))));
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument))));
             }
         }
 
