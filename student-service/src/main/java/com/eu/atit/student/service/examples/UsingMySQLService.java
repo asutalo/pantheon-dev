@@ -19,7 +19,7 @@ public class UsingMySQLService  {
     }
 
     public void printAll(TypeLiteral<?> typeLiteral) throws SQLException {
-        MySQLService<?> mySQLService = mySQLServiceProvider.provide(typeLiteral, true);
+        MySQLService<?> mySQLService = mySQLServiceProvider.provide(typeLiteral);
         mySQLService.getAll().forEach(System.out::println);
     }
 
@@ -41,7 +41,7 @@ public class UsingMySQLService  {
     }
 
     public Object get(Map<String, Object> stringIntegerMap, TypeLiteral<?> typeLiteral) throws SQLException {
-        MySQLService<?> mySQLService = mySQLServiceProvider.provide(typeLiteral, true);
+        MySQLService<?> mySQLService = mySQLServiceProvider.provide(typeLiteral);
 
         return mySQLService.get(stringIntegerMap);
     }
