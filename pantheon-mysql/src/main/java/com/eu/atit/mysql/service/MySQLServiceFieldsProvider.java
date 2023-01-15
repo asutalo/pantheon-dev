@@ -62,15 +62,15 @@ class MySQLServiceFieldsProvider {
         for (Field field : getDeclaredNestedFields(tClass)) {
             Nested nestingInfo = field.getAnnotation(Nested.class);
             String link = nestingInfo.link();
-            MySQLService<?> nestedService;
+            MySQLModelDescriptor<?> nestedMySQLModelDescriptor;
 
             Type genericType = field.getGenericType();
             boolean isList = genericType.getTypeName().contains("List");
             if(isList){
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                nestedService = mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument));
+                nestedMySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(actualTypeArgument));
             } else {
-                nestedService = mySQLServiceProvider.provideNoCache(TypeLiteral.get(field.getType()));
+                nestedMySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
             }
 
             if (nestingInfo.connection().isEmpty() && nestingInfo.outward()==nestingInfo.inward()){
@@ -80,24 +80,24 @@ class MySQLServiceFieldsProvider {
             String foreignKey;
 
 
-            String targetTableLowercase = nestedService.getTableName().toLowerCase();
+            String targetTableLowercase = nestedMySQLModelDescriptor.getTableName().toLowerCase();
             List<ColumnNameAndAlias> columnNameAndAliases;
 
             if(nestingInfo.eager()){
-                columnNameAndAliases = nestedService.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
+                columnNameAndAliases = nestedMySQLModelDescriptor.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias2(targetTableLowercase)).toList();
             } else {
-                columnNameAndAliases = List.of(nestedService.getPrimaryKeyValueSetter().fieldNameAndAlias2(targetTableLowercase));
+                columnNameAndAliases = List.of(nestedMySQLModelDescriptor.getPrimaryKeyValueSetter().fieldNameAndAlias2(targetTableLowercase));
             }
 
             if(!isList){
                 if(nestingInfo.outward()){
                     if (link.isBlank()) {
-                        foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName();
+                        foreignKey = field.getType().getSimpleName().toLowerCase() + "_" + nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName();
                     } else {
                         foreignKey = link;
                     }
 
-                    joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableName(tClass).toLowerCase(), foreignKey, columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableName(tClass).toLowerCase(), foreignKey, columnNameAndAliases));
                 }
 
                 if (nestingInfo.inward()){
@@ -107,20 +107,20 @@ class MySQLServiceFieldsProvider {
                         foreignKey = link;
                     }
 
-                    joinInfos.add(new JoinInfo(nestedService.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, foreignKey, getTableName(tClass).toLowerCase(), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
                 }
             } else {
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
                 String connection = nestingInfo.connection().isEmpty()?getTableName(tClass).toLowerCase().concat("_".concat(targetTableLowercase)):nestingInfo.connection();
-                String fk = nestingInfo.from().isEmpty()?actualTypeArgument.getTypeName().toLowerCase() + "_" + nestedService.getPrimaryKeyFieldMySqlValue().getFieldName():nestingInfo.from();
+                String fk = nestingInfo.from().isEmpty()?actualTypeArgument.getTypeName().toLowerCase() + "_" + nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName():nestingInfo.from();
                 String fk2 = nestingInfo.to().isEmpty()?tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName():nestingInfo.to();
 
-                joinInfos.add(new JoinInfo(connection, connection, fk, getTableName(tClass).toLowerCase(), nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
-                JoinInfo e = new JoinInfo(nestedService.getTableName(), targetTableLowercase, nestedService.getPrimaryKeyFieldMySqlValue().getFieldName(), connection, fk2, columnNameAndAliases);
+                joinInfos.add(new JoinInfo(connection, connection, fk, getTableName(tClass).toLowerCase(), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+                JoinInfo e = new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), connection, fk2, columnNameAndAliases);
                 joinInfos.add(e);
             }
 
-            List<JoinInfo> nestedJoins = nestedService.getJoinInfos();
+            List<JoinInfo> nestedJoins = nestedMySQLModelDescriptor.getJoinInfos();
             if (nestedJoins != null)
                 joinInfos.addAll(nestedJoins);
         }
@@ -198,10 +198,17 @@ class MySQLServiceFieldsProvider {
             Type genericType = field.getGenericType();
             if(genericType.getTypeName().contains("List")){
                 Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument))));
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(actualTypeArgument))));
             } else {
-                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(field.getType()))));
+                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(field.getType()))));
             }
+//            if(genericType.getTypeName().contains("List")){
+//                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+//                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.mySQLService(mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(actualTypeArgument)))));
+//            } else {
+//                MySQLModelDescriptor<?> mySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
+//                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.mySQLService(mySQLModelDescriptor)));
+//            }
         }
 
         return setters;
