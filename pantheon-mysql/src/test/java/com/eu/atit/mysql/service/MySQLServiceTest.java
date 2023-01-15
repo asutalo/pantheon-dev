@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,13 +21,7 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MySQLServiceTest {
@@ -102,6 +97,8 @@ class MySQLServiceTest {
         verify(mockMySQLServiceFieldsProvider).getColumnsAndAliases(SOME_TABLE.toLowerCase(), someSpecificFieldValueSetters, someJoinInfos);
         verify(mockMySQLServiceFieldsProvider).getSpecificNestedFieldValueSetters(SOME_CLASS);
         verify(mockMySQLServiceFieldsProvider).getJoinInfos(SOME_CLASS);
+        verify(mockMySQLServiceFieldsProvider).getSpecificFieldValueOverrides(SOME_CLASS);
+        verify(mockMySQLServiceFieldsProvider).getPrimaryKeyValueSetter(SOME_CLASS);
         verifyNoMoreInteractions(mockMySQLServiceFieldsProvider);
 
         Map<String, FieldMySqlValue<Object>> fieldMySqlValueMap = mySQLService.getFieldMySqlValueMap();
@@ -235,7 +232,7 @@ class MySQLServiceTest {
     @Nested
     class GetAll {
         @Test
-        void shouldUseFilteredSelectToFetchAllElements() throws SQLException {
+        void shouldUseFilteredSelectToFetchAllElements() throws SQLException, IllegalAccessException {
             List<Map<String, Object>> multipleRows = List.of(Map.of(), Map.of());
 
             int expectedNumberOfElements = 2;
@@ -243,6 +240,7 @@ class MySQLServiceTest {
 
             when(mockInstantiator.get()).thenReturn(mockObject).thenReturn(mockObject);
             when(mockMySqlClient.executeSelectQuery(any())).thenReturn(multipleRows);
+            when(mockFieldValueSetter.getFieldValue(mockObject)).thenReturn(1).thenReturn(2);
 
             MySQLService<Object> mySQLService = mySQLService();
 
@@ -254,15 +252,14 @@ class MySQLServiceTest {
         }
 
         @Test
-        void shouldFetchAllElements() throws SQLException {
+        void shouldFetchAllElements() throws SQLException, IllegalAccessException {
             List<Map<String, Object>> multipleRows = List.of(Map.of(), Map.of());
-
             int expectedNumberOfElements = 2;
             int expectedNumberOfSetterOperations = expectedNumberOfElements * someSpecificFieldValueSetters.size();
 
             when(mockInstantiator.get()).thenReturn(mockObject).thenReturn(mockObject);
             when(mockMySqlClient.executeSelectQuery(mockQueryBuilder)).thenReturn(multipleRows);
-
+            when(mockFieldValueSetter.getFieldValue(mockObject)).thenReturn(1).thenReturn(2);
             mySQLService().getAll(mockQueryBuilder);
 
             verify(mockMySqlClient).executeSelectQuery(mockQueryBuilder);

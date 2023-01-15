@@ -169,30 +169,29 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
             elements.add(fullInstanceOfT(row));
         }
 
-        Map<Object, List<T>> collect = elements.stream().collect(Collectors.groupingBy(x -> {
+        Map<Object, List<T>> groupedByPrimaryKey = elements.stream().collect(Collectors.groupingBy(x -> {
             try {
-                return primaryKeyFieldValueSetter.getField().get(x);
+                return primaryKeyFieldValueSetter.getFieldValue(x);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }));
 
-        List<T> elements2 = new LinkedList<>();
+        List<T> joinedElements = new LinkedList<>();
 
+        for (List<T> element : groupedByPrimaryKey.values()) {
+            T original = element.get(0);
 
-        for (List<T> ts : collect.values()) {
-            T original = ts.get(0);
-
-            for (T t : ts) {
+            for (T t : element) {
                 for (SpecificFieldValueOverride<T> specificFieldValueOverride : specificFieldValueOverrides) {
                     specificFieldValueOverride.accept(original, t);
                 }
             }
 
-            elements2.add(original);
+            joinedElements.add(original);
         }
 
-        return elements2;
+        return joinedElements;
     }
 
     @Override
@@ -293,15 +292,14 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(servingType);
         specificFieldValueOverrides = mySQLServiceFieldsProvider.getSpecificFieldValueOverrides(servingType);
         primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(servingType);
-        primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(servingType);
-        specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(servingType);
-        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(servingType);
-        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
-
         fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
         nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> fieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
-
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(servingType);
+
+        specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(servingType);
+        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(servingType);
+
+        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
     }
 
     FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue() {

@@ -207,20 +207,6 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    public <T> List<SpecificNestedListFieldValueSetter<T>> getSpecificNestedListFieldValueSetters(Class<T> tClass) {
-        List<SpecificNestedListFieldValueSetter<T>> setters = new ArrayList<>();
-        for (Field field : getDeclaredNestedFields(tClass)) {
-            field.setAccessible(true);
-            Type genericType = field.getGenericType();
-            if(genericType.getTypeName().contains("List")){
-                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideNoCache(TypeLiteral.get(actualTypeArgument))));
-            }
-        }
-
-        return setters;
-    }
-
     <T> FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
         for (Field field : getDeclaredSqlFields(tClass)) {
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);

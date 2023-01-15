@@ -47,7 +47,7 @@ class QueryBuilderTest {
     @Test
     void buildSelectAllQuery() {
         String someOtherTable = "someOtherTable";
-        String expectedQuery = String.format("SELECT *%nFROM %s %s%nJOIN %s %s ON %s.%s = %s.%s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE.toLowerCase(), someOtherTable, someOtherTable.toLowerCase(), someOtherTable, SOME_KEY, SOME_TABLE, SOME_OTHER_KEY, SOME_WHERE_KEY, SOME_OTHER_KEY);
+        String expectedQuery = String.format("SELECT *%nFROM %s %s%nJOIN %s %s ON %s.%s = %s.%s WHERE %s = ? AND %s = ?;", SOME_TABLE, SOME_TABLE.toLowerCase(), someOtherTable, someOtherTable.toLowerCase(), someOtherTable.toLowerCase(), SOME_KEY, SOME_TABLE, SOME_OTHER_KEY, SOME_WHERE_KEY, SOME_OTHER_KEY);
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();

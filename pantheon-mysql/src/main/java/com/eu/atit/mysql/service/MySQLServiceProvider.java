@@ -11,17 +11,18 @@ import java.util.Map;
 public class MySQLServiceProvider extends DataServiceProvider {
     public MySQLServiceProvider(DataClient dataClient) {
         super(dataClient);
+        serviceFieldProvider = new MySQLServiceFieldsProvider(this);
     }
 
     private final Map<TypeLiteral<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
-
+    private final MySQLServiceFieldsProvider serviceFieldProvider;
     @Override
     public MySQLService<?> provide(TypeLiteral<?> servingType) {
         MySQLService<?> cachedService = mySQLServiceMap.get(servingType);
         if (cachedService ==null) {
             cachedService = mySQLService(servingType);
             mySQLServiceMap.put(servingType, cachedService);
-            cachedService.init(new MySQLServiceFieldsProvider(this));
+            cachedService.init(serviceFieldProvider);
         }
 
         return cachedService;
@@ -31,7 +32,7 @@ public class MySQLServiceProvider extends DataServiceProvider {
         MySQLService<?> cachedService = mySQLServiceMap.get(servingType);
         if (cachedService ==null) {
             cachedService = mySQLService(servingType);
-            cachedService.init(new MySQLServiceFieldsProvider(this));
+            cachedService.init(serviceFieldProvider);
         }
 
         return cachedService;
