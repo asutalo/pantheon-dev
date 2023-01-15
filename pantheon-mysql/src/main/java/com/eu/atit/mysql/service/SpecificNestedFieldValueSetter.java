@@ -1,7 +1,5 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.pantheon.helper.Pair;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +18,7 @@ class SpecificNestedFieldValueSetter<T> {
             observedClasses.add(fieldValueSetter.getField().getType());
             fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row, observedClasses));
         } else {
-            fieldValueSetter.accept(setFieldOn, service.primaryInstanceOfT(row));
+            fieldValueSetter.accept(setFieldOn, service.lazyInstanceOfT(row));
         }
     }
 }

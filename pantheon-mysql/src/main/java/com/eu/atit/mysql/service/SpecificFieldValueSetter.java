@@ -1,7 +1,5 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.pantheon.helper.Pair;
-
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -36,15 +34,7 @@ class SpecificFieldValueSetter<T> implements BiConsumer<T, Map<String, Object>> 
         return aliasFieldName;
     }
 
-    Pair<String, String> fieldNameAndAlias() {
-        return new Pair<>(fieldName, aliasFieldName);
-    }
-
-    Pair<String, String> fieldNameAndAlias(String tableName) {
-        return new Pair<>(tableName + "." + fieldName, aliasFieldName);
-    }
-
-    ColumnNameAndAlias fieldNameAndAlias2(String tableName) {
+    ColumnNameAndAlias fieldNameAndAlias(String tableName) {
         return new ColumnNameAndAlias(tableName + "." + fieldName, aliasFieldName);
     }
 

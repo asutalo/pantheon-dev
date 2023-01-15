@@ -19,10 +19,6 @@ class FieldValueGetter<T> implements Function<T, Object> {
         this.field = field;
     }
 
-    Field getField() {
-        return field;
-    }
-
     @Override
     public Object apply(T t) {
         try {

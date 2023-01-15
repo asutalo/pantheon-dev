@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private final MySqlClient mySqlClient;
@@ -114,8 +113,9 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         T instance = mySQLModelDescriptor.getInstantiator().get();
 
         values.forEach((key, val) -> {
-            if (mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().containsKey(key)) {
-                mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key).accept(instance, val);
+            FieldValueSetter<T> fieldValueSetter = mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key);
+            if (fieldValueSetter != null) {
+                fieldValueSetter.accept(instance, val);
             }
         });
 
@@ -125,8 +125,9 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private QueryBuilder filteredSelect(Map<String, Object> filter) {
         List<MySqlValue> filterMySqlValues = new ArrayList<>();
         filter.forEach((key, val) -> {
-            if (mySQLModelDescriptor.getFieldMySqlValueMap().containsKey(key)) {
-                filterMySqlValues.add(mySQLModelDescriptor.getFieldMySqlValueMap().get(key).of(val));
+            FieldMySqlValue<T> fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key);
+            if (fieldMySqlValue != null) {
+                filterMySqlValues.add(fieldMySqlValue.of(val));
             }
         });
 
@@ -152,7 +153,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     }
 
-    T primaryInstanceOfT(Map<String, Object> row) {
+    T lazyInstanceOfT(Map<String, Object> row) {
         T instance = mySQLModelDescriptor.getInstantiator().get();
 
         mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);

@@ -14,13 +14,7 @@ class ResultSetToInstanceWithListNesting<T> extends ResultSetToInstanceWithNesti
     public List<T> getAll(List<Map<String, Object>> resultSet) {
         List<T> elements = super.getAll(resultSet);
 
-        Map<Object, List<T>> groupedByPrimaryKey = elements.stream().collect(Collectors.groupingBy(x -> {
-            try {
-                return mySQLModelDescriptor.getPrimaryKeyFieldValueSetter().getFieldValue(x);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }));
+        Map<Object, List<T>> groupedByPrimaryKey = elements.stream().collect(Collectors.groupingBy(x -> mySQLModelDescriptor.getPrimaryKeyFieldValueGetter().apply(x)));
 
         List<T> joinedElements = new LinkedList<>();
 

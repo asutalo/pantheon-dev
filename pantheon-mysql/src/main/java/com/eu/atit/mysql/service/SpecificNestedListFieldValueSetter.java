@@ -26,7 +26,7 @@ class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSett
             observedClasses.add((Class<?>) actualTypeArgument);
             fieldValueSetter.accept(setFieldOn, new ArrayList<>(List.of(service.fullInstanceOfT(row, observedClasses))));
         } else {
-            fieldValueSetter.accept(setFieldOn, new ArrayList<>(List.of(service.primaryInstanceOfT(row))));
+            fieldValueSetter.accept(setFieldOn, new ArrayList<>(List.of(service.lazyInstanceOfT(row))));
         }
     }
 }

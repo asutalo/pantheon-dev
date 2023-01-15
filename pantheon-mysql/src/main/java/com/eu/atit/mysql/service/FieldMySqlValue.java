@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * Function to convert a file/variable from an object into a MySqlValue
+ * Function to convert a variable from an object into a MySqlValue
  */
 class FieldMySqlValue<T> implements Function<T, MySqlValue> {
     private final Field field;

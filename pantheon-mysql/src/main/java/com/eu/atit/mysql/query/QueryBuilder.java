@@ -22,7 +22,7 @@ public class QueryBuilder {
     }
 
 
-    public void select(ArrayList<ColumnNameAndAlias> columnsAndAliases) {
+    public void select(List<ColumnNameAndAlias> columnsAndAliases) {
         queryParts.add(new SelectWithAliases(columnsAndAliases));
     }
 

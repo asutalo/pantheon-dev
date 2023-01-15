@@ -1,7 +1,5 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.mysql.client.MySqlClient;
-import com.eu.atit.mysql.query.QueryBuilder;
 import com.google.inject.TypeLiteral;
 
 import java.util.ArrayList;
@@ -12,26 +10,38 @@ import java.util.Map;
 public class MySQLModelDescriptor<T> {
     private final MySQLServiceFieldsProvider mySQLServiceFieldsProvider;
     private final Class<T> modelClass;
+
+    private String tableName;
+
     private Instantiator<T> instantiator;
+
+    /*
+     * only used to set ID on the pojo which is returned from here
+     * enables us to set an exact value directly onto the primary key, i.e. int obtained as a result of an insert statement
+     * */
+    private FieldValueSetter<T> primaryKeyFieldValueSetter;
+    /*
+     * used to update the primary key based on a select statement (using a map from ResultSet and column aliases)
+     * */
+    private SpecificFieldValueSetter<T> primaryKeyValueSetter;
+    private FieldValueGetter<T> primaryKeyFieldValueGetter;
+
+    // converts only primary key into MySqlValue
     private FieldMySqlValue<T> primaryKeyFieldMySqlValue;
 
-    private final Map<String, FieldMySqlValue<T>> fieldMySqlValueMap = new HashMap<>(); //will include primary key
-
     private List<FieldMySqlValue<T>> nonPrimaryKeyFieldMySqlValues;
+
+    // map of aliases pointing to each Fields' MySqlValue
+    private final Map<String, FieldMySqlValue<T>> aliasFieldMySqlValueMap = new HashMap<>();
+
     /*
      * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
      * */
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
     private List<SpecificFieldValueOverride<T>> specificFieldValueOverrides;
-    private SpecificFieldValueSetter<T> primaryKeyValueSetter;
     private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
-    private ArrayList<ColumnNameAndAlias> columnsAndAliases;
+    private final List<ColumnNameAndAlias> columnsAndAliases = new ArrayList<>();
     private Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
-    /*
-     * only used to set ID on the pojo which is returned from here
-     * */
-    private FieldValueSetter<T> primaryKeyFieldValueSetter;
-    private String tableName;
 
     //full traversal down all EAGER nested classes
     private List<JoinInfo> joinInfos;
@@ -42,7 +52,6 @@ public class MySQLModelDescriptor<T> {
 
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         modelClass = (Class<T>) modelTypeLiteral.getRawType();
-        mySQLServiceFieldsProvider.validateClass(modelClass);
         this.mySQLServiceFieldsProvider = mySQLServiceFieldsProvider;
     }
 
@@ -52,27 +61,108 @@ public class MySQLModelDescriptor<T> {
         nonPrimaryKeyFieldMySqlValues = mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(modelClass);
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(modelClass);
+        primaryKeyFieldValueGetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueGetter(modelClass);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(modelClass);
         specificFieldValueOverrides = mySQLServiceFieldsProvider.getSpecificFieldValueOverrides(modelClass);
         primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(modelClass);
-        fieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
-        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> fieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
+        setAliasFieldMySqlValueMap();
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(modelClass);
 
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(modelClass);
         joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass);
 
-        columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
+        setColumnsAndAliases();
+        setFilteredSelect();
+        setResultSetToInstance();
+    }
 
-        if(getJoinInfos().isEmpty()){
-            filteredSelect = new FilteredSelect(this);
-        } else {
-            filteredSelect = new JoinedFilterSelect(this);
+    private void setColumnsAndAliases() {
+        for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
+            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableName));
         }
 
+        for (JoinInfo joinInfo : joinInfos) {
+            columnsAndAliases.addAll(joinInfo.fieldNameAndAliases());
+        }
+    }
+
+    ResultSetToInstance<T> getResultSetToInstance() {
+        return resultSetToInstance;
+    }
+
+    Class<T> getModelClass() {
+        return modelClass;
+    }
+
+    Instantiator<T> getInstantiator() {
+        return instantiator;
+    }
+
+    FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue() {
+        return primaryKeyFieldMySqlValue;
+    }
+
+    Map<String, FieldMySqlValue<T>> getAliasFieldMySqlValueMap() {
+        return aliasFieldMySqlValueMap;
+    }
+
+    List<FieldMySqlValue<T>> getNonPrimaryKeyFieldMySqlValues() {
+        return nonPrimaryKeyFieldMySqlValues;
+    }
+
+    List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters() {
+        return specificFieldValueSetters;
+    }
+
+    List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides() {
+        return specificFieldValueOverrides;
+    }
+
+    SpecificFieldValueSetter<T> getPrimaryKeyValueSetter() {
+        return primaryKeyValueSetter;
+    }
+
+    List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters() {
+        return specificNestedFieldValueSetters;
+    }
+
+    List<ColumnNameAndAlias> getColumnsAndAliases() {
+        return columnsAndAliases;
+    }
+
+    Map<String, FieldValueSetter<T>> getAllExceptPrimaryFieldValueSetterMap() {
+        return allExceptPrimaryFieldValueSetterMap;
+    }
+
+    FieldValueSetter<T> getPrimaryKeyFieldValueSetter() {
+        return primaryKeyFieldValueSetter;
+    }
+
+    FieldValueGetter<T> getPrimaryKeyFieldValueGetter() {
+        return primaryKeyFieldValueGetter;
+    }
+
+    String getTableName() {
+        return tableName;
+    }
+
+    List<JoinInfo> getJoinInfos() {
+        return joinInfos;
+    }
+
+    FilteredSelect getFilteredSelect() {
+        return filteredSelect;
+    }
+
+    private void setAliasFieldMySqlValueMap() {
+        aliasFieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
+        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> aliasFieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
+    }
+
+    private void setResultSetToInstance() {
         boolean hasNestedList = joinInfos.stream().anyMatch(JoinInfo::isListJoin);
 
-        if(hasNestedList) {
+        if (hasNestedList) {
             resultSetToInstance = new ResultSetToInstanceWithListNesting<>(this);
         } else if (!specificNestedFieldValueSetters.isEmpty()) {
             resultSetToInstance = new ResultSetToInstanceWithNesting<>(this);
@@ -81,67 +171,11 @@ public class MySQLModelDescriptor<T> {
         }
     }
 
-    public ResultSetToInstance<T> getResultSetToInstance() {
-        return resultSetToInstance;
-    }
-
-    public Class<T> getModelClass() {
-        return modelClass;
-    }
-
-    public Instantiator<T> getInstantiator() {
-        return instantiator;
-    }
-
-    public FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue() {
-        return primaryKeyFieldMySqlValue;
-    }
-
-    public Map<String, FieldMySqlValue<T>> getFieldMySqlValueMap() {
-        return fieldMySqlValueMap;
-    }
-
-    public List<FieldMySqlValue<T>> getNonPrimaryKeyFieldMySqlValues() {
-        return nonPrimaryKeyFieldMySqlValues;
-    }
-
-    public List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters() {
-        return specificFieldValueSetters;
-    }
-
-    public List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides() {
-        return specificFieldValueOverrides;
-    }
-
-    public SpecificFieldValueSetter<T> getPrimaryKeyValueSetter() {
-        return primaryKeyValueSetter;
-    }
-
-    public List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters() {
-        return specificNestedFieldValueSetters;
-    }
-
-    public ArrayList<ColumnNameAndAlias> getColumnsAndAliases() {
-        return columnsAndAliases;
-    }
-
-    public Map<String, FieldValueSetter<T>> getAllExceptPrimaryFieldValueSetterMap() {
-        return allExceptPrimaryFieldValueSetterMap;
-    }
-
-    public FieldValueSetter<T> getPrimaryKeyFieldValueSetter() {
-        return primaryKeyFieldValueSetter;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public List<JoinInfo> getJoinInfos() {
-        return joinInfos;
-    }
-
-    public FilteredSelect getFilteredSelect() {
-        return filteredSelect;
+    private void setFilteredSelect() {
+        if (getJoinInfos().isEmpty()) {
+            filteredSelect = new FilteredSelect(this);
+        } else {
+            filteredSelect = new JoinedFilterSelect(this);
+        }
     }
 }

@@ -22,9 +22,10 @@ public class JoinInfo {
         this.isListJoin = isListJoin;
     }
 
-    public JoinInfo(String targetTableName, String targetId, String sourceTableName, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases, boolean isListJoin) {
-        this(targetTableName, targetTableName.toLowerCase(), targetId, sourceTableName, sourceId, columnNameAndAliases, isListJoin);
+    public JoinInfo(String targetTableName, String targetTableLowercase, String targetId, String sourceTableName, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases) {
+        this(targetTableName, targetTableLowercase, targetId, sourceTableName, sourceId, columnNameAndAliases, false);
     }
+
 
     public String targetTableName() {
         return targetTableName;
