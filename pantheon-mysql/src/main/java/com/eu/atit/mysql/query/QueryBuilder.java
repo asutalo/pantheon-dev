@@ -54,6 +54,9 @@ public class QueryBuilder {
     public void join(String targetTableName, String targetId, String sourceTableName, String sourceId) {
         queryParts.add(new Join(targetTableName, targetId, sourceTableName, sourceId));
     }
+    public void leftJoin(String targetTableName, String targetId, String sourceTableName, String sourceId) {
+        queryParts.add(new LeftJoin(targetTableName, targetId, sourceTableName, sourceId));
+    }
 
     public void keyIsVal(MySqlValue value) {
         queryParts.add(new KeyVal(value.getMysqlType(), value.getKey(), value.getValue(), getSeparator(), getCurrentIndex()));

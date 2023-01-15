@@ -26,8 +26,8 @@ public class MainQueryBuilder {
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.selectAll();
         queryBuilder.from("student");
-        queryBuilder.join("student_course", "student_id", "student", "id");
-        queryBuilder.join("course", "id", "student_course", "course_id");
+        queryBuilder.leftJoin("student_course", "student_id", "student", "id");
+        queryBuilder.leftJoin("course", "id", "student_course", "course_id");
 
         System.out.println(dataClient.executeSelectQuery(queryBuilder));
 

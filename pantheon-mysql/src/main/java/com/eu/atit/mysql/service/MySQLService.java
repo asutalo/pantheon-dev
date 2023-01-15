@@ -4,18 +4,19 @@ import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.mysql.query.QueryBuilder;
 import com.eu.atit.pantheon.client.data.DataClient;
-import com.eu.atit.pantheon.helper.Pair;
 import com.eu.atit.pantheon.service.data.DataService;
-import com.google.inject.TypeLiteral;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private final MySqlClient mySqlClient;
     private final MySQLModelDescriptor<T> mySQLModelDescriptor;
-
 
     MySQLService(DataClient mySqlClient, MySQLModelDescriptor<T> mySQLModelDescriptor) {
         this.mySqlClient = (MySqlClient) mySqlClient;
@@ -64,28 +65,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     @Override
     public QueryBuilder filteredSelect() {
-
-        //todo convert into 2 functions to avoid if check
-        QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select(mySQLModelDescriptor.getColumnsAndAliases());
-        queryBuilder.from(mySQLModelDescriptor.getTableName());
-
-        if(!mySQLModelDescriptor.getJoinInfos().isEmpty()){
-            List<String> mixes = new ArrayList<>();
-            for (JoinInfo joinInfo : mySQLModelDescriptor.getJoinInfos()) {
-
-                String x = joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId())) + " = " + joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId());
-                String y = joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId()) + " = " + joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId()));
-
-                if (!mixes.contains(x) && !mixes.contains(y)) {
-                    mixes.add(x);
-                    mixes.add(y);
-                    queryBuilder.join(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
-                }
-            }
-        }
-
-        return queryBuilder;
+        return mySQLModelDescriptor.getFilteredSelect().get();
     }
 
     @Override
@@ -114,35 +94,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     @Override
     public List<T> getAll(QueryBuilder filteredSelect) throws SQLException {
         List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
-        List<T> elements = new LinkedList<>();
-
-        for (Map<String, Object> row : resultSet) {
-            elements.add(fullInstanceOfT(row));
-        }
-
-        Map<Object, List<T>> groupedByPrimaryKey = elements.stream().collect(Collectors.groupingBy(x -> {
-            try {
-                return mySQLModelDescriptor.getPrimaryKeyFieldValueSetter().getFieldValue(x);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-
-        List<T> joinedElements = new LinkedList<>();
-
-        for (List<T> element : groupedByPrimaryKey.values()) {
-            T original = element.get(0);
-
-            for (T t : element) {
-                for (SpecificFieldValueOverride<T> specificFieldValueOverride : mySQLModelDescriptor.getSpecificFieldValueOverrides()) {
-                    specificFieldValueOverride.accept(original, t);
-                }
-            }
-
-            joinedElements.add(original);
-        }
-
-        return joinedElements;
+        return mySQLModelDescriptor.getResultSetToInstance().getAll(resultSet);
     }
 
     @Override
@@ -153,11 +105,12 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     }
 
     /*
-    * Used to initialise a pojo that will be inserted/updated
-    * Does not include primary keys to avoid nulling it out
-    * */
+     * Used to initialise a pojo that will be inserted/updated
+     * Does not include primary keys to avoid nulling it out
+     * */
     @Override
     public T instanceOfT(Map<String, Object> values) {
+        //todo does not support nesting atm
         T instance = mySQLModelDescriptor.getInstantiator().get();
 
         values.forEach((key, val) -> {
@@ -177,7 +130,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
             }
         });
 
-        if (filterMySqlValues.isEmpty()) throw new IllegalStateException("Provided filters would produce no results");
+        if (filterMySqlValues.isEmpty()) throw new IllegalStateException("Provided filters do not match any attribute");
 
         QueryBuilder queryBuilder = filteredSelect();
         queryBuilder.where();
@@ -190,36 +143,19 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return queryBuilder;
     }
 
-     T fullInstanceOfT(Map<String, Object> row) {
-        T instance = mySQLModelDescriptor.getInstantiator().get();
-
-        mySQLModelDescriptor.getSpecificFieldValueSetters().forEach(setter -> setter.accept(instance, row));
-
-        if(!mySQLModelDescriptor.getSpecificNestedFieldValueSetters().isEmpty()){
-            for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : mySQLModelDescriptor.getSpecificNestedFieldValueSetters()) {
-                specificNestedFieldValueSetter.accept(instance, row, new ArrayList<>(List.of(mySQLModelDescriptor.getModelClass())));
-            }
-        }
-        return instance;
+    T fullInstanceOfT(Map<String, Object> row) {
+        return mySQLModelDescriptor.getResultSetToInstance().get(row);
     }
 
-     T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
-        T instance = mySQLModelDescriptor.getInstantiator().get();
+    T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
+        return mySQLModelDescriptor.getResultSetToInstance().get(row, observedClasses);
 
-        mySQLModelDescriptor.getSpecificFieldValueSetters().forEach(setter -> setter.accept(instance, row));
-
-        if(!mySQLModelDescriptor.getSpecificNestedFieldValueSetters().isEmpty()){
-            for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : mySQLModelDescriptor.getSpecificNestedFieldValueSetters()) {
-                specificNestedFieldValueSetter.accept(instance, row, observedClasses);
-            }
-        }
-        return instance;
     }
 
-     T primaryInstanceOfT(Map<String, Object> row) {
+    T primaryInstanceOfT(Map<String, Object> row) {
         T instance = mySQLModelDescriptor.getInstantiator().get();
 
-         mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);
+        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);
         return instance;
     }
 
@@ -227,9 +163,5 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
         mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(user)));
         return mySqlValues;
-    }
-
-    public MySQLModelDescriptor<T> getMySQLModelDescriptor() {
-        return mySQLModelDescriptor;
     }
 }

@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.client.MySqlClient;
+import com.eu.atit.mysql.query.QueryBuilder;
 import com.google.inject.TypeLiteral;
 
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public class MySQLModelDescriptor<T> {
     //full traversal down all EAGER nested classes
     private List<JoinInfo> joinInfos;
 
+    private FilteredSelect filteredSelect;
+
+    private ResultSetToInstance<T> resultSetToInstance;
+
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         modelClass = (Class<T>) modelTypeLiteral.getRawType();
         mySQLServiceFieldsProvider.validateClass(modelClass);
@@ -58,10 +63,26 @@ public class MySQLModelDescriptor<T> {
         joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass);
 
         columnsAndAliases = mySQLServiceFieldsProvider.getColumnsAndAliases(tableName.toLowerCase(), specificFieldValueSetters, joinInfos);
+
+        if(getJoinInfos().isEmpty()){
+            filteredSelect = new FilteredSelect(this);
+        } else {
+            filteredSelect = new JoinedFilterSelect(this);
+        }
+
+        boolean hasNestedList = joinInfos.stream().anyMatch(JoinInfo::isListJoin);
+
+        if(hasNestedList) {
+            resultSetToInstance = new ResultSetToInstanceWithListNesting<>(this);
+        } else if (!specificNestedFieldValueSetters.isEmpty()) {
+            resultSetToInstance = new ResultSetToInstanceWithNesting<>(this);
+        } else {
+            resultSetToInstance = new ResultSetToInstance<>(this);
+        }
     }
 
-    public MySQLServiceFieldsProvider getMySQLServiceFieldsProvider() {
-        return mySQLServiceFieldsProvider;
+    public ResultSetToInstance<T> getResultSetToInstance() {
+        return resultSetToInstance;
     }
 
     public Class<T> getModelClass() {
@@ -118,5 +139,9 @@ public class MySQLModelDescriptor<T> {
 
     public List<JoinInfo> getJoinInfos() {
         return joinInfos;
+    }
+
+    public FilteredSelect getFilteredSelect() {
+        return filteredSelect;
     }
 }

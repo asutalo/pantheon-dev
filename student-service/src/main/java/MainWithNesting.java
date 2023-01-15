@@ -24,7 +24,7 @@ public class MainWithNesting {
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.select(new ArrayList<>(List.of(new ColumnNameAndAlias("student.name", "student_name"), new ColumnNameAndAlias("type.name", "type_name"))));
         queryBuilder.from("student");
-        queryBuilder.join("type", "id", "student", "id");
+        queryBuilder.leftJoin("type", "id", "student", "id");
         return queryBuilder;
     }
 }
