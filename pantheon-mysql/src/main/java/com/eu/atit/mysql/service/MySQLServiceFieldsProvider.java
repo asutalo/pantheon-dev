@@ -169,36 +169,43 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    <T> List<JoinInfo> getJoinInfos(Class<T> tClass) {
+    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
         List<JoinInfo> joinInfos = new ArrayList<>();
 
-        for (Field field : getDeclaredNestedFields(tClass)) {
+        for (Field field : getDeclaredNestedFields(modelClass)) {
             Nested nestingInfo = field.getAnnotation(Nested.class);
             Type genericType = field.getGenericType();
             boolean isList = isList(genericType);
+            validateNestingDirection(nestingInfo, isList);
+
             MySQLModelDescriptor<?> nestedMySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(joiningWith(field, genericType, isList)));
-            validateNestingDirection(nestingInfo);
-            String targetTableLowercase = nestedMySQLModelDescriptor.getTableName().toLowerCase();
+            String modelClassName = modelClass.getSimpleName();
+            String modelClassNameLowerCase = modelClassName.toLowerCase();
+            String targetTableName = nestedMySQLModelDescriptor.getTableName();
+            String targetTableLowercase = nestedMySQLModelDescriptor.getTableNameLowercase();
+            String nestedPrimaryKeyFieldName = nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName();
             List<ColumnNameAndAlias> columnNameAndAliases = getColumnNameAndAliases(nestingInfo, nestedMySQLModelDescriptor, targetTableLowercase);
 
             if (!isList) {
                 String link = nestingInfo.link();
                 if (nestingInfo.outward()) {
-                    joinInfos.add(new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), getTableNameLowercase(tClass), getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor), columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor), columnNameAndAliases));
                 }
 
                 if (nestingInfo.inward()) {
-                    joinInfos.add(new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, getInwardJoinForeignKey(link, tClass), getTableNameLowercase(tClass), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, getInwardJoinForeignKey(link, modelClass), modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases));
                 }
             } else {
-                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                String connection = nestingInfo.connection().isEmpty() ? getTableNameLowercase(tClass).concat("_".concat(targetTableLowercase)) : nestingInfo.connection();
-                String fk = nestingInfo.from().isEmpty() ? actualTypeArgument.getTypeName().toLowerCase() + "_" + nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName() : nestingInfo.from();
-                String fk2 = nestingInfo.to().isEmpty() ? tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName() : nestingInfo.to();
+                Class<T> actualTypeArgument = (Class<T>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                String connectingTable = nestingInfo.connection().isEmpty() ? connectingTable(getTableName(modelClass), targetTableName) : nestingInfo.connection();
+                String connectingTableLowercase = connectingTable.toLowerCase();
+                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(actualTypeArgument.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
+                String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
 
-                joinInfos.add(new JoinInfo(connection, connection, fk, getTableNameLowercase(tClass), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), columnNameAndAliases, true));
-                JoinInfo e = new JoinInfo(nestedMySQLModelDescriptor.getTableName(), targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), connection, fk2, columnNameAndAliases, true);
-                joinInfos.add(e);
+                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyFrom, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true);
+                joinInfos.add(joinToConnectingTable);
+                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyTo, columnNameAndAliases, true);
+                joinInfos.add(joinFromConnectingTableToTarget);
             }
 
             List<JoinInfo> nestedJoins = nestedMySQLModelDescriptor.getJoinInfos();
@@ -210,9 +217,13 @@ class MySQLServiceFieldsProvider {
         return joinInfos;
     }
 
+    private String connectingTable(String modelClass, String targetTableLowercase) {
+        return modelClass + "_" + targetTableLowercase;
+    }
+
     private String getInwardJoinForeignKey(String link, Class<?> tClass) {
         if (link.isBlank()) {
-            return tClass.getSimpleName().toLowerCase() + "_" + getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
+            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
         } else {
             return link;
         }
@@ -220,7 +231,7 @@ class MySQLServiceFieldsProvider {
 
     private String getOutwardJoinForeignKey(String link, Field field, MySQLModelDescriptor<?> nestedMySQLModelDescriptor) {
         if (link.isBlank()) {
-            return field.getType().getSimpleName().toLowerCase() + "_" + nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName();
+            return connectingTable(field.getType().getSimpleName().toLowerCase(), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName());
         } else {
             return link;
         }
@@ -236,8 +247,8 @@ class MySQLServiceFieldsProvider {
         return columnNameAndAliases;
     }
 
-    private void validateNestingDirection(Nested nestingInfo) {
-        if (nestingInfo.connection().isEmpty() && nestingInfo.outward() == nestingInfo.inward()) {
+    private void validateNestingDirection(Nested nestingInfo, boolean isList) {
+        if (!isList && nestingInfo.outward() == nestingInfo.inward()) {
             throw new RuntimeException(NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR);
         }
     }

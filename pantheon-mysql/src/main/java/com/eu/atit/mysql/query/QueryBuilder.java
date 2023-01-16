@@ -6,10 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class QueryBuilder {
     private static final String NONE = "";
@@ -22,7 +19,7 @@ public class QueryBuilder {
     }
 
 
-    public void select(List<ColumnNameAndAlias> columnsAndAliases) {
+    public void select(Set<ColumnNameAndAlias> columnsAndAliases) {
         queryParts.add(new SelectWithAliases(columnsAndAliases));
     }
 

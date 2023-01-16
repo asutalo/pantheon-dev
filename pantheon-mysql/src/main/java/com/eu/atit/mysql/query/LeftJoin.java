@@ -23,7 +23,7 @@ public class LeftJoin extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(LEFT_JOIN).concat(targetTableName).concat(SPACE).concat(targetTableNameLowercase).concat(ON).concat(targetTableNameLowercase).concat(DOT).concat(targetId).concat(EQUALS).concat(sourceTableName).concat(DOT).concat(sourceId);
+        return query.concat(LEFT_JOIN).concat(targetTableName).concat(SPACE).concat(targetTableNameLowercase).concat(ON).concat(sourceTableName).concat(DOT).concat(sourceId).concat(EQUALS).concat(targetTableNameLowercase).concat(DOT).concat(targetId);
     }
 
     @Override

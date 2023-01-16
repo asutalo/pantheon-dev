@@ -16,13 +16,13 @@ public class JoinedFilterSelect extends FilteredSelect{
         List<String> combinations = new ArrayList<>();
         for (JoinInfo joinInfo : mySQLModelDescriptor.getJoinInfos()) {
 
-            String sourceJoinInfo = joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId()) + " = " + joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId()));
-            String targetJoinInfo = joinInfo.targetTableLowercase().concat(".".concat(joinInfo.targetId())) + " = " + joinInfo.sourceTableName().concat(".").concat(joinInfo.sourceId());
+            String sourceJoinInfo = joinInfo.sourceTableAlias().concat(".").concat(joinInfo.sourceId()) + " = " + joinInfo.targetTableAlias().concat(".".concat(joinInfo.targetId()));
+            String targetJoinInfo = joinInfo.targetTableAlias().concat(".".concat(joinInfo.targetId())) + " = " + joinInfo.sourceTableAlias().concat(".").concat(joinInfo.sourceId());
 
             if (!combinations.contains(targetJoinInfo) && !combinations.contains(sourceJoinInfo)) {
                 combinations.add(targetJoinInfo);
                 combinations.add(sourceJoinInfo);
-                queryBuilder.leftJoin(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableName(), joinInfo.sourceId());
+                queryBuilder.leftJoin(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableAlias(), joinInfo.sourceId());
             }
         }
 

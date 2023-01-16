@@ -2,16 +2,14 @@ package com.eu.atit.mysql.service;
 
 import com.google.inject.TypeLiteral;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MySQLModelDescriptor<T> {
     private final MySQLServiceFieldsProvider mySQLServiceFieldsProvider;
     private final Class<T> modelClass;
 
     private String tableName;
+    private String tableNameLowercase;
 
     private Instantiator<T> instantiator;
 
@@ -40,7 +38,7 @@ public class MySQLModelDescriptor<T> {
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
     private List<SpecificFieldValueOverride<T>> specificFieldValueOverrides;
     private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
-    private final List<ColumnNameAndAlias> columnsAndAliases = new ArrayList<>();
+    private final Set<ColumnNameAndAlias> columnsAndAliases = new HashSet<>();
     private Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
 
     //full traversal down all EAGER nested classes
@@ -57,6 +55,7 @@ public class MySQLModelDescriptor<T> {
 
     public void init() {
         tableName = mySQLServiceFieldsProvider.getTableName(modelClass);
+        tableNameLowercase = mySQLServiceFieldsProvider.getTableNameLowercase(modelClass);
         instantiator = mySQLServiceFieldsProvider.getInstantiator(modelClass);
         nonPrimaryKeyFieldMySqlValues = mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(modelClass);
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
@@ -78,7 +77,7 @@ public class MySQLModelDescriptor<T> {
 
     private void setColumnsAndAliases() {
         for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
-            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableName));
+            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableNameLowercase));
         }
 
         for (JoinInfo joinInfo : joinInfos) {
@@ -126,7 +125,7 @@ public class MySQLModelDescriptor<T> {
         return specificNestedFieldValueSetters;
     }
 
-    List<ColumnNameAndAlias> getColumnsAndAliases() {
+    Set<ColumnNameAndAlias> getColumnsAndAliases() {
         return columnsAndAliases;
     }
 
@@ -144,6 +143,10 @@ public class MySQLModelDescriptor<T> {
 
     String getTableName() {
         return tableName;
+    }
+
+    String getTableNameLowercase() {
+        return tableNameLowercase;
     }
 
     List<JoinInfo> getJoinInfos() {

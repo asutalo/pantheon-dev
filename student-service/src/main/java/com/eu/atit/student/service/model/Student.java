@@ -18,7 +18,7 @@ public class Student {
     @Nested(inward = true, eager = true)
     private Diploma diploma;
 
-    @Nested(connection = "student_course", from = "student_id", to = "course_id", eager = true)
+    @Nested( eager = true)
     private List<Course> courses;
 
 //    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {

@@ -2,31 +2,29 @@ package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SelectWithAliases extends KeyWord implements QueryPart {
     static final String SELECT = "SELECT" + System.lineSeparator();
     static final String AS = " AS ";
     static final String SEPARATOR = ", ";
-    private final List<ColumnNameAndAlias> columnsAndAliases;
+    private final Set<ColumnNameAndAlias> columnsAndAliases;
 
-    public SelectWithAliases(List<ColumnNameAndAlias> columnsAndAliases) {
-        this.columnsAndAliases = new ArrayList<>(columnsAndAliases);
+    public SelectWithAliases(Set<ColumnNameAndAlias> columnsAndAliases) {
+        this.columnsAndAliases = new HashSet<>(columnsAndAliases);
     }
 
     @Override
     public String apply(String query) {
         StringBuilder selectionStringBuilder = new StringBuilder(query.concat(SELECT));
 
-        ColumnNameAndAlias columnAndAlias = columnsAndAliases.get(0);
+        ColumnNameAndAlias columnAndAlias = columnsAndAliases.iterator().next();
 
         selectionStringBuilder.append(columnAndAlias.fieldName());
         selectionStringBuilder.append(AS);
         selectionStringBuilder.append(columnAndAlias.alias());
 
-        columnsAndAliases.remove(0);
+        columnsAndAliases.remove(columnAndAlias);
 
         for (ColumnNameAndAlias cAndA : columnsAndAliases) {
             selectionStringBuilder.append(SEPARATOR);
