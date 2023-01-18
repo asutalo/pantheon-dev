@@ -162,6 +162,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     private LinkedList<MySqlValue> mySqlValues(T user) {
         LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
+        //todo if 1:1 relationship, should allow setting primary key as well, i.e. diploma.id = student.id
         mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(user)));
         return mySqlValues;
     }
