@@ -7,8 +7,8 @@ import com.mysql.cj.MysqlType;
 import java.util.List;
 
 public class Student {
-    @MySqlField(type = MysqlType.INT, primary = true, column = "SSSID")
-    private int idSSSS;
+    @MySqlField(type = MysqlType.INT, primary = true)
+    private int id;
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
@@ -18,7 +18,7 @@ public class Student {
     @Nested(inward = true, eager = true)
     private Diploma diploma;
 
-    @Nested(eager = true, connection = "bananana", to = "isus", from = "crna gospa")
+    @Nested(eager = true)
     private List<Course> courses;
 
 //    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
@@ -33,7 +33,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + idSSSS +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", type=" + type +
                 ", diploma=" + diploma +

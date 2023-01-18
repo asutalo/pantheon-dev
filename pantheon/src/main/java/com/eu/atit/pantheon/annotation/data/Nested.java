@@ -8,7 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Nested {
-
     boolean outward() default false;
 
     boolean inward() default false;

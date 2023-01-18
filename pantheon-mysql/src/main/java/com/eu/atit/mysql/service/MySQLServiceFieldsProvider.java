@@ -90,7 +90,7 @@ class MySQLServiceFieldsProvider {
     <T> List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters(Class<T> tClass) {
         List<SpecificFieldValueSetter<T>> setters = new ArrayList<>();
         String tableName = getTableNameLowercase(tClass);
-        for (Field field : getDeclaredSqlFields(tClass)) {
+        for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
             field.setAccessible(true);
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
 
@@ -113,6 +113,7 @@ class MySQLServiceFieldsProvider {
         String fieldName = mySqlFieldInfo.column();
         String tableName = getTableNameLowercase(tClass);
         if (fieldName.isBlank()) {
+
             return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), tableName);
         } else {
             return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName, tableName);
@@ -315,6 +316,10 @@ class MySQLServiceFieldsProvider {
 
     private <T> List<Field> getDeclaredSqlFields(Class<T> tClass) {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
+    }
+
+    private <T> List<Field> getDeclaredSqlFieldsOnly(Class<T> tClass) {
+        return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null && field.getAnnotation(Nested.class) == null).collect(Collectors.toList());
     }
 
     private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
