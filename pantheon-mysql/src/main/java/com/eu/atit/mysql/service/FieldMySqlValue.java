@@ -105,4 +105,8 @@ class FieldMySqlValue<T> implements Function<T, MySqlValue> {
                 ", mysqlType=" + mysqlType +
                 '}';
     }
+
+    public Field getField() {
+        return field;
+    }
 }

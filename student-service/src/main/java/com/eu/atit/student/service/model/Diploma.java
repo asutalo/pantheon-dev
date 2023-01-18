@@ -6,20 +6,17 @@ import com.mysql.cj.MysqlType;
 
 
 public final class Diploma {
-    @MySqlField(type = MysqlType.INT, primary = true)
-    private int id;
     @MySqlField(type = MysqlType.BOOLEAN)
     private Boolean obtained;
-
+    @MySqlField(type = MysqlType.INT, primary = true)
     @Nested(outward = true, eager = true)
-    private Student student;
+    private Student stipe; //todo should not be in select statement as its ID is not stored anywhere in this object
 
     @Override
     public String toString() {
         return "Diploma{" +
-                "id=" + id +
-                ", obtained=" + obtained +
-                ", student=" + student +
+                "obtained=" + obtained +
+                ", stipe=" + stipe +
                 '}';
     }
 }

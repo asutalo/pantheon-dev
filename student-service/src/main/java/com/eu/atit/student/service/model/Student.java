@@ -7,18 +7,18 @@ import com.mysql.cj.MysqlType;
 import java.util.List;
 
 public class Student {
-    @MySqlField(type = MysqlType.INT, primary = true)
-    private int id;
+    @MySqlField(type = MysqlType.INT, primary = true, column = "SSSID")
+    private int idSSSS;
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
-    @Nested(outward = true, eager = true)
+    @Nested(outward = true, eager = true) //link = "badonkadonk") //todo replace link with @MySqlField-column
     private Type type;
 
     @Nested(inward = true, eager = true)
     private Diploma diploma;
 
-    @Nested( eager = true)
+    @Nested(eager = true, connection = "bananana", to = "isus", from = "crna gospa")
     private List<Course> courses;
 
 //    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
@@ -33,7 +33,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
+                "id=" + idSSSS +
                 ", name='" + name + '\'' +
                 ", type=" + type +
                 ", diploma=" + diploma +

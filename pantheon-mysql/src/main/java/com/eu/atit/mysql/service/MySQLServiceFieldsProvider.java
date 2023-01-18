@@ -16,6 +16,7 @@ class MySQLServiceFieldsProvider {
     static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
     static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor";
     static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
+    static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
     private final MySQLServiceProvider mySQLServiceProvider;
 
     public MySQLServiceFieldsProvider(MySQLServiceProvider mySQLServiceProvider) {
@@ -189,11 +190,18 @@ class MySQLServiceFieldsProvider {
             if (!isList) {
                 String link = nestingInfo.link();
                 if (nestingInfo.outward()) {
-                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor), columnNameAndAliases));
+                    if(isPrimary(field)) {
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases);
+                        joinInfos.add(e);
+
+                    } else {
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor.getModelClass()), columnNameAndAliases);
+                        joinInfos.add(e);
+                    }
                 }
 
                 if (nestingInfo.inward()) {
-                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, getInwardJoinForeignKey(link, modelClass), modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases));
                 }
             } else {
                 Class<T> actualTypeArgument = (Class<T>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
@@ -202,9 +210,9 @@ class MySQLServiceFieldsProvider {
                 String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(actualTypeArgument.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
                 String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
 
-                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyFrom, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true);
+                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true);
                 joinInfos.add(joinToConnectingTable);
-                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyTo, columnNameAndAliases, true);
+                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyFrom, columnNameAndAliases, true);
                 joinInfos.add(joinFromConnectingTableToTarget);
             }
 
@@ -229,12 +237,52 @@ class MySQLServiceFieldsProvider {
         }
     }
 
-    private String getOutwardJoinForeignKey(String link, Field field, MySQLModelDescriptor<?> nestedMySQLModelDescriptor) {
+    private String getOutwardJoinForeignKey(String link, Field field, Class<?> modelClass) {
         if (link.isBlank()) {
+            return connectingTable(field.getType().getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(modelClass).getFieldName());
+        } else {
+            return link;
+        }
+    }
+
+
+
+    private String getInwardJoinForeignKey(String link, Class<?> tClass, Field field) {
+        if (link.isBlank()) {
+
+            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
+        } else {
+            return link;
+        }
+    }
+
+//    private String getInwardJoinForeignKey(String link, Class<?> tClass, Field field) {
+//        if (link.isBlank()) {
+//            if(isPrimary(field)){
+//                return getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
+//            }
+//
+//            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
+//        } else {
+//            return link;
+//        }
+//    }
+
+    private String getOutwardJoinForeignKey(String link, Field field, MySQLModelDescriptor<?> nestedMySQLModelDescriptor, Class<?> tClass) {
+        if (link.isBlank()) {
+//            if(isPrimary(field)){
+//                return getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
+//            }
             return connectingTable(field.getType().getSimpleName().toLowerCase(), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName());
         } else {
             return link;
         }
+    }
+
+    private boolean isPrimary(Field field){
+        MySqlField annotation = field.getAnnotation(MySqlField.class);
+
+        return annotation != null && annotation.primary();
     }
 
     private static List<ColumnNameAndAlias> getColumnNameAndAliases(Nested nestingInfo, MySQLModelDescriptor<?> nestedMySQLModelDescriptor, String targetTableLowercase) {
@@ -279,6 +327,8 @@ class MySQLServiceFieldsProvider {
             throw new RuntimeException(NO_PRIMARY_KEY_FOUND);
         else if (primaryKeys.size() > 1)
             throw new RuntimeException(THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY);
+        else if(primaryKeys.get(0).getGenericType().getTypeName().contains("List"))
+            throw new RuntimeException(PRIMARY_KEY_CANNOT_BE_A_LIST);
 
         return primaryKeys.get(0);
     }

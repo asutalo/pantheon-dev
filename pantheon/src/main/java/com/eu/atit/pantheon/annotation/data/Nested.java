@@ -14,10 +14,8 @@ public @interface Nested {
     boolean inward() default false;
     /**
      * in an outward relationship the link is the name of the column in the parent that points to the main ID column of the child
-     * in an inward relationship the link is the name of the column in the child that points to the main ID column of the parent
      * */
-
-    String link() default "";
+    String link() default ""; //todo replace link with @MySqlField-column
 
     boolean eager() default false;
 
