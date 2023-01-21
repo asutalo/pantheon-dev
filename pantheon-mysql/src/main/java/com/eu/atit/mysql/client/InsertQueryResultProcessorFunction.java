@@ -13,7 +13,7 @@ class InsertQueryResultProcessorFunction implements Function<PreparedStatement, 
         try {
             if (preparedStatement.executeUpdate() > 0) {
                 ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-
+                //todo don't fail when returning a value for a provided primary key (known, not generated in insert)
                 generatedKeys.next();
 
                 return generatedKeys.getInt(Statement.RETURN_GENERATED_KEYS);
