@@ -12,6 +12,7 @@ public class Student {
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
+    @MySqlField(type = MysqlType.INT, column = "type_id")
     @Nested(outward = true, eager = true) //link = "badonkadonk") //todo replace link with @MySqlField-column
     private Type type;
 
@@ -21,13 +22,13 @@ public class Student {
     @Nested(eager = true)
     private List<Course> courses;
 
-//    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
-//        this.id = id;
-//        this.name = name;
-//        this.type = type;
-//        this.diploma = diploma;
-//        this.courses = courses;
-//    }
+    public Student(){}
+    public Student(String name, Type type, Diploma diploma, List<Course> courses) {
+        this.name = name;
+        this.type = type;
+        this.diploma = diploma;
+        this.courses = courses;
+    }
 
 
     @Override
@@ -39,5 +40,9 @@ public class Student {
                 ", diploma=" + diploma +
                 ", courses=" + courses +
                 '}';
+    }
+
+    public void setId(int i) {
+        id = i;
     }
 }

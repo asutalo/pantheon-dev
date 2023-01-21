@@ -1,6 +1,5 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.pantheon.helper.Pair;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +32,7 @@ class MySQLServiceFieldsProviderTest {
     @Test
     void getFieldMySqlValues_shouldProvideAllValuesExceptPrimaryKey() {
         int nonPrimaryFieldsInTestTarget = 2;
-        List<FieldMySqlValue<TestTarget>> actualFieldMySqlValues = mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(TestTarget.class);
+        List<FieldMySqlValue> actualFieldMySqlValues = mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(TestTarget.class);
 
         Assertions.assertEquals(nonPrimaryFieldsInTestTarget, actualFieldMySqlValues.size());
         Assertions.assertTrue(actualFieldMySqlValues.stream().noneMatch(testTargetFieldMySqlValue -> testTargetFieldMySqlValue.getFieldName().equals(PRIMARY_KEY_FIELD_IN_TEST_TARGET)));

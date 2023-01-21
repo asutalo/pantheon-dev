@@ -14,7 +14,10 @@ public class Type {
     }
 
     //mandatory empty constructor
-    private Type(){}
+    public Type() {}
+    public Type(int id){
+        this.id = id;
+    }
 
     @Override
     public String toString() {

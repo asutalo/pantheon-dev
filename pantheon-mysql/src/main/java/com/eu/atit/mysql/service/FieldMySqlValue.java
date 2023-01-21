@@ -1,17 +1,17 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.MySqlValue;
+import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Function to convert a variable from an object into a MySqlValue
  */
-class FieldMySqlValue<T> implements Function<T, MySqlValue> {
-    private final Field field;
+class FieldMySqlValue {
+    private final Field field;//todo replace with FieldValueGetter to simplify
     private final String fieldName;
     private final String variableName;
     private final String aliasName;
@@ -29,8 +29,27 @@ class FieldMySqlValue<T> implements Function<T, MySqlValue> {
         aliasName = alias(tableName, fieldName);
     }
 
-    private String alias(String tableName, String fieldName) {
-        return tableName + "." + fieldName;
+    public FieldMySqlValue(MySQLModelDescriptor<?> modelDescriptor, Field parentField) {
+        FieldMySqlValue nestedPrimaryKeyFieldMySqlValue = modelDescriptor.getPrimaryKeyFieldMySqlValue();
+        this.field = nestedPrimaryKeyFieldMySqlValue.getField();
+        this.mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
+        this.fieldName = fieldName(parentField);
+        variableName = parentField.getName();
+        aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
+    }
+
+    private String fieldName(Field field) {
+        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+        if (mySqlFieldInfo == null) {
+            return field.getName();
+        }
+        String fieldName = mySqlFieldInfo.column();
+
+        if (fieldName.isBlank()) {
+            return field.getName();
+        }
+
+        return fieldName;
     }
 
     /**
@@ -45,8 +64,11 @@ class FieldMySqlValue<T> implements Function<T, MySqlValue> {
         aliasName = alias(tableName, fieldName);
     }
 
-    @Override
-    public MySqlValue apply(T valueOf) {
+    private String alias(String tableName, String fieldName) {
+        return tableName + "." + fieldName;
+    }
+
+    public MySqlValue apply(Object valueOf) {
         try {
             Object fieldValue = field.get(valueOf);
             return new MySqlValue(mysqlType, fieldName, fieldValue);
@@ -76,7 +98,7 @@ class FieldMySqlValue<T> implements Function<T, MySqlValue> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FieldMySqlValue<?> that = (FieldMySqlValue<?>) o;
+        FieldMySqlValue that = (FieldMySqlValue) o;
 
         if (!Objects.equals(field, that.field)) return false;
         if (!Objects.equals(fieldName, that.fieldName)) return false;
@@ -106,7 +128,11 @@ class FieldMySqlValue<T> implements Function<T, MySqlValue> {
                 '}';
     }
 
-    public Field getField() {
+    Field getField() {
         return field;
+    }
+
+    MysqlType getMysqlType() {
+        return mysqlType;
     }
 }

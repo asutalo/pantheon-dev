@@ -2,6 +2,7 @@ package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
+import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.Constructor;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 class MySQLServiceFieldsProvider {
     static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
     static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
-    static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor";
+    static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
     static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
     static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
     private final MySQLServiceProvider mySQLServiceProvider;
@@ -37,12 +38,16 @@ class MySQLServiceFieldsProvider {
             declaredConstructor.setAccessible(true);
             return new Instantiator<>(declaredConstructor);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR, e);
+            throw new RuntimeException(String.format(FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR, tClass), e);
         }
     }
 
     <T> FieldValueGetter<T> getPrimaryKeyFieldValueGetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
+        return fieldToFieldValueGetter(field);
+    }
+
+    private static <T> FieldValueGetter<T> fieldToFieldValueGetter(Field field) {
         field.setAccessible(true);
         return new FieldValueGetter<>(field);
     }
@@ -55,6 +60,7 @@ class MySQLServiceFieldsProvider {
 
     <T> Map<String, FieldValueSetter<T>> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
         Map<String, FieldValueSetter<T>> nonPrimaryFieldValueSetterMap = new HashMap<>();
+//        for (Field field : getDeclaredSqlFieldsOnly(tClass)) { todo
 
         for (Field field : tClass.getDeclaredFields()) {
             field.setAccessible(true);
@@ -105,7 +111,7 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    <T> FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
+    <T> FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         field.setAccessible(true);
 
@@ -113,31 +119,34 @@ class MySQLServiceFieldsProvider {
         String fieldName = mySqlFieldInfo.column();
         String tableName = getTableNameLowercase(tClass);
         if (fieldName.isBlank()) {
-
-            return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), tableName);
+            return new FieldMySqlValue(field, mySqlFieldInfo.type(), tableName);
         } else {
-            return new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName, tableName);
+            return new FieldMySqlValue(field, mySqlFieldInfo.type(), fieldName, tableName);
         }
     }
 
-    <T> List<FieldMySqlValue<T>> getNonPrimaryKeyFieldMySqlValues(Class<T> tClass) {
-        List<FieldMySqlValue<T>> getters = new ArrayList<>();
+    <T> List<FieldMySqlValue> getNonPrimaryKeyFieldMySqlValues(Class<T> tClass) {
+        List<FieldMySqlValue> getters = new ArrayList<>();
 
-        for (Field field : getDeclaredSqlFields(tClass)) {
-            field.setAccessible(true);
-            MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-            String tableName = getTableNameLowercase(tClass);
-            if (!mySqlFieldInfo.primary()) {
-                String fieldName = mySqlFieldInfo.column();
-                if (fieldName.isBlank()) {
-                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type(), tableName));
-                } else {
-                    getters.add(new FieldMySqlValue<>(field, mySqlFieldInfo.type(), fieldName, tableName));
-                }
+        for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
+            if(!isPrimary(field)){
+                getters.add(fieldToFieldMySqlValue(tClass, field));
             }
         }
 
         return getters;
+    }
+
+    private <T> FieldMySqlValue fieldToFieldMySqlValue(Class<T> tClass, Field field) {
+        field.setAccessible(true);
+        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+        String tableName = getTableNameLowercase(tClass);
+        String fieldName = mySqlFieldInfo.column();
+        if (fieldName.isBlank()) {
+            return(new FieldMySqlValue(field, mySqlFieldInfo.type(), tableName));
+        } else {
+            return (new FieldMySqlValue(field, mySqlFieldInfo.type(), fieldName, tableName));
+        }
     }
 
     <T> List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides(Class<T> tClass) {
@@ -169,6 +178,26 @@ class MySQLServiceFieldsProvider {
         }
 
         return setters;
+    }
+
+    <T> FieldMySqlValue getNestedPrimaryFieldMySqlValue(Class<T> tClass) {
+        Field field = getDeclaredPrimaryField(tClass);
+        field.setAccessible(true);
+        MySQLModelDescriptor<?> modelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
+
+        return new FieldMySqlValue(modelDescriptor, field);
+    }
+
+    <T> List<Pair<FieldMySqlValue, FieldValueGetter<T>>> getNestedFieldsMySqlValue(Class<T> tClass) {
+        List<Pair<FieldMySqlValue, FieldValueGetter<T>>> nestedFieldsMySqlValues = new ArrayList<>();
+        List<Field> fields = getDeclaredNestedMySqlFields(tClass);
+        fields.forEach(nestedField->{
+            nestedField.setAccessible(true);
+
+            nestedFieldsMySqlValues.add(new Pair<>(new FieldMySqlValue(mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(nestedField.getType())), nestedField), fieldToFieldValueGetter(nestedField)));
+        });
+
+        return nestedFieldsMySqlValues;
     }
 
     <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
@@ -322,7 +351,7 @@ class MySQLServiceFieldsProvider {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null && field.getAnnotation(Nested.class) == null).collect(Collectors.toList());
     }
 
-    private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
+    <T> Field getDeclaredPrimaryField(Class<T> tClass) {
         List<Field> primaryKeys = Arrays.stream(tClass.getDeclaredFields()).filter(field -> {
             MySqlField annotation = field.getAnnotation(MySqlField.class);
             return annotation != null && annotation.primary();
@@ -340,5 +369,9 @@ class MySQLServiceFieldsProvider {
 
     private <T> List<Field> getDeclaredNestedFields(Class<T> tClass) {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null).collect(Collectors.toList());
+    }
+
+    private <T> List<Field> getDeclaredNestedMySqlFields(Class<T> tClass) {
+        return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null && field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
     }
 }

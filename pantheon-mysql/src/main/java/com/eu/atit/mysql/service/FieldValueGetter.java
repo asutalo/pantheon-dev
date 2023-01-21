@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Function to set a value into an instance of an object
  */
-class FieldValueGetter<T> implements Function<T, Object> {
+class FieldValueGetter<T> {
     final Field field;
 
     /**
@@ -19,7 +19,6 @@ class FieldValueGetter<T> implements Function<T, Object> {
         this.field = field;
     }
 
-    @Override
     public Object apply(T t) {
         try {
             return field.get(t);

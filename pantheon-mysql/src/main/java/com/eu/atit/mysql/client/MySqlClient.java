@@ -17,7 +17,6 @@ public class MySqlClient implements DataClient {
     private final OtherDmlQueryResultProcessorFunction otherDmlQueryResultProcessorFunction;
 
 
-    //todo provide a factory for easier instantiation by user
     public MySqlClient(Connector connector) {
         this.connector = connector;
 

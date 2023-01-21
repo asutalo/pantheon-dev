@@ -125,7 +125,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private QueryBuilder filteredSelect(Map<String, Object> filter) {
         List<MySqlValue> filterMySqlValues = new ArrayList<>();
         filter.forEach((key, val) -> {
-            FieldMySqlValue<T> fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key);
+            FieldMySqlValue fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key);
             if (fieldMySqlValue != null) {
                 filterMySqlValues.add(fieldMySqlValue.of(val));
             }
@@ -161,9 +161,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     }
 
     private LinkedList<MySqlValue> mySqlValues(T user) {
-        LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
         //todo if 1:1 relationship, should allow setting primary key as well, i.e. diploma.id = student.id
-        mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(user)));
-        return mySqlValues;
+        return mySQLModelDescriptor.getMySqlValuesFilter().get(user);
     }
 }

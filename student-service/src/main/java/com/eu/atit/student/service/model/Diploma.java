@@ -12,6 +12,12 @@ public final class Diploma {
     @Nested(outward = true, eager = true)
     private Student stipe; //todo should not be in select statement as its ID is not stored anywhere in this object
 
+    public Diploma(){}
+    public Diploma(Student i, boolean b) {
+        stipe = i;
+        obtained = b;
+    }
+
     @Override
     public String toString() {
         return "Diploma{" +

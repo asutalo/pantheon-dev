@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.mysql.query.MySqlValue;
+import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
 import java.util.*;
@@ -25,12 +27,12 @@ public class MySQLModelDescriptor<T> {
     private FieldValueGetter<T> primaryKeyFieldValueGetter;
 
     // converts only primary key into MySqlValue
-    private FieldMySqlValue<T> primaryKeyFieldMySqlValue;
+    private FieldMySqlValue primaryKeyFieldMySqlValue;
 
-    private List<FieldMySqlValue<T>> nonPrimaryKeyFieldMySqlValues;
+    private List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues;
 
     // map of aliases pointing to each Fields' MySqlValue
-    private final Map<String, FieldMySqlValue<T>> aliasFieldMySqlValueMap = new HashMap<>();
+    private final Map<String, FieldMySqlValue> aliasFieldMySqlValueMap = new HashMap<>();
 
     /*
      * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
@@ -47,6 +49,7 @@ public class MySQLModelDescriptor<T> {
     private FilteredSelect filteredSelect;
 
     private ResultSetToInstance<T> resultSetToInstance;
+    private MySqlValuesFilter<T> mySqlValuesFilter;
 
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         modelClass = (Class<T>) modelTypeLiteral.getRawType();
@@ -73,6 +76,7 @@ public class MySQLModelDescriptor<T> {
         setColumnsAndAliases();
         setFilteredSelect();
         setResultSetToInstance();
+        setMySqlValuesFilter();
     }
 
     private void setColumnsAndAliases() {
@@ -97,15 +101,15 @@ public class MySQLModelDescriptor<T> {
         return instantiator;
     }
 
-    FieldMySqlValue<T> getPrimaryKeyFieldMySqlValue() {
+    FieldMySqlValue getPrimaryKeyFieldMySqlValue() {
         return primaryKeyFieldMySqlValue;
     }
 
-    Map<String, FieldMySqlValue<T>> getAliasFieldMySqlValueMap() {
+    Map<String, FieldMySqlValue> getAliasFieldMySqlValueMap() {
         return aliasFieldMySqlValueMap;
     }
 
-    List<FieldMySqlValue<T>> getNonPrimaryKeyFieldMySqlValues() {
+    List<FieldMySqlValue> getNonPrimaryKeyFieldMySqlValues() {
         return nonPrimaryKeyFieldMySqlValues;
     }
 
@@ -173,6 +177,42 @@ public class MySQLModelDescriptor<T> {
             resultSetToInstance = new ResultSetToInstance<>(this);
         }
     }
+    private void setMySqlValuesFilter(){
+        if(mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass).isEmpty()){
+            mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
+        } else {
+            mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
+        }
+    }
+    static class MySqlValuesFilterWithNestedPrimaryKey<T> extends NonPrimaryMySqlValuesFilter<T>{
+        private final List<Pair<FieldMySqlValue, FieldValueGetter<T>>> nestedFieldMySqlValues;
+
+        MySqlValuesFilterWithNestedPrimaryKey(MySQLModelDescriptor<T> mySQLModelDescriptor) {
+            super(mySQLModelDescriptor);
+            this.nestedFieldMySqlValues = mySQLModelDescriptor.getNestedPrimaryFieldMySqlValues();
+        }
+
+        @Override
+        LinkedList<MySqlValue> get(T object) {
+            LinkedList<MySqlValue> mySqlValues = super.get(object);
+            nestedFieldMySqlValues.forEach(nestedFieldMySqlValue -> mySqlValues.add(nestedFieldMySqlValue.left().apply(nestedFieldMySqlValue.right().apply(object))));
+            return mySqlValues;
+        }
+    }
+
+    List<Pair<FieldMySqlValue, FieldValueGetter<T>>> getNestedPrimaryFieldMySqlValues() {
+        return mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass);
+    }
+
+
+
+//    private void setMySqlValuesFilter(){
+//        if(mySQLServiceFieldsProvider.getDeclaredPrimaryField(modelClass).getAnnotation(Nested.class) != null){
+//            mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
+//        } else {
+//            mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
+//        }
+//    }
 
     private void setFilteredSelect() {
         if (getJoinInfos().isEmpty()) {
@@ -180,5 +220,55 @@ public class MySQLModelDescriptor<T> {
         } else {
             filteredSelect = new JoinedFilterSelect(this);
         }
+    }
+
+    MySqlValuesFilter<T> getMySqlValuesFilter() {
+        return mySqlValuesFilter;
+    }
+
+    static abstract class MySqlValuesFilter<T>{
+        final MySQLModelDescriptor<T> mySQLModelDescriptor;
+
+        MySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
+            this.mySQLModelDescriptor = mySQLModelDescriptor;
+        }
+
+        abstract LinkedList<MySqlValue> get(T object);
+    }
+
+    static class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T>{
+        NonPrimaryMySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
+            super(mySQLModelDescriptor);
+        }
+
+        @Override
+        LinkedList<MySqlValue> get(T object) {
+            LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
+            mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(object)));
+
+            return mySqlValues;
+        }
+    }
+
+
+    static class MySqlValuesFilterWithNestedPrimaryKey2<T> extends NonPrimaryMySqlValuesFilter<T>{
+        private final FieldMySqlValue nestedPrimaryFieldMySqlValue;
+
+        MySqlValuesFilterWithNestedPrimaryKey2(MySQLModelDescriptor<T> mySQLModelDescriptor) {
+            super(mySQLModelDescriptor);
+            this.nestedPrimaryFieldMySqlValue = mySQLModelDescriptor.getNestedPrimaryFieldMySqlValue();
+        }
+
+        @Override
+        LinkedList<MySqlValue> get(T object) {
+            LinkedList<MySqlValue> mySqlValues = super.get(object);
+            mySqlValues.add(nestedPrimaryFieldMySqlValue.apply(mySQLModelDescriptor.getPrimaryKeyFieldValueGetter().apply(object)));
+
+            return mySqlValues;
+        }
+    }
+
+    FieldMySqlValue getNestedPrimaryFieldMySqlValue() {
+        return mySQLServiceFieldsProvider.getNestedPrimaryFieldMySqlValue(modelClass);
     }
 }
