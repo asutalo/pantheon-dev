@@ -36,4 +36,15 @@ public class LeftJoin extends KeyWord implements QueryPart {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "LeftJoin{" +
+                "targetTableName='" + targetTableName + '\'' +
+                ", targetId='" + targetId + '\'' +
+                ", sourceTableName='" + sourceTableName + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", targetTableNameLowercase='" + targetTableNameLowercase + '\'' +
+                '}';
+    }
 }

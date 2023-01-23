@@ -60,4 +60,13 @@ public class Update implements QueryPart {
     public int hashCode() {
         return Objects.hash(tableName, valuesForQuery, valuesForParams);
     }
+
+    @Override
+    public String toString() {
+        return "Update{" +
+                "tableName='" + tableName + '\'' +
+                ", valuesForQuery=" + valuesForQuery +
+                ", valuesForParams=" + valuesForParams +
+                '}';
+    }
 }

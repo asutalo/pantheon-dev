@@ -6,16 +6,16 @@ public class From extends KeyWord implements QueryPart {
     static final String FROM = System.lineSeparator() + "FROM ";
     static final String SPACE = " ";
     private final String tableName;
-    private final String tableNameLowercase;
+    private final String tableNameAlias;
 
     public From(String tableName) {
         this.tableName = tableName;
-        this.tableNameLowercase = tableName.toLowerCase();
+        this.tableNameAlias = tableName.toLowerCase();
     }
 
     @Override
     public String apply(String query) {
-        return query.concat(FROM).concat(tableName).concat(SPACE).concat(tableNameLowercase);
+        return query.concat(FROM).concat(tableName).concat(SPACE).concat(tableNameAlias);
     }
 
     public String getTableName() {
@@ -33,5 +33,13 @@ public class From extends KeyWord implements QueryPart {
     @Override
     public int hashCode() {
         return Objects.hash(tableName);
+    }
+
+    @Override
+    public String toString() {
+        return "From{" +
+                "tableName='" + tableName + '\'' +
+                ", tableNameLowercase='" + tableNameAlias + '\'' +
+                '}';
     }
 }

@@ -47,4 +47,11 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     public int hashCode() {
         return Objects.hash(columnsAndAliases);
     }
+
+    @Override
+    public String toString() {
+        return "SelectWithAliases{" +
+                "columnsAndAliases=" + columnsAndAliases +
+                '}';
+    }
 }

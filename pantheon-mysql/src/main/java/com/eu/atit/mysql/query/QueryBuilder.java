@@ -109,12 +109,25 @@ public class QueryBuilder {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         QueryBuilder that = (QueryBuilder) o;
-        return paramIndex == that.paramIndex && Objects.equals(queryParts, that.queryParts);
+
+        if (paramIndex != that.paramIndex) return false;
+        return queryParts.equals(that.queryParts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(queryParts, paramIndex);
+        int result = queryParts.hashCode();
+        result = 31 * result + paramIndex;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "QueryBuilder{" +
+                "queryParts=" + queryParts +
+                ", paramIndex=" + paramIndex +
+                '}';
     }
 }

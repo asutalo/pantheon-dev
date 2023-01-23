@@ -18,4 +18,9 @@ public class SelectAll extends KeyWord implements QueryPart {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "SelectAll{}";
+    }
 }

@@ -57,4 +57,15 @@ public class KeyVal implements QueryPart {
     public int hashCode() {
         return Objects.hash(value, key, separator, index, targetType);
     }
+
+    @Override
+    public String toString() {
+        return "KeyVal{" +
+                "value=" + value +
+                ", key='" + key + '\'' +
+                ", separator='" + separator + '\'' +
+                ", index=" + index +
+                ", targetType=" + targetType +
+                '}';
+    }
 }

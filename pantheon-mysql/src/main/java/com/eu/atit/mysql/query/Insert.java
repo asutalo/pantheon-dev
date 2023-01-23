@@ -65,4 +65,13 @@ public class Insert implements QueryPart {
     public int hashCode() {
         return Objects.hash(tableName, valuesForQuery, valuesForParams);
     }
+
+    @Override
+    public String toString() {
+        return "Insert{" +
+                "tableName='" + tableName + '\'' +
+                ", valuesForQuery=" + valuesForQuery +
+                ", valuesForParams=" + valuesForParams +
+                '}';
+    }
 }

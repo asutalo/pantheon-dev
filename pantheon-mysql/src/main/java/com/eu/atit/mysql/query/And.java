@@ -19,4 +19,9 @@ public class And extends KeyWord implements QueryPart {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "And{}";
+    }
 }

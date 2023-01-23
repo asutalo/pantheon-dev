@@ -18,4 +18,9 @@ public class Delete extends KeyWord implements QueryPart {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "Delete{}";
+    }
 }

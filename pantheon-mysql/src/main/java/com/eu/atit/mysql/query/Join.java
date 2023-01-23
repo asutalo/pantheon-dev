@@ -36,4 +36,15 @@ public class Join extends KeyWord implements QueryPart {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "Join{" +
+                "targetTableName='" + targetTableName + '\'' +
+                ", targetId='" + targetId + '\'' +
+                ", sourceTableName='" + sourceTableName + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", targetTableNameLowercase='" + targetTableNameLowercase + '\'' +
+                '}';
+    }
 }
