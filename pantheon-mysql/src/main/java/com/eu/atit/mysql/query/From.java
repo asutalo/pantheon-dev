@@ -2,9 +2,10 @@ package com.eu.atit.mysql.query;
 
 import java.util.Objects;
 
+import static com.eu.atit.mysql.query.SelectWithAliases.AS;
+
 public class From extends KeyWord implements QueryPart {
-    static final String FROM = System.lineSeparator() + "FROM ";
-    static final String SPACE = " ";
+    static final String FROM = System.lineSeparator() + "FROM\t";
     private final String tableName;
     private final String tableNameAlias;
 
@@ -15,7 +16,7 @@ public class From extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(FROM).concat(tableName).concat(SPACE).concat(tableNameAlias);
+        return query.concat(FROM).concat(tableName).concat(AS).concat(tableNameAlias);
     }
 
     public String getTableName() {

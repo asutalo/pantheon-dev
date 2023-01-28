@@ -16,6 +16,13 @@ public class MySqlValue {
         this.value = value;
     }
 
+    public MySqlValue(MysqlType mysqlType, String key, Object value, int paramIndex) {
+        this.mysqlType = mysqlType;
+        this.key = key;
+        this.value = value;
+        this.paramIndex = paramIndex;
+    }
+
     public MysqlType getMysqlType() {
         return mysqlType;
     }

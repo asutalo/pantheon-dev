@@ -1,10 +1,10 @@
 package com.eu.atit.mysql.query;
 
-import static com.eu.atit.mysql.query.From.SPACE;
+import static com.eu.atit.mysql.query.SelectWithAliases.AS;
 
 public class Join extends KeyWord implements QueryPart {
-    static final String JOIN =  System.lineSeparator() + "JOIN ";
-    static final String ON = " ON ";
+    static final String JOIN = System.lineSeparator().concat("JOIN ");
+    static final String ON = "ON ";
     static final String EQUALS = " = ";
     static final String DOT = ".";
     private final String targetTableName;
@@ -23,7 +23,11 @@ public class Join extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(JOIN).concat(targetTableName).concat(SPACE).concat(targetTableNameLowercase).concat(ON).concat(targetTableNameLowercase).concat(DOT).concat(targetId).concat(EQUALS).concat(sourceTableName).concat(DOT).concat(sourceId);
+        return joinQuery(query.concat(JOIN));
+    }
+
+    String joinQuery(String query) {
+        return query.concat(targetTableName).concat(AS).concat(targetTableNameLowercase).concat(System.lineSeparator()).concat("\t\t\t").concat(ON).concat(sourceTableName).concat(DOT).concat(sourceId).concat(EQUALS).concat(targetTableNameLowercase).concat(DOT).concat(targetId);
     }
 
     @Override

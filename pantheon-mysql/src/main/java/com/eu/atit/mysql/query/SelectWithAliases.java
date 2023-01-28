@@ -5,9 +5,9 @@ import com.eu.atit.mysql.service.ColumnNameAndAlias;
 import java.util.*;
 
 public class SelectWithAliases extends KeyWord implements QueryPart {
-    static final String SELECT = "SELECT" + System.lineSeparator();
+    static final String SELECT = "SELECT\t";
     static final String AS = " AS ";
-    static final String SEPARATOR = ", ";
+    static final String SEPARATOR = ",".concat(System.lineSeparator()).concat("\t\t");
     private final Set<ColumnNameAndAlias> columnsAndAliases;
 
     public SelectWithAliases(Set<ColumnNameAndAlias> columnsAndAliases) {
@@ -17,7 +17,6 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     @Override
     public String apply(String query) {
         StringBuilder selectionStringBuilder = new StringBuilder(query.concat(SELECT));
-
         ColumnNameAndAlias columnAndAlias = columnsAndAliases.iterator().next();
 
         selectionStringBuilder.append(columnAndAlias.fieldName());
@@ -27,6 +26,7 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
         columnsAndAliases.remove(columnAndAlias);
 
         for (ColumnNameAndAlias cAndA : columnsAndAliases) {
+
             selectionStringBuilder.append(SEPARATOR);
             selectionStringBuilder.append(cAndA.fieldName());
             selectionStringBuilder.append(AS);

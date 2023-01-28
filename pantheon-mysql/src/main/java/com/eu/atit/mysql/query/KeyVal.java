@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class KeyVal implements QueryPart {
     static final String VAL = " = ?";
-
     private final Object value;
     private final String key;
     private final String separator;

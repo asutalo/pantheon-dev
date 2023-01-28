@@ -1,7 +1,7 @@
 package com.eu.atit.mysql.query;
 
 public class Where extends KeyWord implements QueryPart {
-    static final String WHERE = " WHERE ";
+    static final String WHERE = System.lineSeparator().concat("WHERE\t");
 
     public Where() {
     }

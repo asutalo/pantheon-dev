@@ -39,7 +39,7 @@ public class Insert implements QueryPart {
             placeholdersBuilder.append(PLACEHOLDER);
         }
 
-        return query.concat("INSERT INTO ").concat(tableName).concat(" (").concat(keysBuilder.toString()).concat(") VALUES (").concat(placeholdersBuilder.toString()).concat(")");
+        return query.concat("INSERT INTO\t").concat(tableName).concat(System.lineSeparator()).concat("\t\t(").concat(keysBuilder.toString()).concat(")").concat(System.lineSeparator()).concat("VALUES").concat(System.lineSeparator()).concat("\t\t(").concat(placeholdersBuilder.toString()).concat(")");
     }
 
     @Override
@@ -51,6 +51,10 @@ public class Insert implements QueryPart {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public List<MySqlValue> getValuesForParams() {
+        return valuesForParams;
     }
 
     @Override

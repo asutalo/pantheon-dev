@@ -34,7 +34,7 @@ public class Update implements QueryPart {
             keysPlaceholderBuilder.append(value.getKey().concat(" = ?"));
         }
 
-        return query.concat(UPDATE).concat(tableName).concat(" SET ").concat(keysPlaceholderBuilder.toString());
+        return query.concat(UPDATE).concat("\t").concat(tableName).concat(System.lineSeparator()).concat("SET\t\t").concat(keysPlaceholderBuilder.toString());
     }
 
     @Override
@@ -46,6 +46,10 @@ public class Update implements QueryPart {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public List<MySqlValue> getValuesForParams() {
+        return valuesForParams;
     }
 
     @Override

@@ -75,7 +75,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
             return fullInstanceOfT(resultSet.get(0));
         }
 
-        throw new IllegalStateException();
+        throw new IllegalStateException("No elements found");
     }
 
     @Override
@@ -124,8 +124,9 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
     private QueryBuilder filteredSelect(Map<String, Object> filter) {
         List<MySqlValue> filterMySqlValues = new ArrayList<>();
+
         filter.forEach((key, val) -> {
-            FieldMySqlValue fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key);
+            FieldMySqlValue fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key); // todo mySQLModelDescriptor.getAliasFieldMySqlValueMap() as global variable in this class?
             if (fieldMySqlValue != null) {
                 filterMySqlValues.add(fieldMySqlValue.of(val));
             }
@@ -161,7 +162,6 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     }
 
     private LinkedList<MySqlValue> mySqlValues(T user) {
-        //todo if 1:1 relationship, should allow setting primary key as well, i.e. diploma.id = student.id
         return mySQLModelDescriptor.getMySqlValuesFilter().get(user);
     }
 }

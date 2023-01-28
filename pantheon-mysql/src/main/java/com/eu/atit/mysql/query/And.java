@@ -2,7 +2,7 @@ package com.eu.atit.mysql.query;
 
 
 public class And extends KeyWord implements QueryPart {
-    static final String AND = " AND ";
+    static final String AND = System.lineSeparator().concat("\t\tAND ");
 
     @Override
     public String apply(String query) {

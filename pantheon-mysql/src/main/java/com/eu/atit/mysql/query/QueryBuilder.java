@@ -6,12 +6,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Normalizer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class QueryBuilder {
     private static final String NONE = "";
     private static final String COMMA = ", ";
-    private final List<QueryPart> queryParts = new LinkedList<>();
+    private final List<QueryPart> queryParts = new ArrayList<>();
     private int paramIndex = 0;
 
     public void selectAll() {
@@ -74,7 +76,7 @@ public class QueryBuilder {
         return separator;
     }
 
-    String buildQueryString() {
+    public String buildQueryString() {
         String query = "";
         for (QueryPart queryPart : queryParts) {
             query = queryPart.apply(query);
@@ -94,6 +96,14 @@ public class QueryBuilder {
 
         System.out.println("prepped: " + preparedStatement);
         return preparedStatement;
+    }
+
+    public List<QueryPart> getQueryParts() {
+        return queryParts;
+    }
+
+    public List<KeyVal> getKeyValues() {
+        return queryParts.stream().filter(queryPart -> queryPart instanceof KeyVal).map(queryPart -> (KeyVal)queryPart).collect(Collectors.toList());
     }
 
     private int getCurrentIndex() {
