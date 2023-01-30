@@ -29,13 +29,13 @@ public class Main {
         MySQLService<Diploma> diplomaMySQLService = (MySQLService<Diploma>) mySQLServiceProvider.provide(TypeLiteral.get(Diploma.class));
 
 
-        Student i = new Student();
-        i.setId(4);
+//        Student i = new Student();
+//        i.setId(4);
 //        Student i = new Student("shime", new Type(1), null, List.of());
 //        studentMySQLService.save(i);
 //        studentMySQLService.getAll().forEach(System.out::println);
-        diplomaMySQLService.save(new Diploma(i, true));
-//        diplomaMySQLService.getAll().forEach(System.out::println);
+//        diplomaMySQLService.save(new Diploma(i, true));
+        diplomaMySQLService.getAll().forEach(System.out::println);
 //        typeMySQLService.getAll().forEach(System.out::println);
 //        courseMySQLService.getAll().forEach(System.out::println);
 //

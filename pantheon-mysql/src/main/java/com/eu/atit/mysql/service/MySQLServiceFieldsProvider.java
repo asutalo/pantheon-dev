@@ -156,9 +156,19 @@ class MySQLServiceFieldsProvider {
             overrides.add(new SpecificFieldValueOverride<>(field));
         }
 
-        for (Field field : getDeclaredNestedFields(tClass)) {
+        List<Field> declaredNestedFields = getDeclaredNestedFields(tClass);
+
+        List<Field> nestedLists = declaredNestedFields.stream().filter(field -> isList(field.getGenericType())).toList();
+        List<Field> nestedObjects = declaredNestedFields.stream().filter(field -> !isList(field.getGenericType())).toList();
+
+        for (Field field : nestedObjects) {
             field.setAccessible(true);
             overrides.add(new SpecificFieldValueOverride<>(field));
+        }
+
+        for (Field field : nestedLists) {
+            field.setAccessible(true);
+            overrides.add(new SpecificListFieldValueOverride<>(field));
         }
 
         return overrides;

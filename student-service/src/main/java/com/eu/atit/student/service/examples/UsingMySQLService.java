@@ -40,9 +40,9 @@ public class UsingMySQLService  {
         mySQLService.delete(newType);
     }
 
-    public Object get(Map<String, Object> stringIntegerMap, TypeLiteral<?> typeLiteral) throws SQLException {
+    public Object get(Map<String, Object> filterMap, TypeLiteral<?> typeLiteral) throws SQLException {
         MySQLService<?> mySQLService = mySQLServiceProvider.provide(typeLiteral);
 
-        return mySQLService.get(stringIntegerMap);
+        return mySQLService.get(filterMap);
     }
 }

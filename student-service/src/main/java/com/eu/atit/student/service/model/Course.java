@@ -19,18 +19,11 @@ public  class Course {
         return name;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Course) obj;
-        return this.id == that.id &&
-                Objects.equals(this.name, that.name);
-    }
+    public Course() {}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
+    public Course(Integer id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     @Override
@@ -40,4 +33,11 @@ public  class Course {
                 "name=" + name + ']';
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

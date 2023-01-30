@@ -93,6 +93,10 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     @Override
     public List<T> getAll(QueryBuilder filteredSelect) throws SQLException {
         List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
+        System.out.println("fetched");
+        System.out.println("-----------------------");
+        System.out.println(resultSet);
+        System.out.println("-----------------------");
         return mySQLModelDescriptor.getResultSetToInstance().getAll(resultSet);
     }
 

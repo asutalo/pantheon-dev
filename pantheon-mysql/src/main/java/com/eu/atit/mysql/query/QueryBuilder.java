@@ -94,7 +94,14 @@ public class QueryBuilder {
             queryPart.apply(preparedStatement);
         }
 
-        System.out.println("prepped: " + preparedStatement);
+        System.out.println("-----------------------------------------");
+        System.out.println("-----------------------------------------");
+
+        System.out.println("prepped: ");
+        System.out.println(preparedStatement);
+
+        System.out.println("-----------------------------------------");
+        System.out.println("-----------------------------------------");
         return preparedStatement;
     }
 

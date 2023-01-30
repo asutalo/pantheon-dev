@@ -12,7 +12,7 @@ public class Student {
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
-    @MySqlField(type = MysqlType.INT, column = "type_id")
+    @MySqlField(type = MysqlType.INT, column = "badonkadonk")//todo column is ignored here?
     @Nested(outward = true, eager = true) //link = "badonkadonk") //todo replace link with @MySqlField-column
     private Type type;
 
@@ -23,7 +23,8 @@ public class Student {
     private List<Course> courses;
 
     public Student(){}
-    public Student(String name, Type type, Diploma diploma, List<Course> courses) {
+    public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.diploma = diploma;
@@ -37,12 +38,36 @@ public class Student {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", type=" + type +
-                ", diploma=" + diploma +
+                ", diploma=" + diploma.getObtained() +
                 ", courses=" + courses +
                 '}';
     }
 
     public void setId(int i) {
         id = i;
+    }
+
+    public void setDiploma(Diploma diploma) {
+        this.diploma = diploma;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Diploma getDiploma() {
+        return diploma;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
     }
 }
