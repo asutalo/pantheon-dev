@@ -9,9 +9,27 @@ import java.util.*;
 public class MySQLModelDescriptor<T> {
     private final MySQLServiceFieldsProvider mySQLServiceFieldsProvider;
     private final Class<T> modelClass;
-
     private String tableName;
     private String tableNameLowercase;
+
+    private FieldsMerger fieldsMerger;
+
+    private FieldsMergerDTO.Crossroads crossroads;
+
+    public FieldsMerger getFieldsMerger() {
+        return fieldsMerger;
+    }
+
+    private boolean hasDescendantWithList;
+    private boolean hasNestedList;
+
+    public boolean isHasDescendantWithList() {
+        return hasDescendantWithList;
+    }
+
+    public boolean isHasNestedList() {
+        return hasNestedList;
+    }
 
     private Instantiator<T> instantiator;
 
@@ -24,7 +42,7 @@ public class MySQLModelDescriptor<T> {
      * used to update the primary key based on a select statement (using a map from ResultSet and column aliases)
      * */
     private SpecificFieldValueSetter<T> primaryKeyValueSetter;
-    private FieldValueGetter<T> primaryKeyFieldValueGetter;
+    private FieldValueGetter primaryKeyFieldValueGetter;
 
     // converts only primary key into MySqlValue
     private FieldMySqlValue primaryKeyFieldMySqlValue;
@@ -39,6 +57,7 @@ public class MySQLModelDescriptor<T> {
      * */
     private List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
     private List<SpecificFieldValueOverride<T>> specificFieldValueOverrides;
+    private List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> specificListFieldValueOverrides;
     private List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
     private final Set<ColumnNameAndAlias> columnsAndAliases = new HashSet<>();
     private Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
@@ -66,8 +85,12 @@ public class MySQLModelDescriptor<T> {
         primaryKeyFieldValueGetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueGetter(modelClass);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(modelClass);
         specificFieldValueOverrides = mySQLServiceFieldsProvider.getSpecificFieldValueOverrides(modelClass);
-        primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(modelClass);
+        specificListFieldValueOverrides = mySQLServiceFieldsProvider.getSpecificListFieldValueOverrides(modelClass);
+
+        hasNestedList = specificListFieldValueOverrides.size() > 0;
+
         setAliasFieldMySqlValueMap();
+        primaryKeyValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyValueSetter(modelClass);
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(modelClass);
 
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(modelClass);
@@ -77,6 +100,16 @@ public class MySQLModelDescriptor<T> {
         setFilteredSelect();
         setResultSetToInstance();
         setMySqlValuesFilter();
+
+
+        FieldValueGetter nestedPrimaryKeyValueGetter = mySQLServiceFieldsProvider.getNestedPrimaryKeyFieldValueGetter(modelClass);
+
+        hasDescendantWithList = joinInfos.stream().anyMatch(JoinInfo::hasAnyList);
+        if(hasNestedList || hasDescendantWithList) {
+            fieldsMerger = new FieldsMerger(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
+        } else {
+            fieldsMerger = new FieldsMerger.DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
+        }
     }
 
     private void setColumnsAndAliases() {
@@ -141,7 +174,7 @@ public class MySQLModelDescriptor<T> {
         return primaryKeyFieldValueSetter;
     }
 
-    FieldValueGetter<T> getPrimaryKeyFieldValueGetter() {
+    FieldValueGetter getPrimaryKeyFieldValueGetter() {
         return primaryKeyFieldValueGetter;
     }
 
@@ -166,6 +199,19 @@ public class MySQLModelDescriptor<T> {
         nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> aliasFieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
     }
 
+    private void eh() {
+        boolean hasNestedList = joinInfos.stream().anyMatch(JoinInfo::hasAnyList);
+
+        if(hasNestedList){
+            hasDescendantWithList = true;
+            System.out.println(modelClass + " has descendant with list: true");
+        } else {
+            System.out.println(modelClass + " has descendant with list: false");
+        }
+
+        System.out.println(modelClass + " has a list: " + hasNestedList);
+    }
+
     private void setResultSetToInstance() {
         boolean hasNestedList = joinInfos.stream().anyMatch(JoinInfo::isListJoin);
 
@@ -184,8 +230,9 @@ public class MySQLModelDescriptor<T> {
             mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
         }
     }
+
     static class MySqlValuesFilterWithNestedPrimaryKey<T> extends NonPrimaryMySqlValuesFilter<T>{
-        private final List<Pair<FieldMySqlValue, FieldValueGetter<T>>> nestedFieldMySqlValues;
+        private final List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldMySqlValues;
 
         MySqlValuesFilterWithNestedPrimaryKey(MySQLModelDescriptor<T> mySQLModelDescriptor) {
             super(mySQLModelDescriptor);
@@ -200,7 +247,7 @@ public class MySQLModelDescriptor<T> {
         }
     }
 
-    List<Pair<FieldMySqlValue, FieldValueGetter<T>>> getNestedPrimaryFieldMySqlValues() {
+    List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {
         return mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass);
     }
 

@@ -38,7 +38,7 @@ public class Student {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", type=" + type +
-                ", diploma=" + diploma.getObtained() +
+                ", diploma=" + diploma.getStudent().id +
                 ", courses=" + courses +
                 '}';
     }

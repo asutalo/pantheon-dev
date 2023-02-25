@@ -42,14 +42,24 @@ class MySQLServiceFieldsProvider {
         }
     }
 
-    <T> FieldValueGetter<T> getPrimaryKeyFieldValueGetter(Class<T> tClass) {
+    <T> FieldValueGetter getPrimaryKeyFieldValueGetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         return fieldToFieldValueGetter(field);
     }
 
-    private static <T> FieldValueGetter<T> fieldToFieldValueGetter(Field field) {
+    <T> FieldValueGetter getNestedPrimaryKeyFieldValueGetter(Class<T> tClass) {
+        Field field = getDeclaredPrimaryField(tClass);
+        if(field.getAnnotation(Nested.class)!=null) {
+            field.setAccessible(true);
+            return new NestedFieldValueGetter(field, mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType())));
+        }
+
+        return null;
+    }
+
+    private static <T> FieldValueGetter fieldToFieldValueGetter(Field field) {
         field.setAccessible(true);
-        return new FieldValueGetter<>(field);
+        return new FieldValueGetter(field);
     }
 
     <T> FieldValueSetter<T> getPrimaryKeyFieldValueSetter(Class<T> tClass) {
@@ -78,11 +88,14 @@ class MySQLServiceFieldsProvider {
         return nonPrimaryFieldValueSetterMap;
     }
 
-    <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
+    <T> SpecificFieldValueSetter getPrimaryKeyValueSetter(Class<T> tClass) {
         String tableName = getTableNameLowercase(tClass);
         Field field = getDeclaredPrimaryField(tClass);
         field.setAccessible(true);
 
+        if(field.getAnnotation(Nested.class) != null){
+            return new LazySpecificFieldValueSetter(field, tableName,  mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(field.getType())));
+        }
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String fieldName = mySqlFieldInfo.column();
 
@@ -151,20 +164,22 @@ class MySQLServiceFieldsProvider {
 
     <T> List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides(Class<T> tClass) {
         List<SpecificFieldValueOverride<T>> overrides = new ArrayList<>();
-        for (Field field : getDeclaredSqlFields(tClass)) {
-            field.setAccessible(true);
-            overrides.add(new SpecificFieldValueOverride<>(field));
-        }
+        //todo remove, not needed at all
+//        for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
+//            field.setAccessible(true);
+//            overrides.add(new SpecificFieldValueOverride<>(field));
+//        }
 
         List<Field> declaredNestedFields = getDeclaredNestedFields(tClass);
 
         List<Field> nestedLists = declaredNestedFields.stream().filter(field -> isList(field.getGenericType())).toList();
-        List<Field> nestedObjects = declaredNestedFields.stream().filter(field -> !isList(field.getGenericType())).toList();
+//        List<Field> nestedObjects = declaredNestedFields.stream().filter(field -> !isList(field.getGenericType())).toList();
 
-        for (Field field : nestedObjects) {
-            field.setAccessible(true);
-            overrides.add(new SpecificFieldValueOverride<>(field));
-        }
+        //todo remove, not needed at all
+//        for (Field field : nestedObjects) {
+//            field.setAccessible(true);
+//            overrides.add(new SpecificFieldValueOverride<>(field));
+//        }
 
         for (Field field : nestedLists) {
             field.setAccessible(true);
@@ -172,6 +187,46 @@ class MySQLServiceFieldsProvider {
         }
 
         return overrides;
+    }
+
+    <T> List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> getSpecificListFieldValueOverrides(Class<T> tClass) {
+        List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> overrides = new ArrayList<>();
+
+        List<Field> nestedLists = getDeclaredNestedFields(tClass).stream().filter(field -> isList(field.getGenericType())).toList();
+
+        for (Field field : nestedLists) {
+            field.setAccessible(true);
+            overrides.add(new Pair<>(new SpecificListFieldValueOverride<>(field), new SpecificListFieldValueOverride<>(field)));
+        }
+
+        return overrides;
+    }
+
+    List<FieldsMergerDTO> myNestedModelsDTOs (Class<?> tClass) {
+        List<Field> flatNested = getDeclaredNestedFields(tClass);
+
+        return flatNested.stream().map(f-> {
+            f.setAccessible(true);
+            MySQLModelDescriptor<?> modelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(
+                    isList(f.getGenericType())?((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0]:
+                    f.getType()));
+
+            FieldsMergerDTO.Crossroads crossroads;
+            if(isList(f.getGenericType())){
+                crossroads = new FieldsMergerDTO.ListRoad(modelDescriptor.getFieldsMerger(), new FieldValueSetter<>(f), new FieldValueGetter(f));
+            } else if (
+                    modelDescriptor.isHasDescendantWithList()){
+                FieldsMerger fieldsMerger = modelDescriptor.getFieldsMerger();
+                if (fieldsMerger==null) {
+                    fieldsMerger = new FieldsMerger.DeadEnd(modelDescriptor.getPrimaryKeyFieldValueGetter(), null);
+                }
+                crossroads = new FieldsMergerDTO.SingleRoad(fieldsMerger, new FieldValueSetter<>(f), new FieldValueGetter(f));
+
+            } else {
+                crossroads = new FieldsMergerDTO.SingleRoad(modelDescriptor.getFieldsMerger(), new FieldValueSetter<>(f), new FieldValueGetter(f));
+            }
+           return new FieldsMergerDTO(new FieldValueSetter<>(f), crossroads);
+        }).toList();
     }
 
     <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass) {
@@ -198,8 +253,8 @@ class MySQLServiceFieldsProvider {
         return new FieldMySqlValue(modelDescriptor, field);
     }
 
-    <T> List<Pair<FieldMySqlValue, FieldValueGetter<T>>> getNestedFieldsMySqlValue(Class<T> tClass) {
-        List<Pair<FieldMySqlValue, FieldValueGetter<T>>> nestedFieldsMySqlValues = new ArrayList<>();
+    <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {
+        List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
         List<Field> fields = getDeclaredNestedMySqlFields(tClass);
         fields.forEach(nestedField->{
             nestedField.setAccessible(true);
@@ -212,6 +267,15 @@ class MySQLServiceFieldsProvider {
 
     <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
         List<JoinInfo> joinInfos = new ArrayList<>();
+
+        boolean hasAnyList = false;
+        for (Field field : getDeclaredNestedFields(modelClass)) {
+            Type genericType = field.getGenericType();
+            if( isList(genericType)){
+                hasAnyList = true;
+                break;
+            }
+        }
 
         for (Field field : getDeclaredNestedFields(modelClass)) {
             Nested nestingInfo = field.getAnnotation(Nested.class);
@@ -231,17 +295,17 @@ class MySQLServiceFieldsProvider {
                 String link = nestingInfo.link();
                 if (nestingInfo.outward()) {
                     if(isPrimary(field)) {
-                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases);
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList);
                         joinInfos.add(e);
 
                     } else {
-                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor.getModelClass()), columnNameAndAliases);
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor.getModelClass()), columnNameAndAliases, hasAnyList);
                         joinInfos.add(e);
                     }
                 }
 
                 if (nestingInfo.inward()) {
-                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases));
+                    joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList));
                 }
             } else {
                 Class<T> actualTypeArgument = (Class<T>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
@@ -250,9 +314,9 @@ class MySQLServiceFieldsProvider {
                 String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(actualTypeArgument.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
                 String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
 
-                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true);
+                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true, hasAnyList, modelClass, actualTypeArgument);
                 joinInfos.add(joinToConnectingTable);
-                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyFrom, columnNameAndAliases, true);
+                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyFrom, columnNameAndAliases, true, hasAnyList, modelClass, actualTypeArgument);
                 joinInfos.add(joinFromConnectingTableToTarget);
             }
 

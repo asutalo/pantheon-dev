@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Function to set a value into an instance of an object
  */
-class FieldValueGetter<T> {
+class FieldValueGetter {
     final Field field;
 
     /**
@@ -19,7 +19,7 @@ class FieldValueGetter<T> {
         this.field = field;
     }
 
-    public Object apply(T t) {
+    public Object apply(Object t) {
         try {
             return field.get(t);
         } catch (IllegalAccessException e) {

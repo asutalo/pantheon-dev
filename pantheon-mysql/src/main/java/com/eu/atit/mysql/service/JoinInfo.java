@@ -11,8 +11,11 @@ public class JoinInfo {
     private final String sourceId;
     private final List<ColumnNameAndAlias> columnNameAndAliases;
     private final boolean isListJoin;
+    private final boolean hasAnyList;
+    private final Class<?> parent;
+    private final Class<?> child;
 
-    public JoinInfo(String targetTableName, String targetTableAlias, String targetId, String sourceTableAlias, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases, boolean isListJoin) {
+    public JoinInfo(String targetTableName, String targetTableAlias, String targetId, String sourceTableAlias, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases, boolean isListJoin, boolean hasAnyList, Class<?> parent, Class<?> child) {
         this.targetTableName = targetTableName;
         this.targetTableAlias = targetTableAlias;
         this.targetId = targetId;
@@ -20,10 +23,13 @@ public class JoinInfo {
         this.sourceId = sourceId;
         this.columnNameAndAliases = columnNameAndAliases;
         this.isListJoin = isListJoin;
+        this.hasAnyList = hasAnyList;
+        this.parent = parent;
+        this.child = child;
     }
 
-    public JoinInfo(String targetTableName, String targetTableAlias, String targetId, String sourceTableAlias, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases) {
-        this(targetTableName, targetTableAlias, targetId, sourceTableAlias, sourceId, columnNameAndAliases, false);
+    public JoinInfo(String targetTableName, String targetTableAlias, String targetId, String sourceTableAlias, String sourceId, List<ColumnNameAndAlias> columnNameAndAliases, boolean hasAnyList) {
+        this(targetTableName, targetTableAlias, targetId, sourceTableAlias, sourceId, columnNameAndAliases, false, hasAnyList, null, null);
     }
 
 
@@ -55,6 +61,34 @@ public class JoinInfo {
         return isListJoin;
     }
 
+    public boolean hasAnyList() {
+        return hasAnyList;
+    }
+
+    public Class<?> getParent() {
+        return parent;
+    }
+
+    public Class<?> getChild() {
+        return child;
+    }
+
+    @Override
+    public String toString() {
+        return "JoinInfo{" +
+               "targetTableName='" + targetTableName + '\'' +
+               ", targetTableAlias='" + targetTableAlias + '\'' +
+               ", targetId='" + targetId + '\'' +
+               ", sourceTableAlias='" + sourceTableAlias + '\'' +
+               ", sourceId='" + sourceId + '\'' +
+               ", columnNameAndAliases=" + columnNameAndAliases +
+               ", isListJoin=" + isListJoin +
+               ", hasAnyList=" + hasAnyList +
+               ", parent=" + parent +
+               ", child=" + child +
+               '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -63,6 +97,7 @@ public class JoinInfo {
         JoinInfo joinInfo = (JoinInfo) o;
 
         if (isListJoin != joinInfo.isListJoin) return false;
+        if (hasAnyList != joinInfo.hasAnyList) return false;
         if (!Objects.equals(targetTableName, joinInfo.targetTableName))
             return false;
         if (!Objects.equals(targetTableAlias, joinInfo.targetTableAlias))
@@ -71,7 +106,10 @@ public class JoinInfo {
         if (!Objects.equals(sourceTableAlias, joinInfo.sourceTableAlias))
             return false;
         if (!Objects.equals(sourceId, joinInfo.sourceId)) return false;
-        return Objects.equals(columnNameAndAliases, joinInfo.columnNameAndAliases);
+        if (!Objects.equals(columnNameAndAliases, joinInfo.columnNameAndAliases))
+            return false;
+        if (!Objects.equals(parent, joinInfo.parent)) return false;
+        return Objects.equals(child, joinInfo.child);
     }
 
     @Override
@@ -83,19 +121,9 @@ public class JoinInfo {
         result = 31 * result + (sourceId != null ? sourceId.hashCode() : 0);
         result = 31 * result + (columnNameAndAliases != null ? columnNameAndAliases.hashCode() : 0);
         result = 31 * result + (isListJoin ? 1 : 0);
+        result = 31 * result + (hasAnyList ? 1 : 0);
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + (child != null ? child.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "JoinInfo{" +
-                "targetTableName='" + targetTableName + '\'' +
-                ", targetTableLowercase='" + targetTableAlias + '\'' +
-                ", targetId='" + targetId + '\'' +
-                ", sourceTableName='" + sourceTableAlias + '\'' +
-                ", sourceId='" + sourceId + '\'' +
-                ", columnNameAndAliases=" + columnNameAndAliases +
-                ", isListJoin=" + isListJoin +
-                '}';
     }
 }

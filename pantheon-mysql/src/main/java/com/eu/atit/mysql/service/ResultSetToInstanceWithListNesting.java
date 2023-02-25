@@ -13,23 +13,6 @@ class ResultSetToInstanceWithListNesting<T> extends ResultSetToInstanceWithNesti
     @Override
     public List<T> getAll(List<Map<String, Object>> resultSet) {
         List<T> elements = super.getAll(resultSet);
-
-        Map<Object, List<T>> groupedByPrimaryKey = elements.stream().collect(Collectors.groupingBy(x -> mySQLModelDescriptor.getPrimaryKeyFieldValueGetter().apply(x)));
-
-        List<T> joinedElements = new LinkedList<>();
-
-        for (List<T> element : groupedByPrimaryKey.values()) {
-            T original = element.get(0);
-
-            for (T t : element) {
-                for (SpecificFieldValueOverride<T> specificFieldValueOverride : mySQLModelDescriptor.getSpecificFieldValueOverrides()) {
-                    specificFieldValueOverride.accept(original, t);
-                }
-            }
-
-            joinedElements.add(original);
-        }
-
-        return joinedElements;
+        return (List<T>) mySQLModelDescriptor.getFieldsMerger().first(elements);
     }
 }

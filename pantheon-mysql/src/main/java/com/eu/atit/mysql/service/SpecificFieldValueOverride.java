@@ -7,10 +7,10 @@ import java.util.function.BiConsumer;
 
 class SpecificFieldValueOverride<T> implements BiConsumer<T, T> {
      final FieldValueSetter<T> fieldValueSetter;
-     final FieldValueGetter<T> fieldValueGetter;
+     final FieldValueGetter fieldValueGetter;
 
     SpecificFieldValueOverride(Field fieldToSet) {
-        fieldValueGetter = new FieldValueGetter<>(fieldToSet);
+        fieldValueGetter = new FieldValueGetter(fieldToSet);
         fieldValueSetter = new FieldValueSetter<>(fieldToSet);
     }
 

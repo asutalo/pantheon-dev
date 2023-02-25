@@ -16,7 +16,12 @@ class SpecificListFieldValueOverride<T> extends SpecificFieldValueOverride<T> {
     @Override
     public void accept(T setFieldOn, T getValueFrom) {
         LinkedHashSet<T> valueToSet = new LinkedHashSet<>((List<T>) fieldValueGetter.apply(setFieldOn));
-        valueToSet.addAll((List<T>) fieldValueGetter.apply(getValueFrom));
+
+        System.out.println("base: " + valueToSet);
+        List<T> apply = (List<T>) fieldValueGetter.apply(getValueFrom);
+
+        System.out.println("adding: " + apply);
+        valueToSet.addAll(apply);
 
         fieldValueSetter.accept(setFieldOn, new ArrayList<>(valueToSet));
     }

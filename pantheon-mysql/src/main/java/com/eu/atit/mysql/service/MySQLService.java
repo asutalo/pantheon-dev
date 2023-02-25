@@ -161,7 +161,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     T lazyInstanceOfT(Map<String, Object> row) {
         T instance = mySQLModelDescriptor.getInstantiator().get();
 
-        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);
+        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);//todo doublecheck it works properly for nested primary key
         return instance;
     }
 

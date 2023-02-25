@@ -122,10 +122,10 @@ class WorkingWithMySQLServiceTest {
 
             when(mockMySqlClient.executeSelectQuery(any())).thenReturn(
                     List.of(
+                            getRowFor(null, null, ALUMNI_1),
                             getRowFor(COMP_SCI_102, STUDENT_1),
                             getRowFor(STAT_101, STUDENT_1),
                             getRowFor(ALGBR101, STUDENT_1),
-                            getRowFor(null, null, ALUMNI_1),
                             getRowFor(COMP_SCI_102, STUDENT_2),
                             getRowFor(STAT_101, STUDENT_2)
                     ));
@@ -135,7 +135,6 @@ class WorkingWithMySQLServiceTest {
             verify(mockMySqlClient).executeSelectQuery(queryBuilderCaptor.capture());
             assertEquals(expectedQuery, getActualQuery(queryBuilderCaptor.getValue()));
             assertEquals(expectedDiplomas.toString(), actualDiplomas.toString());
-            //todo fix grouping when nested...
         }
     }
 
