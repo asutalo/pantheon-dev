@@ -1,7 +1,7 @@
 package com.eu.atit.mysql.service.merging.direction;
 
 import com.eu.atit.mysql.service.FieldValueGetter;
-import com.eu.atit.mysql.service.FieldsMerger;
+import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 
 import java.util.List;
 

@@ -1,4 +1,6 @@
-package com.eu.atit.mysql.service;
+package com.eu.atit.mysql.service.merging.fields;
+
+import com.eu.atit.mysql.service.FieldValueGetter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,23 +36,12 @@ public class FieldsMerger {
         return groupedById.values().stream().flatMap(Collection::stream).toList();
     }
 
-    Object second(List<Object> toMerge) {
+    public Object second(List<Object> toMerge) {
         Object originalA = toMerge.get(0);
         for (FieldsMergerDTO tFieldsMergerDTO : fieldsMergerDTOList) {
             tFieldsMergerDTO.fieldValueSetter().accept(originalA, tFieldsMergerDTO.apply(toMerge));
         }
 
         return originalA;
-    }
-
-    static class DeadEnd extends FieldsMerger {
-        public DeadEnd(FieldValueGetter primaryFieldValueGetter, List<FieldsMergerDTO> fieldsMergerDTOList) {
-            super(primaryFieldValueGetter, fieldsMergerDTOList);
-        }
-
-        @Override
-        Object second(List<Object> toMerge) {
-            return toMerge.get(0);
-        }
     }
 }

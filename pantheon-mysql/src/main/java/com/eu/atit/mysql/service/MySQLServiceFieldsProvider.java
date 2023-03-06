@@ -2,8 +2,11 @@ package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.merging.direction.Crossroads;
+import com.eu.atit.mysql.service.merging.direction.DeadEnd;
 import com.eu.atit.mysql.service.merging.direction.ListRoad;
 import com.eu.atit.mysql.service.merging.direction.SingleRoad;
+import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
+import com.eu.atit.mysql.service.merging.fields.FieldsMergerDTO;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
@@ -193,7 +196,7 @@ class MySQLServiceFieldsProvider {
                     modelDescriptor.isHasDescendantWithList()){
                 FieldsMerger fieldsMerger = modelDescriptor.getFieldsMerger();
                 if (fieldsMerger==null) {
-                    fieldsMerger = new FieldsMerger.DeadEnd(modelDescriptor.getPrimaryKeyFieldValueGetter(), null);
+                    fieldsMerger = new DeadEnd(modelDescriptor.getPrimaryKeyFieldValueGetter(), null);
                 }
                 crossroads = new SingleRoad(fieldsMerger,  new FieldValueGetter(f));
 

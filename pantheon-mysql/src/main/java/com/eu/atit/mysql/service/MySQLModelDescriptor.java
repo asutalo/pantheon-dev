@@ -1,9 +1,10 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
 import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
+import com.eu.atit.mysql.service.merging.direction.DeadEnd;
+import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
@@ -97,7 +98,7 @@ public class MySQLModelDescriptor<T> {
         if(mySQLServiceFieldsProvider.getSpecificListFieldValueOverrides(modelClass).size() > 0 || hasDescendantWithList) {
             fieldsMerger = new FieldsMerger(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
         } else {
-            fieldsMerger = new FieldsMerger.DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
+            fieldsMerger = new DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
         }
     }
 
