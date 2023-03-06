@@ -2,7 +2,6 @@ package com.eu.atit.student.service.examples;
 
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.query.QueryBuilder;
-import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.student.service.model.Course;
 import com.eu.atit.student.service.model.Diploma;
 import com.eu.atit.student.service.model.Student;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.inject.Named;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;

@@ -23,10 +23,7 @@ import java.util.Map;
 
 import static com.eu.atit.pantheon.server.response.exception.InternalServerErrorException.INTERNAL_SERVER_ERROR_MESSAGE;
 import static com.eu.atit.pantheon.server.response.exception.InternalServerErrorException.INTERNAL_SERVER_ERROR_STATUS;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HandlerTest {

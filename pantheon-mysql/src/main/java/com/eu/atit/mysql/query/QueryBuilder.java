@@ -6,8 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QueryBuilder {
@@ -50,9 +52,11 @@ public class QueryBuilder {
     public void and() {
         queryParts.add(new And());
     }
+
     public void join(String targetTableName, String targetId, String sourceTableName, String sourceId) {
         queryParts.add(new Join(targetTableName, targetId, sourceTableName, sourceId));
     }
+
     public void leftJoin(String targetTableName, String targetId, String sourceTableName, String sourceId) {
         queryParts.add(new LeftJoin(targetTableName, targetId, sourceTableName, sourceId));
     }
@@ -104,7 +108,7 @@ public class QueryBuilder {
     }
 
     public List<KeyVal> getKeyValues() {
-        return queryParts.stream().filter(queryPart -> queryPart instanceof KeyVal).map(queryPart -> (KeyVal)queryPart).collect(Collectors.toList());
+        return queryParts.stream().filter(queryPart -> queryPart instanceof KeyVal).map(queryPart -> (KeyVal) queryPart).collect(Collectors.toList());
     }
 
     private int getCurrentIndex() {
@@ -137,8 +141,8 @@ public class QueryBuilder {
     @Override
     public String toString() {
         return "QueryBuilder{" +
-                "queryParts=" + queryParts +
-                ", paramIndex=" + paramIndex +
-                '}';
+               "queryParts=" + queryParts +
+               ", paramIndex=" + paramIndex +
+               '}';
     }
 }

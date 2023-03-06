@@ -10,7 +10,7 @@ public abstract class Crossroads implements Function<List<Object>, Object> {
     final FieldsMerger childMerger;
     final FieldValueGetter nestedObjectGetter;
 
-    public Crossroads(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter){
+    public Crossroads(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter) {
         this.childMerger = childMerger;
         this.nestedObjectGetter = nestedObjectGetter;
     }

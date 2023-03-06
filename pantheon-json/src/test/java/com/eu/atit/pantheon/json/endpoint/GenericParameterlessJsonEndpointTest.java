@@ -23,9 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 
-import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.CREATED;
-import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.LOCATION;
-import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.OK;
+import static com.eu.atit.pantheon.json.endpoint.GenericJsonEndpoint.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

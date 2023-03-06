@@ -120,12 +120,12 @@ public class FieldMySqlValue {
     @Override
     public String toString() {
         return "FieldMySqlValue{" +
-                "field=" + field +
-                ", fieldName='" + fieldName + '\'' +
-                ", variableName='" + variableName + '\'' +
-                ", aliasName='" + aliasName + '\'' +
-                ", mysqlType=" + mysqlType +
-                '}';
+               "field=" + field +
+               ", fieldName='" + fieldName + '\'' +
+               ", variableName='" + variableName + '\'' +
+               ", aliasName='" + aliasName + '\'' +
+               ", mysqlType=" + mysqlType +
+               '}';
     }
 
     Field getField() {

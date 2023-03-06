@@ -12,7 +12,9 @@ public final class Diploma {
     @Nested(outward = true, eager = true)
     private Student student; //todo should not be in select statement as its ID is not stored anywhere in this object
 
-    public Diploma(){}
+    public Diploma() {
+    }
+
     public Diploma(Student student, boolean obtained) {
         this.student = student;
         this.obtained = obtained;

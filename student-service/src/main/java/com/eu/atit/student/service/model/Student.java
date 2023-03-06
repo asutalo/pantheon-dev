@@ -22,7 +22,9 @@ public class Student {
     @Nested(eager = true)
     private List<Course> courses;
 
-    public Student(){}
+    public Student() {
+    }
+
     public Student(int id, String name, Type type, Diploma diploma, List<Course> courses) {
         this.id = id;
         this.name = name;
@@ -35,12 +37,12 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                ", diploma=" + diploma.getStudent().id +
-                ", courses=" + courses +
-                '}';
+               "id=" + id +
+               ", name='" + name + '\'' +
+               ", type=" + type +
+               ", diploma=" + diploma.getStudent().id +
+               ", courses=" + courses +
+               '}';
     }
 
     public void setId(int i) {

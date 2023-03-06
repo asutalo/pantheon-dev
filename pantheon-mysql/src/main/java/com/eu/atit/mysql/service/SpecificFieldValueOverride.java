@@ -1,13 +1,11 @@
 package com.eu.atit.mysql.service;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 class SpecificFieldValueOverride<T> implements BiConsumer<T, T> {
-     final FieldValueSetter<T> fieldValueSetter;
-     final FieldValueGetter fieldValueGetter;
+    final FieldValueSetter<T> fieldValueSetter;
+    final FieldValueGetter fieldValueGetter;
 
     SpecificFieldValueOverride(Field fieldToSet) {
         fieldValueGetter = new FieldValueGetter(fieldToSet);
@@ -16,6 +14,6 @@ class SpecificFieldValueOverride<T> implements BiConsumer<T, T> {
 
     @Override
     public void accept(T setFieldOn, T getValueFrom) {
-            fieldValueSetter.accept(setFieldOn, fieldValueGetter.apply(getValueFrom));
+        fieldValueSetter.accept(setFieldOn, fieldValueGetter.apply(getValueFrom));
     }
 }

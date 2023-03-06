@@ -3,15 +3,12 @@ package com.eu.atit.student.service.examples;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
-import com.eu.atit.student.service.model.Diploma;
-import com.eu.atit.student.service.model.Student;
-import com.eu.atit.student.service.model.Type;
 import com.google.inject.TypeLiteral;
 
 import java.sql.SQLException;
 import java.util.Map;
 
-public class UsingMySQLService  {
+public class UsingMySQLService {
     private final MySQLServiceProvider mySQLServiceProvider;
 
     public UsingMySQLService(MySqlClient mySqlClient) {

@@ -5,7 +5,7 @@ import com.eu.atit.mysql.service.MySQLModelDescriptor;
 
 import java.util.LinkedList;
 
-public abstract class MySqlValuesFilter<T>{
+public abstract class MySqlValuesFilter<T> {
     final MySQLModelDescriptor<T> mySQLModelDescriptor;
 
     MySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {

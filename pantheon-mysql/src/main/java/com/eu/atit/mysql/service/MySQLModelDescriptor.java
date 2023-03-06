@@ -23,6 +23,7 @@ public class MySQLModelDescriptor<T> {
     }
 
     private boolean hasDescendantWithList;
+
     public boolean isHasDescendantWithList() {
         return hasDescendantWithList;
     }
@@ -95,7 +96,7 @@ public class MySQLModelDescriptor<T> {
         FieldValueGetter nestedPrimaryKeyValueGetter = mySQLServiceFieldsProvider.getNestedPrimaryKeyFieldValueGetter(modelClass);
 
         hasDescendantWithList = joinInfos.stream().anyMatch(JoinInfo::hasAnyList);
-        if(mySQLServiceFieldsProvider.getSpecificListFieldValueOverrides(modelClass).size() > 0 || hasDescendantWithList) {
+        if (mySQLServiceFieldsProvider.getSpecificListFieldValueOverrides(modelClass).size() > 0 || hasDescendantWithList) {
             fieldsMerger = new FieldsMerger(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
         } else {
             fieldsMerger = new DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
@@ -196,14 +197,14 @@ public class MySQLModelDescriptor<T> {
             resultSetToInstance = new ResultSetToInstance<>(this);
         }
     }
-    private void setMySqlValuesFilter(){
-        if(getNestedPrimaryFieldMySqlValues().isEmpty()){
+
+    private void setMySqlValuesFilter() {
+        if (getNestedPrimaryFieldMySqlValues().isEmpty()) {
             mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
         } else {
             mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
         }
     }
-
 
 
     public List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {

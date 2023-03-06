@@ -68,10 +68,10 @@ public class MySqlValue {
     @Override
     public String toString() {
         return "MySqlValue{" +
-                "mysqlType=" + mysqlType +
-                ", key='" + key + '\'' +
-                ", value=" + value +
-                ", paramIndex=" + paramIndex +
-                '}';
+               "mysqlType=" + mysqlType +
+               ", key='" + key + '\'' +
+               ", value=" + value +
+               ", paramIndex=" + paramIndex +
+               '}';
     }
 }

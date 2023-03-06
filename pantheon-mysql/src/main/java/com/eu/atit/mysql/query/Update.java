@@ -65,9 +65,9 @@ public class Update implements QueryPart {
     @Override
     public String toString() {
         return "Update{" +
-                "tableName='" + tableName + '\'' +
-                ", valuesForQuery=" + valuesForQuery +
-                ", valuesForParams=" + valuesForParams +
-                '}';
+               "tableName='" + tableName + '\'' +
+               ", valuesForQuery=" + valuesForQuery +
+               ", valuesForParams=" + valuesForParams +
+               '}';
     }
 }

@@ -16,7 +16,7 @@ public class MainQueryBuilderTransactionary {
 
     public static void main(String[] args) throws SQLException {
         LinkedList<String> dbParams = new LinkedList<>(List.of("some_db_name", "some_db_user", "some_Password", "some_db_user@localhost"));
-        
+
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
 
         Connection connection = dataClient.startTransaction();

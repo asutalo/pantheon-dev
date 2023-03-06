@@ -5,7 +5,7 @@ import com.eu.atit.mysql.service.MySQLModelDescriptor;
 
 import java.util.LinkedList;
 
-public class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T>{
+public class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T> {
     public NonPrimaryMySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
         super(mySQLModelDescriptor);
     }

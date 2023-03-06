@@ -35,8 +35,8 @@ public class From extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "From{" +
-                "tableName='" + tableName + '\'' +
-                ", tableNameLowercase='" + tableNameAlias + '\'' +
-                '}';
+               "tableName='" + tableName + '\'' +
+               ", tableNameLowercase='" + tableNameAlias + '\'' +
+               '}';
     }
 }

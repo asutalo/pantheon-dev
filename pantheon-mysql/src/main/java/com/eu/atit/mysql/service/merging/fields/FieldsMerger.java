@@ -2,19 +2,15 @@ package com.eu.atit.mysql.service.merging.fields;
 
 import com.eu.atit.mysql.service.FieldValueGetter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FieldsMerger {
     final FieldValueGetter primaryFieldValueGetter;
 
     /*
-    * list of fields that should be merged and instructions on how to merge
-    *
-    * */
+     * list of fields that should be merged and instructions on how to merge
+     *
+     * */
     private final List<FieldsMergerDTO> fieldsMergerDTOList;
 
     public FieldsMerger(FieldValueGetter primaryFieldValueGetter, List<FieldsMergerDTO> fieldsMergerDTOList) {

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSetter<T>{
+class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSetter<T> {
     private final FieldValueSetter<T> fieldValueSetter;
     private final MySQLService<?> service;
     private final Type actualTypeArgument;
@@ -22,7 +22,7 @@ class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSett
 
     @Override
     public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
-        if (!observedClasses.contains((Class<?>) actualTypeArgument)){
+        if (!observedClasses.contains((Class<?>) actualTypeArgument)) {
             observedClasses.add((Class<?>) actualTypeArgument);
             fieldValueSetter.accept(setFieldOn, new ArrayList<>(List.of(service.fullInstanceOfT(row, observedClasses))));
         } else {

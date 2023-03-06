@@ -44,11 +44,11 @@ public class Join extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "Join{" +
-                "targetTableName='" + targetTableName + '\'' +
-                ", targetId='" + targetId + '\'' +
-                ", sourceTableName='" + sourceTableName + '\'' +
-                ", sourceId='" + sourceId + '\'' +
-                ", targetTableNameLowercase='" + targetTableNameLowercase + '\'' +
-                '}';
+               "targetTableName='" + targetTableName + '\'' +
+               ", targetId='" + targetId + '\'' +
+               ", sourceTableName='" + sourceTableName + '\'' +
+               ", sourceId='" + sourceId + '\'' +
+               ", targetTableNameLowercase='" + targetTableNameLowercase + '\'' +
+               '}';
     }
 }

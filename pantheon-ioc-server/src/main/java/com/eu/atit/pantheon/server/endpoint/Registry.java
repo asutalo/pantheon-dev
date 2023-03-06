@@ -42,7 +42,7 @@ public class Registry {
     }
 
     //for tests
-    public void clearEndpoints(){
+    public void clearEndpoints() {
         endpoints.clear();
     }
 }

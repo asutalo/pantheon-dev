@@ -6,6 +6,7 @@ Built on top of the [Pantheon IOC Server](https://github.com/asutalo/pantheon-io
 CRUD endpoints.
 
 # Features
+
 Generic `parameterised` and `parameterless` endpoints for working with your domain objects.
 
 All responses from the generic endpoints will be formatted as JSON.
@@ -13,24 +14,25 @@ All responses from the generic endpoints will be formatted as JSON.
 There are several annotations which can be used to manage how your domain objects are interacted with:
 
 * @Location
-  * Mandatory that there is *1* variable marked
-  * Used to provide a URL to a newly saved object
+    * Mandatory that there is *1* variable marked
+    * Used to provide a URL to a newly saved object
 * @Protected
-  * Meant to mark a variable as requiring additional authorization to be fetched 
-  * Incomplete - at the moment there's to way to authorize access to the variable
-  * Once finished it should allow you to specify how the authorization is performed
+    * Meant to mark a variable as requiring additional authorization to be fetched
+    * Incomplete - at the moment there's to way to authorize access to the variable
+    * Once finished it should allow you to specify how the authorization is performed
 
 The generic endpoints provide the following verbs:
 
 * GenericParameterisedJsonEndpoint
-  * GET
-  * DELETE
-  * PUT
+    * GET
+    * DELETE
+    * PUT
 * GenericParameterlessJsonEndpoint
-  * GET
-  * POST
+    * GET
+    * POST
 
 # Restrictions
+
 At the moment only simple variables (i.e. Java standard types) are supported.
 
 # Usage
@@ -85,11 +87,13 @@ When the main method is executed navigate to `http://localhost:8080/cars` to int
 or to `http://localhost:8080/cars/1` to interact with the *parameterised* endpoint.
 
 # Coming Soon...
+
 * Tweaking requests
-  * i.e. limit, sort, filtering
+    * i.e. limit, sort, filtering
 * Nesting
-  * Support for custom classes as variables within the domain objects
+    * Support for custom classes as variables within the domain objects
 
 # Importing
 
-The library is available via [![](https://jitpack.io/v/asutalo/pantheon-json.svg)](https://jitpack.io/#asutalo/pantheon-json)
+The library is available
+via [![](https://jitpack.io/v/asutalo/pantheon-json.svg)](https://jitpack.io/#asutalo/pantheon-json)

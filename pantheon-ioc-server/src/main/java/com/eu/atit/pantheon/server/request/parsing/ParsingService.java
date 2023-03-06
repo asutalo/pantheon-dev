@@ -7,11 +7,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -53,7 +49,7 @@ public class ParsingService {
         String[] pathAndQuery = splitPathAndQuery(uriDefinition);
         Iterator<String> iterator = getIterator(separatedPath(pathAndQuery));
 
-        if(uriDefinition.equals("") || uriDefinition.equals("/") || uriDefinition.equals("\\/")){
+        if (uriDefinition.equals("") || uriDefinition.equals("/") || uriDefinition.equals("\\/")) {
             return "\\/";
         }
 

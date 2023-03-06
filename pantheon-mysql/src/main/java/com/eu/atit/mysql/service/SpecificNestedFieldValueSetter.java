@@ -14,7 +14,7 @@ class SpecificNestedFieldValueSetter<T> {
     }
 
     public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
-        if (!observedClasses.contains(fieldValueSetter.getField().getType())){
+        if (!observedClasses.contains(fieldValueSetter.getField().getType())) {
             observedClasses.add(fieldValueSetter.getField().getType());
             fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row, observedClasses));
         } else {

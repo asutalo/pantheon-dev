@@ -5,7 +5,7 @@ import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 
 import java.util.List;
 
-public  class SingleRoad extends Crossroads{
+public class SingleRoad extends Crossroads {
     public SingleRoad(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter) {
         super(childMerger, nestedObjectGetter);
     }

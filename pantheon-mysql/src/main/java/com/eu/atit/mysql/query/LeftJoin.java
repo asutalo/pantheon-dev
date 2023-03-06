@@ -3,6 +3,7 @@ package com.eu.atit.mysql.query;
 
 public class LeftJoin extends Join implements QueryPart {
     static final String LEFT = System.lineSeparator().concat("LEFT JOIN ");
+
     public LeftJoin(String targetTableName, String targetId, String sourceTableName, String sourceId) {
         super(targetTableName, targetId, sourceTableName, sourceId);
     }

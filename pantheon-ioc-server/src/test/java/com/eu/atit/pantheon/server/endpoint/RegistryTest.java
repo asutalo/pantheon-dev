@@ -57,7 +57,7 @@ class RegistryTest {
     }
 
     @Test
-    void clearEndpoints(){
+    void clearEndpoints() {
         registry.registerEndpoint(new TestEndpoint("some"));
         registry.clearEndpoints();
 

@@ -2,7 +2,9 @@ package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class SelectWithAliases extends KeyWord implements QueryPart {
     static final String SELECT = "SELECT\t";
@@ -51,7 +53,7 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "SelectWithAliases{" +
-                "columnsAndAliases=" + columnsAndAliases +
-                '}';
+               "columnsAndAliases=" + columnsAndAliases +
+               '}';
     }
 }

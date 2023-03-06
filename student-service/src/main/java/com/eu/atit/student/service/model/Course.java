@@ -3,13 +3,11 @@ package com.eu.atit.student.service.model;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 
-import java.util.Objects;
-
-public  class Course {
+public class Course {
     @MySqlField(type = MysqlType.INT, primary = true)
-    private  Integer id;
+    private Integer id;
     @MySqlField(type = MysqlType.VARCHAR)
-    private  String name;
+    private String name;
 
     public int id() {
         return id;
@@ -19,7 +17,8 @@ public  class Course {
         return name;
     }
 
-    public Course() {}
+    public Course() {
+    }
 
     public Course(Integer id, String name) {
         this.id = id;
@@ -29,8 +28,8 @@ public  class Course {
     @Override
     public String toString() {
         return "Course[" +
-                "id=" + id + ", " +
-                "name=" + name + ']';
+               "id=" + id + ", " +
+               "name=" + name + ']';
     }
 
     public Integer getId() {

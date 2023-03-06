@@ -69,9 +69,9 @@ public class Insert implements QueryPart {
     @Override
     public String toString() {
         return "Insert{" +
-                "tableName='" + tableName + '\'' +
-                ", valuesForQuery=" + valuesForQuery +
-                ", valuesForParams=" + valuesForParams +
-                '}';
+               "tableName='" + tableName + '\'' +
+               ", valuesForQuery=" + valuesForQuery +
+               ", valuesForParams=" + valuesForParams +
+               '}';
     }
 }

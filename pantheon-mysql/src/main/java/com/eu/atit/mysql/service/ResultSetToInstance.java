@@ -1,22 +1,17 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.mysql.query.QueryBuilder;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 class ResultSetToInstance<T> {
     final MySQLModelDescriptor<T> mySQLModelDescriptor;
 
-    ResultSetToInstance(MySQLModelDescriptor<T> mySQLModelDescriptor){
+    ResultSetToInstance(MySQLModelDescriptor<T> mySQLModelDescriptor) {
         this.mySQLModelDescriptor = mySQLModelDescriptor;
     }
 
-    public List<T> getAll(List<Map<String, Object>> resultSet)  {
+    public List<T> getAll(List<Map<String, Object>> resultSet) {
         List<T> elements = new LinkedList<>();
         for (Map<String, Object> row : resultSet) {
             elements.add(get(row));

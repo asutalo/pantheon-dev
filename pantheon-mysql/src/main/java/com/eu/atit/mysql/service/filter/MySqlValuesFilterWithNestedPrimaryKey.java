@@ -9,7 +9,7 @@ import com.eu.atit.pantheon.helper.Pair;
 import java.util.LinkedList;
 import java.util.List;
 
-public  class MySqlValuesFilterWithNestedPrimaryKey<T> extends NonPrimaryMySqlValuesFilter<T>{
+public class MySqlValuesFilterWithNestedPrimaryKey<T> extends NonPrimaryMySqlValuesFilter<T> {
     private final List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldMySqlValues;
 
     public MySqlValuesFilterWithNestedPrimaryKey(MySQLModelDescriptor<T> mySQLModelDescriptor) {

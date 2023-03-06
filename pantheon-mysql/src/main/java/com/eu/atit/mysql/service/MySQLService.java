@@ -7,11 +7,7 @@ import com.eu.atit.pantheon.client.data.DataClient;
 import com.eu.atit.pantheon.service.data.DataService;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MySQLService<T> implements DataService<T, QueryBuilder> {
     private final MySqlClient mySqlClient;

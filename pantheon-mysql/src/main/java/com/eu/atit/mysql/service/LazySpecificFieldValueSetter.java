@@ -3,7 +3,7 @@ package com.eu.atit.mysql.service;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class LazySpecificFieldValueSetter<T> extends SpecificFieldValueSetter<T>{
+public class LazySpecificFieldValueSetter<T> extends SpecificFieldValueSetter<T> {
     private final MySQLService<?> service;
     private final FieldValueSetter<T> fieldValueSetter;
 

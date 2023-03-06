@@ -5,9 +5,10 @@ import java.lang.reflect.Field;
 /**
  * Function to set a value into an instance of an object
  */
-class NestedFieldValueGetter extends FieldValueGetter{
+class NestedFieldValueGetter extends FieldValueGetter {
 
     private final FieldValueGetter nestedPrimaryKeyFieldValueGetter;
+
     NestedFieldValueGetter(Field field, MySQLModelDescriptor<?> mySQLModelDescriptor) {
         super(field);
         nestedPrimaryKeyFieldValueGetter = mySQLModelDescriptor.getPrimaryKeyFieldValueGetter();

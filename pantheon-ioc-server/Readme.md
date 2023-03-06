@@ -24,6 +24,7 @@ be a **double digit**, and a query parameter, *name* which has to be a **word**.
 incorrect format the request will come back as a ***404***.
 
 After you extend Endpoints class you have a choice of overriding the default methods for:
+
 * get
 * post
 * put
@@ -31,7 +32,7 @@ After you extend Endpoints class you have a choice of overriding the default met
 * head
 * patch
 
-Overriding these will allow your Endpoint to process the corresponding requests, should a request come using a method 
+Overriding these will allow your Endpoint to process the corresponding requests, should a request come using a method
 which is not implemented by you, it will respond with ***501***.
 
 Each of the methods above responds with a *Response* object, and you can use the existing *SimpleResponse* class or
@@ -73,4 +74,5 @@ When the main method is executed navigate to `http://localhost:8080/helloWorld` 
 
 ## Importing
 
-The library is available via [![](https://jitpack.io/v/asutalo/pantheon-ioc-server.svg)](https://jitpack.io/#asutalo/pantheon-ioc-server)
+The library is available
+via [![](https://jitpack.io/v/asutalo/pantheon-ioc-server.svg)](https://jitpack.io/#asutalo/pantheon-ioc-server)

@@ -4,10 +4,6 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
-import com.eu.atit.student.service.model.Course;
-import com.eu.atit.student.service.model.Diploma;
-import com.eu.atit.student.service.model.Student;
-import com.eu.atit.student.service.model.Type;
 import com.google.inject.TypeLiteral;
 
 import java.sql.DriverManager;
@@ -31,7 +27,7 @@ public class WorkingWithMySQLService {
         mySQLServiceProvider = new MySQLServiceProvider(dataClient);
     }
 
-    public List<?> getAll(Class<?>classToFetch) throws SQLException {
+    public List<?> getAll(Class<?> classToFetch) throws SQLException {
         MySQLService<?> studentMySQLService = mySQLServiceProvider.provide(TypeLiteral.get(classToFetch));
         return studentMySQLService.getAll();
     }

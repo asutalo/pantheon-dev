@@ -1,10 +1,6 @@
 package com.eu.atit.mysql.service;
 
 import java.lang.reflect.Field;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Function to set a value into an instance of an object

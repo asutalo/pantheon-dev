@@ -5,7 +5,7 @@ import com.eu.atit.mysql.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JoinedFilterSelect extends FilteredSelect{
+public class JoinedFilterSelect extends FilteredSelect {
     private final QueryBuilder joinedFilteredSelectQueryBuilder;
 
     JoinedFilterSelect(MySQLModelDescriptor<?> mySQLModelDescriptor) {
@@ -30,7 +30,7 @@ public class JoinedFilterSelect extends FilteredSelect{
     }
 
     @Override
-    QueryBuilder get(){
+    QueryBuilder get() {
         return joinedFilteredSelectQueryBuilder;
     }
 }

@@ -1,10 +1,10 @@
 package com.eu.atit.mysql.service.merging.fields;
 
-import java.util.List;
-import java.util.function.Function;
-
 import com.eu.atit.mysql.service.FieldValueSetter;
 import com.eu.atit.mysql.service.merging.direction.Crossroads;
+
+import java.util.List;
+import java.util.function.Function;
 
 public class FieldsMergerDTO {
     private final FieldValueSetter<Object> fieldValueSetter;
