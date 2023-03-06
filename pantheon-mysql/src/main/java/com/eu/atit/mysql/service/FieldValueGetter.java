@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Function to set a value into an instance of an object
  */
-class FieldValueGetter {
+public class FieldValueGetter {
     final Field field;
 
     /**

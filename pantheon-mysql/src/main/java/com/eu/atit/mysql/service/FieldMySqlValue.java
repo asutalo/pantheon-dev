@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Function to convert a variable from an object into a MySqlValue
  */
-class FieldMySqlValue {
+public class FieldMySqlValue {
     private final Field field;//todo replace with FieldValueGetter to simplify
     private final String fieldName;
     private final String variableName;

@@ -1,6 +1,9 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.MySqlValue;
+import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
+import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
+import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
@@ -128,7 +131,7 @@ public class MySQLModelDescriptor<T> {
         return aliasFieldMySqlValueMap;
     }
 
-    List<FieldMySqlValue> getNonPrimaryKeyFieldMySqlValues() {
+    public List<FieldMySqlValue> getNonPrimaryKeyFieldMySqlValues() {
         return nonPrimaryKeyFieldMySqlValues;
     }
 
@@ -193,30 +196,16 @@ public class MySQLModelDescriptor<T> {
         }
     }
     private void setMySqlValuesFilter(){
-        if(mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass).isEmpty()){
+        if(getNestedPrimaryFieldMySqlValues().isEmpty()){
             mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
         } else {
             mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
         }
     }
 
-    static class MySqlValuesFilterWithNestedPrimaryKey<T> extends NonPrimaryMySqlValuesFilter<T>{
-        private final List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldMySqlValues;
 
-        MySqlValuesFilterWithNestedPrimaryKey(MySQLModelDescriptor<T> mySQLModelDescriptor) {
-            super(mySQLModelDescriptor);
-            this.nestedFieldMySqlValues = mySQLModelDescriptor.getNestedPrimaryFieldMySqlValues();
-        }
 
-        @Override
-        LinkedList<MySqlValue> get(T object) {
-            LinkedList<MySqlValue> mySqlValues = super.get(object);
-            nestedFieldMySqlValues.forEach(nestedFieldMySqlValue -> mySqlValues.add(nestedFieldMySqlValue.left().apply(nestedFieldMySqlValue.right().apply(object))));
-            return mySqlValues;
-        }
-    }
-
-    List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {
+    public List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {
         return mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass);
     }
 
@@ -230,29 +219,5 @@ public class MySQLModelDescriptor<T> {
 
     MySqlValuesFilter<T> getMySqlValuesFilter() {
         return mySqlValuesFilter;
-    }
-
-    static abstract class MySqlValuesFilter<T>{
-        final MySQLModelDescriptor<T> mySQLModelDescriptor;
-
-        MySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
-            this.mySQLModelDescriptor = mySQLModelDescriptor;
-        }
-
-        abstract LinkedList<MySqlValue> get(T object);
-    }
-
-    static class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T>{
-        NonPrimaryMySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
-            super(mySQLModelDescriptor);
-        }
-
-        @Override
-        LinkedList<MySqlValue> get(T object) {
-            LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
-            mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(object)));
-
-            return mySqlValues;
-        }
     }
 }

@@ -1,6 +1,9 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.mysql.service.merging.direction.Crossroads;
+import com.eu.atit.mysql.service.merging.direction.ListRoad;
+import com.eu.atit.mysql.service.merging.direction.SingleRoad;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
@@ -57,7 +60,7 @@ class MySQLServiceFieldsProvider {
         return null;
     }
 
-    private static <T> FieldValueGetter fieldToFieldValueGetter(Field field) {
+    private static FieldValueGetter fieldToFieldValueGetter(Field field) {
         field.setAccessible(true);
         return new FieldValueGetter(field);
     }
@@ -70,7 +73,6 @@ class MySQLServiceFieldsProvider {
 
     <T> Map<String, FieldValueSetter<T>> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
         Map<String, FieldValueSetter<T>> nonPrimaryFieldValueSetterMap = new HashMap<>();
-//        for (Field field : getDeclaredSqlFieldsOnly(tClass)) { todo
 
         for (Field field : tClass.getDeclaredFields()) {
             field.setAccessible(true);
@@ -88,13 +90,13 @@ class MySQLServiceFieldsProvider {
         return nonPrimaryFieldValueSetterMap;
     }
 
-    <T> SpecificFieldValueSetter getPrimaryKeyValueSetter(Class<T> tClass) {
+    <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
         String tableName = getTableNameLowercase(tClass);
         Field field = getDeclaredPrimaryField(tClass);
         field.setAccessible(true);
 
         if(field.getAnnotation(Nested.class) != null){
-            return new LazySpecificFieldValueSetter(field, tableName,  mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(field.getType())));
+            return new LazySpecificFieldValueSetter<>(field, tableName, mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(field.getType())));
         }
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String fieldName = mySqlFieldInfo.column();
@@ -184,19 +186,19 @@ class MySQLServiceFieldsProvider {
                     isList(f.getGenericType())?((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0]:
                     f.getType()));
 
-            FieldsMergerDTO.Crossroads crossroads;
+            Crossroads crossroads;
             if(isList(f.getGenericType())){
-                crossroads = new FieldsMergerDTO.ListRoad(modelDescriptor.getFieldsMerger(),  new FieldValueGetter(f));
+                crossroads = new ListRoad(modelDescriptor.getFieldsMerger(),  new FieldValueGetter(f));
             } else if (
                     modelDescriptor.isHasDescendantWithList()){
                 FieldsMerger fieldsMerger = modelDescriptor.getFieldsMerger();
                 if (fieldsMerger==null) {
                     fieldsMerger = new FieldsMerger.DeadEnd(modelDescriptor.getPrimaryKeyFieldValueGetter(), null);
                 }
-                crossroads = new FieldsMergerDTO.SingleRoad(fieldsMerger,  new FieldValueGetter(f));
+                crossroads = new SingleRoad(fieldsMerger,  new FieldValueGetter(f));
 
             } else {
-                crossroads = new FieldsMergerDTO.SingleRoad(modelDescriptor.getFieldsMerger(), new FieldValueGetter(f));
+                crossroads = new SingleRoad(modelDescriptor.getFieldsMerger(), new FieldValueGetter(f));
             }
            return new FieldsMergerDTO(new FieldValueSetter<>(f), crossroads);
         }).toList();
@@ -217,14 +219,6 @@ class MySQLServiceFieldsProvider {
 
         return setters;
     }
-
-//    <T> FieldMySqlValue getNestedPrimaryFieldMySqlValue(Class<T> tClass) {todo check
-//        Field field = getDeclaredPrimaryField(tClass);
-//        field.setAccessible(true);
-//        MySQLModelDescriptor<?> modelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
-//
-//        return new FieldMySqlValue(modelDescriptor, field);
-//    }
 
     <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
