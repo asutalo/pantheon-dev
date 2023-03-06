@@ -61,10 +61,10 @@ public class QueryBuilder {
         queryParts.add(new KeyVal(value.getMysqlType(), value.getKey(), value.getValue(), getSeparator(), getCurrentIndex()));
     }
 
-    void setQueryParts(List<QueryPart> queryParts) {
-        this.queryParts.clear();
-        this.queryParts.addAll(queryParts);
-    }
+//    void setQueryParts(List<QueryPart> queryParts) {todo check
+//        this.queryParts.clear();
+//        this.queryParts.addAll(queryParts);
+//    }
 
     private String getSeparator() {
         String separator = COMMA;
@@ -94,14 +94,8 @@ public class QueryBuilder {
             queryPart.apply(preparedStatement);
         }
 
-        System.out.println("-----------------------------------------");
-        System.out.println("-----------------------------------------");
-
-        System.out.println("prepped: ");
         System.out.println(preparedStatement);
 
-        System.out.println("-----------------------------------------");
-        System.out.println("-----------------------------------------");
         return preparedStatement;
     }
 

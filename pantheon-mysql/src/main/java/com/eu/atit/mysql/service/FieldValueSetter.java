@@ -28,8 +28,4 @@ class FieldValueSetter<T> implements BiConsumer<T, Object> {
     Field getField() {
         return field;
     }
-
-    Object getFieldValue(T valueOf) throws IllegalAccessException {
-        return field.get(valueOf);
-    }
 }

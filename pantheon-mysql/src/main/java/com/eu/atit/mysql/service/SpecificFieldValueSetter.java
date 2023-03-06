@@ -26,14 +26,6 @@ class SpecificFieldValueSetter<T> implements BiConsumer<T, Map<String, Object>> 
         fieldValueSetter.accept(setFieldOn, row.get(aliasFieldName));
     }
 
-    String getFieldName() {
-        return fieldName;
-    }
-
-    String getAliasFieldName() {
-        return aliasFieldName;
-    }
-
     ColumnNameAndAlias fieldNameAndAlias(String tableName) {
         return new ColumnNameAndAlias(tableName + "." + fieldName, aliasFieldName);
     }

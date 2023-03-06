@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
 
+
+//todo check
 public class ValKey implements QueryPart {
     static final String VAL = "?";
     static final String AS = " AS ";
@@ -32,14 +34,6 @@ public class ValKey implements QueryPart {
     @Override
     public void apply(PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setObject(index, value, targetType);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public MysqlType getValueType() {
-        return targetType;
     }
 
     @Override

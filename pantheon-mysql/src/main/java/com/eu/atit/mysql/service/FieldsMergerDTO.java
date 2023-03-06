@@ -10,19 +10,17 @@ public class FieldsMergerDTO {
 
     abstract static class Crossroads implements Function<List<Object>, Object>{
          final FieldsMerger childMerger;
-         final FieldValueSetter<Object> fieldValueSetter;
          final FieldValueGetter nestedObjectGetter;
 
-        public Crossroads(FieldsMerger childMerger, FieldValueSetter<Object> fieldValueSetter, FieldValueGetter nestedObjectGetter){
+        public Crossroads(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter){
             this.childMerger = childMerger;
-            this.fieldValueSetter = fieldValueSetter;
             this.nestedObjectGetter = nestedObjectGetter;
         }
     }
 
     static class ListRoad extends Crossroads{
-        public ListRoad(FieldsMerger childMerger, FieldValueSetter<Object> fieldValueSetter, FieldValueGetter nestedObjectGetter) {
-            super(childMerger, fieldValueSetter, nestedObjectGetter);
+        public ListRoad(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter) {
+            super(childMerger, nestedObjectGetter);
         }
 
         @Override
@@ -36,8 +34,8 @@ public class FieldsMergerDTO {
     }
 
     static class SingleRoad extends Crossroads{
-        public SingleRoad(FieldsMerger childMerger, FieldValueSetter<Object> fieldValueSetter, FieldValueGetter nestedObjectGetter) {
-            super(childMerger, fieldValueSetter, nestedObjectGetter);
+        public SingleRoad(FieldsMerger childMerger, FieldValueGetter nestedObjectGetter) {
+            super(childMerger, nestedObjectGetter);
         }
 
         @Override

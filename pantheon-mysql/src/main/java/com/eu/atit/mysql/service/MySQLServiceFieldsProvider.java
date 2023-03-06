@@ -162,33 +162,6 @@ class MySQLServiceFieldsProvider {
         }
     }
 
-    <T> List<SpecificFieldValueOverride<T>> getSpecificFieldValueOverrides(Class<T> tClass) {
-        List<SpecificFieldValueOverride<T>> overrides = new ArrayList<>();
-        //todo remove, not needed at all
-//        for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
-//            field.setAccessible(true);
-//            overrides.add(new SpecificFieldValueOverride<>(field));
-//        }
-
-        List<Field> declaredNestedFields = getDeclaredNestedFields(tClass);
-
-        List<Field> nestedLists = declaredNestedFields.stream().filter(field -> isList(field.getGenericType())).toList();
-//        List<Field> nestedObjects = declaredNestedFields.stream().filter(field -> !isList(field.getGenericType())).toList();
-
-        //todo remove, not needed at all
-//        for (Field field : nestedObjects) {
-//            field.setAccessible(true);
-//            overrides.add(new SpecificFieldValueOverride<>(field));
-//        }
-
-        for (Field field : nestedLists) {
-            field.setAccessible(true);
-            overrides.add(new SpecificListFieldValueOverride<>(field));
-        }
-
-        return overrides;
-    }
-
     <T> List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> getSpecificListFieldValueOverrides(Class<T> tClass) {
         List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> overrides = new ArrayList<>();
 
@@ -213,17 +186,17 @@ class MySQLServiceFieldsProvider {
 
             FieldsMergerDTO.Crossroads crossroads;
             if(isList(f.getGenericType())){
-                crossroads = new FieldsMergerDTO.ListRoad(modelDescriptor.getFieldsMerger(), new FieldValueSetter<>(f), new FieldValueGetter(f));
+                crossroads = new FieldsMergerDTO.ListRoad(modelDescriptor.getFieldsMerger(),  new FieldValueGetter(f));
             } else if (
                     modelDescriptor.isHasDescendantWithList()){
                 FieldsMerger fieldsMerger = modelDescriptor.getFieldsMerger();
                 if (fieldsMerger==null) {
                     fieldsMerger = new FieldsMerger.DeadEnd(modelDescriptor.getPrimaryKeyFieldValueGetter(), null);
                 }
-                crossroads = new FieldsMergerDTO.SingleRoad(fieldsMerger, new FieldValueSetter<>(f), new FieldValueGetter(f));
+                crossroads = new FieldsMergerDTO.SingleRoad(fieldsMerger,  new FieldValueGetter(f));
 
             } else {
-                crossroads = new FieldsMergerDTO.SingleRoad(modelDescriptor.getFieldsMerger(), new FieldValueSetter<>(f), new FieldValueGetter(f));
+                crossroads = new FieldsMergerDTO.SingleRoad(modelDescriptor.getFieldsMerger(), new FieldValueGetter(f));
             }
            return new FieldsMergerDTO(new FieldValueSetter<>(f), crossroads);
         }).toList();
@@ -245,13 +218,13 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    <T> FieldMySqlValue getNestedPrimaryFieldMySqlValue(Class<T> tClass) {
-        Field field = getDeclaredPrimaryField(tClass);
-        field.setAccessible(true);
-        MySQLModelDescriptor<?> modelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
-
-        return new FieldMySqlValue(modelDescriptor, field);
-    }
+//    <T> FieldMySqlValue getNestedPrimaryFieldMySqlValue(Class<T> tClass) {todo check
+//        Field field = getDeclaredPrimaryField(tClass);
+//        field.setAccessible(true);
+//        MySQLModelDescriptor<?> modelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType()));
+//
+//        return new FieldMySqlValue(modelDescriptor, field);
+//    }
 
     <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
@@ -333,51 +306,9 @@ class MySQLServiceFieldsProvider {
         return modelClass + "_" + targetTableLowercase;
     }
 
-    private String getInwardJoinForeignKey(String link, Class<?> tClass) {
-        if (link.isBlank()) {
-            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
-        } else {
-            return link;
-        }
-    }
-
     private String getOutwardJoinForeignKey(String link, Field field, Class<?> modelClass) {
         if (link.isBlank()) {
             return connectingTable(field.getType().getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(modelClass).getFieldName());
-        } else {
-            return link;
-        }
-    }
-
-
-
-    private String getInwardJoinForeignKey(String link, Class<?> tClass, Field field) {
-        if (link.isBlank()) {
-
-            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
-        } else {
-            return link;
-        }
-    }
-
-//    private String getInwardJoinForeignKey(String link, Class<?> tClass, Field field) {
-//        if (link.isBlank()) {
-//            if(isPrimary(field)){
-//                return getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
-//            }
-//
-//            return connectingTable(tClass.getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(tClass).getFieldName());
-//        } else {
-//            return link;
-//        }
-//    }
-
-    private String getOutwardJoinForeignKey(String link, Field field, MySQLModelDescriptor<?> nestedMySQLModelDescriptor, Class<?> tClass) {
-        if (link.isBlank()) {
-//            if(isPrimary(field)){
-//                return getPrimaryKeyFieldMySqlValue(tClass).getFieldName();
-//            }
-            return connectingTable(field.getType().getSimpleName().toLowerCase(), nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName());
         } else {
             return link;
         }
@@ -415,10 +346,6 @@ class MySQLServiceFieldsProvider {
         } else {
             return field.getType();
         }
-    }
-
-    private <T> List<Field> getDeclaredSqlFields(Class<T> tClass) {
-        return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
     }
 
     private <T> List<Field> getDeclaredSqlFieldsOnly(Class<T> tClass) {

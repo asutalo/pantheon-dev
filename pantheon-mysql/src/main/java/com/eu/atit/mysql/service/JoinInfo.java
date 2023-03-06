@@ -65,14 +65,6 @@ public class JoinInfo {
         return hasAnyList;
     }
 
-    public Class<?> getParent() {
-        return parent;
-    }
-
-    public Class<?> getChild() {
-        return child;
-    }
-
     @Override
     public String toString() {
         return "JoinInfo{" +

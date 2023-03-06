@@ -49,10 +49,6 @@ public class Insert implements QueryPart {
         }
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
     public List<MySqlValue> getValuesForParams() {
         return valuesForParams;
     }

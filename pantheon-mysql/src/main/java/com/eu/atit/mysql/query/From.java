@@ -19,10 +19,6 @@ public class From extends KeyWord implements QueryPart {
         return query.concat(FROM).concat(tableName).concat(AS).concat(tableNameAlias);
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

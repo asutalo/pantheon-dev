@@ -18,10 +18,6 @@ class Instantiator<T> implements Supplier<T> {
         this.declaredConstructor = declaredConstructor;
     }
 
-    Constructor<T> getDeclaredConstructor() {
-        return declaredConstructor;
-    }
-
     @Override
     public T get() {
         try {

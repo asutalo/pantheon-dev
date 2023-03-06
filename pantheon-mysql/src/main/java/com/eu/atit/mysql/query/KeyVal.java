@@ -36,14 +36,6 @@ public class KeyVal implements QueryPart {
         return value;
     }
 
-    public MysqlType getValueType() {
-        return targetType;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
