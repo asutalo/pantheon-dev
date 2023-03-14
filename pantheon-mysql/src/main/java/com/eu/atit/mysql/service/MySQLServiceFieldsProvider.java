@@ -63,11 +63,6 @@ class MySQLServiceFieldsProvider {
         return null;
     }
 
-    private static FieldValueGetter fieldToFieldValueGetter(Field field) {
-        field.setAccessible(true);
-        return new FieldValueGetter(field);
-    }
-
     <T> FieldValueSetter<T> getPrimaryKeyFieldValueSetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         field.setAccessible(true);
@@ -131,8 +126,11 @@ class MySQLServiceFieldsProvider {
 
     <T> FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
-        field.setAccessible(true);
+        if(field.getAnnotation(Nested.class)!=null){
+            return mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(field.getType())).getPrimaryKeyFieldMySqlValue();
+        }
 
+        field.setAccessible(true);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String fieldName = mySqlFieldInfo.column();
         String tableName = getTableNameLowercase(tClass);
@@ -153,18 +151,6 @@ class MySQLServiceFieldsProvider {
         }
 
         return getters;
-    }
-
-    private <T> FieldMySqlValue fieldToFieldMySqlValue(Class<T> tClass, Field field) {
-        field.setAccessible(true);
-        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-        String tableName = getTableNameLowercase(tClass);
-        String fieldName = mySqlFieldInfo.column();
-        if (fieldName.isBlank()) {
-            return (new FieldMySqlValue(field, mySqlFieldInfo.type(), tableName));
-        } else {
-            return (new FieldMySqlValue(field, mySqlFieldInfo.type(), fieldName, tableName));
-        }
     }
 
     <T> List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> getSpecificListFieldValueOverrides(Class<T> tClass) {
@@ -223,7 +209,7 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {
+    <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {//todo wtf are these
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
         List<Field> fields = getDeclaredNestedMySqlFields(tClass);
         fields.forEach(nestedField -> {
@@ -235,7 +221,22 @@ class MySQLServiceFieldsProvider {
         return nestedFieldsMySqlValues;
     }
 
-    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
+    String getPrimaryKeyFieldName(Class<?> ofClass){
+        Field field = getDeclaredPrimaryField(ofClass);
+        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+        if (mySqlFieldInfo == null) {
+            return field.getName();
+        }
+        String fieldName = mySqlFieldInfo.column();
+
+        if (fieldName.isBlank()) {
+            return field.getName();
+        }
+
+        return fieldName;
+    }
+
+    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass,MySQLModelDescriptor<?> requesterDescriptor) {
         List<JoinInfo> joinInfos = new ArrayList<>();
 
         boolean hasAnyList = false;
@@ -252,24 +253,38 @@ class MySQLServiceFieldsProvider {
             Type genericType = field.getGenericType();
             boolean isList = isList(genericType);
             validateNestingDirection(nestingInfo, isList);
+            Class<?> joiningWithClass = joiningWith(field, genericType, isList);
 
-            MySQLModelDescriptor<?> nestedMySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(joiningWith(field, genericType, isList)));
+            MySQLModelDescriptor<?> nestedMySQLModelDescriptor;
+            if((getPrimaryFieldType(joiningWithClass).equals(modelClass))){
+                nestedMySQLModelDescriptor = requesterDescriptor;
+            } else {
+                nestedMySQLModelDescriptor = mySQLServiceProvider.provideMySqlModelDescriptorNoCache(TypeLiteral.get(joiningWithClass));
+            }
+
             String modelClassName = modelClass.getSimpleName();
             String modelClassNameLowerCase = modelClassName.toLowerCase();
-            String targetTableName = nestedMySQLModelDescriptor.getTableName();
-            String targetTableLowercase = nestedMySQLModelDescriptor.getTableNameLowercase();
-            String nestedPrimaryKeyFieldName = nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName();
-            List<ColumnNameAndAlias> columnNameAndAliases = getColumnNameAndAliases(nestingInfo, nestedMySQLModelDescriptor, targetTableLowercase);
+            String targetTableName = getTableName(joiningWithClass);
+            String targetTableLowercase = getTableNameLowercase(joiningWithClass);
+
+            String nestedPrimaryKeyFieldName;
+
+            if(getPrimaryFieldType(joiningWithClass).equals(modelClass)){
+                nestedPrimaryKeyFieldName = getPrimaryKeyFieldName(modelClass);
+            }else {
+                nestedPrimaryKeyFieldName = getPrimaryKeyFieldName(joiningWithClass);
+            }
+
+            List<ColumnNameAndAlias> columnNameAndAliases = getColumnNameAndAliases(nestingInfo, joiningWithClass, targetTableLowercase);
 
             if (!isList) {
                 String link = nestingInfo.link();
                 if (nestingInfo.outward()) {
                     if (isPrimary(field)) {
-                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedMySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getFieldName(), modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList);
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, hasAnyList);
                         joinInfos.add(e);
-
                     } else {
-                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, nestedMySQLModelDescriptor.getModelClass()), columnNameAndAliases, hasAnyList);
+                        JoinInfo e = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getOutwardJoinForeignKey(link, field, joiningWithClass), columnNameAndAliases, hasAnyList);
                         joinInfos.add(e);
                     }
                 }
@@ -298,6 +313,38 @@ class MySQLServiceFieldsProvider {
 
         return joinInfos;
     }
+    private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
+        List<Field> primaryKeys = Arrays.stream(tClass.getDeclaredFields()).filter(field -> {
+            MySqlField annotation = field.getAnnotation(MySqlField.class);
+            return annotation != null && annotation.primary();
+        }).toList();
+
+        if (primaryKeys.isEmpty())
+            throw new RuntimeException(NO_PRIMARY_KEY_FOUND);
+        else if (primaryKeys.size() > 1)
+            throw new RuntimeException(THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY);
+        else if (primaryKeys.get(0).getGenericType().getTypeName().contains("List"))
+            throw new RuntimeException(PRIMARY_KEY_CANNOT_BE_A_LIST);
+
+        return primaryKeys.get(0);
+    }
+
+    private static FieldValueGetter fieldToFieldValueGetter(Field field) {
+        field.setAccessible(true);
+        return new FieldValueGetter(field);
+    }
+
+    private <T> FieldMySqlValue fieldToFieldMySqlValue(Class<T> tClass, Field field) {
+        field.setAccessible(true);
+        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+        String tableName = getTableNameLowercase(tClass);
+        String fieldName = mySqlFieldInfo.column();
+        if (fieldName.isBlank()) {
+            return (new FieldMySqlValue(field, mySqlFieldInfo.type(), tableName));
+        } else {
+            return (new FieldMySqlValue(field, mySqlFieldInfo.type(), fieldName, tableName));
+        }
+    }
 
     private String connectingTable(String modelClass, String targetTableLowercase) {
         return modelClass + "_" + targetTableLowercase;
@@ -317,12 +364,12 @@ class MySQLServiceFieldsProvider {
         return annotation != null && annotation.primary();
     }
 
-    private static List<ColumnNameAndAlias> getColumnNameAndAliases(Nested nestingInfo, MySQLModelDescriptor<?> nestedMySQLModelDescriptor, String targetTableLowercase) {
+    private List<ColumnNameAndAlias> getColumnNameAndAliases(Nested nestingInfo, Class<?> targetClass, String targetTableLowercase) {
         List<ColumnNameAndAlias> columnNameAndAliases;
         if (nestingInfo.eager()) {
-            columnNameAndAliases = nestedMySQLModelDescriptor.getSpecificFieldValueSetters().stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias(targetTableLowercase)).toList();
+            columnNameAndAliases = getSpecificFieldValueSetters(targetClass).stream().map(specificFieldValueSetter -> specificFieldValueSetter.fieldNameAndAlias(targetTableLowercase)).toList();
         } else {
-            columnNameAndAliases = List.of(nestedMySQLModelDescriptor.getPrimaryKeyValueSetter().fieldNameAndAlias(targetTableLowercase));
+            columnNameAndAliases = List.of(getPrimaryKeyValueSetter(targetClass).fieldNameAndAlias(targetTableLowercase));
         }
         return columnNameAndAliases;
     }
@@ -337,9 +384,9 @@ class MySQLServiceFieldsProvider {
         return genericType.getTypeName().contains("List");
     }
 
-    private Type joiningWith(Field field, Type genericType, boolean isList) {
+    private Class<?> joiningWith(Field field, Type genericType, boolean isList) {
         if (isList) {
-            return ((ParameterizedType) genericType).getActualTypeArguments()[0];
+            return (Class<?>)((ParameterizedType) genericType).getActualTypeArguments()[0];
         } else {
             return field.getType();
         }
@@ -349,27 +396,15 @@ class MySQLServiceFieldsProvider {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(MySqlField.class) != null && field.getAnnotation(Nested.class) == null).collect(Collectors.toList());
     }
 
-    <T> Field getDeclaredPrimaryField(Class<T> tClass) {
-        List<Field> primaryKeys = Arrays.stream(tClass.getDeclaredFields()).filter(field -> {
-            MySqlField annotation = field.getAnnotation(MySqlField.class);
-            return annotation != null && annotation.primary();
-        }).toList();
-
-        if (primaryKeys.isEmpty())
-            throw new RuntimeException(NO_PRIMARY_KEY_FOUND);
-        else if (primaryKeys.size() > 1)
-            throw new RuntimeException(THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY);
-        else if (primaryKeys.get(0).getGenericType().getTypeName().contains("List"))
-            throw new RuntimeException(PRIMARY_KEY_CANNOT_BE_A_LIST);
-
-        return primaryKeys.get(0);
-    }
-
     private <T> List<Field> getDeclaredNestedFields(Class<T> tClass) {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null).collect(Collectors.toList());
     }
 
     private <T> List<Field> getDeclaredNestedMySqlFields(Class<T> tClass) {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null && field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
+    }
+
+    public <T> Class<?> getPrimaryFieldType(Class<T> modelClass) {
+        return getDeclaredPrimaryField(modelClass).getType();
     }
 }

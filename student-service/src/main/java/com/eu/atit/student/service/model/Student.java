@@ -12,7 +12,7 @@ public class Student {
     @MySqlField(type = MysqlType.VARCHAR)
     private String name;
 
-    @MySqlField(type = MysqlType.INT, column = "badonkadonk")//todo column is ignored here?
+    @MySqlField(type = MysqlType.INT)
     @Nested(outward = true, eager = true) //link = "badonkadonk") //todo replace link with @MySqlField-column
     private Type type;
 
