@@ -37,7 +37,7 @@ public class MySQLServiceProvider extends DataServiceProvider {
         return mySQLServiceMap.get(servingType);
     }
 
-    MySQLModelDescriptor<?> provideMySqlModelDescriptorNoCache(TypeLiteral<?> servingType) {
+    private MySQLModelDescriptor<?> provideMySqlModelDescriptorNoCache(TypeLiteral<?> servingType) {
         MySQLModelDescriptor<?> cachedDescriptor = mySQLModelDescriptorMap.get(servingType);
         if (cachedDescriptor == null) {
             cachedDescriptor = mySQLModelDescriptor(servingType);

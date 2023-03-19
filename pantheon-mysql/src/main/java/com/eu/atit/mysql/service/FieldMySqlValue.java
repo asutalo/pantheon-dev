@@ -29,8 +29,7 @@ public class FieldMySqlValue {
         aliasName = alias(tableName, fieldName);
     }
 
-    public FieldMySqlValue(MySQLModelDescriptor<?> modelDescriptor, Field parentField) {
-        FieldMySqlValue nestedPrimaryKeyFieldMySqlValue = modelDescriptor.getPrimaryKeyFieldMySqlValue();
+    public FieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field parentField) {
         this.field = nestedPrimaryKeyFieldMySqlValue.getField();
         this.mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
         this.fieldName = fieldName(parentField);

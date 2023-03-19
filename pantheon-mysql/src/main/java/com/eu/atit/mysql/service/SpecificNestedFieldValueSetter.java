@@ -21,4 +21,29 @@ class SpecificNestedFieldValueSetter<T> {
             fieldValueSetter.accept(setFieldOn, service.lazyInstanceOfT(row));
         }
     }
+
+
+//    private final FieldValueSetter<T> fieldValueSetter;
+//    private final ResultSetToInstance<?> resultSetToInstance;
+//    final Instantiator<?> instantiator;
+//    final SpecificFieldValueSetter<?> primaryKeyValueSetter;
+//
+//    SpecificNestedFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
+//        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+//        this.resultSetToInstance = resultSetToInstance;
+//        this.instantiator = instantiator;
+//        this.primaryKeyValueSetter = primaryKeyValueSetter;
+//    }
+//
+//    public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
+//        if (!observedClasses.contains(fieldValueSetter.getField().getType())) {
+//            observedClasses.add(fieldValueSetter.getField().getType());
+//            fieldValueSetter.accept(setFieldOn, resultSetToInstance.get(row));
+//        } else {
+//            Object instance = instantiator.get();
+//
+//            primaryKeyValueSetter.accept(instance, row);
+//            fieldValueSetter.accept(setFieldOn, instance);
+//        }
+//    }
 }

@@ -3,7 +3,6 @@ package com.eu.atit.mysql.service;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
 import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
-import com.eu.atit.mysql.service.merging.direction.DeadEnd;
 import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
@@ -91,24 +90,14 @@ public class MySQLModelDescriptor<T> {
 
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(modelClass);
 
-        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass, this);
+        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass);
 
         setColumnsAndAliases();
         setFilteredSelect();
         setResultSetToInstance();
+//        resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass, this);
         setMySqlValuesFilter();
-        setFieldsMerger();
-    }
-
-    private void setFieldsMerger() {
-        FieldValueGetter nestedPrimaryKeyValueGetter = mySQLServiceFieldsProvider.getNestedPrimaryKeyFieldValueGetter(modelClass);
-
-        hasDescendantWithList = joinInfos.stream().anyMatch(JoinInfo::hasAnyList);
-        if (mySQLServiceFieldsProvider.getSpecificListFieldValueOverrides(modelClass).size() > 0 || hasDescendantWithList) {
-            fieldsMerger = new FieldsMerger(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
-        } else {
-            fieldsMerger = new DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : primaryKeyFieldValueGetter, mySQLServiceFieldsProvider.myNestedModelsDTOs(modelClass));
-        }
+        fieldsMerger = mySQLServiceFieldsProvider.getFieldsMerger(modelClass);
     }
 
     private void setColumnsAndAliases() {

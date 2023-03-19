@@ -9,9 +9,9 @@ class NestedFieldValueGetter extends FieldValueGetter {
 
     private final FieldValueGetter nestedPrimaryKeyFieldValueGetter;
 
-    NestedFieldValueGetter(Field field, MySQLModelDescriptor<?> mySQLModelDescriptor) {
+    NestedFieldValueGetter(Field field, FieldValueGetter nestedPrimaryKeyFieldValueGetter) {
         super(field);
-        nestedPrimaryKeyFieldValueGetter = mySQLModelDescriptor.getPrimaryKeyFieldValueGetter();
+        this.nestedPrimaryKeyFieldValueGetter = nestedPrimaryKeyFieldValueGetter;
     }
 
     @Override
