@@ -170,6 +170,7 @@ class MySQLServiceFieldsProvider {
     }
 
     FieldsMerger getFieldsMerger(Class<?> modelClass, List<Class<?>> observedClasses){
+        observedClasses.add(modelClass);
         FieldsMerger fieldsMerger;
         FieldValueGetter nestedPrimaryKeyValueGetter = getNestedPrimaryKeyFieldValueGetter(modelClass);
 
@@ -188,8 +189,7 @@ class MySQLServiceFieldsProvider {
 
         return flatNested.stream().map(f -> {
             f.setAccessible(true);
-            Class<?> type = isList(f.getGenericType()) ? (Class<?>) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0] :
-                    f.getType();
+            Class<?> type = joiningWith(f, f.getGenericType(), isList(f.getGenericType()));
 
             Crossroads crossroads;
 
@@ -199,7 +199,6 @@ class MySQLServiceFieldsProvider {
                 fieldsMerger = new DeadEnd(getPrimaryKeyFieldValueGetter(type), null);
             }
             else {
-                observedClasses.add(type);
                 fieldsMerger = getFieldsMerger(type, observedClasses);
             }
 
@@ -278,6 +277,7 @@ class MySQLServiceFieldsProvider {
 
     <T> List<JoinInfo> getJoinInfos(Class<T> modelClass, List<Class<?>> observedClasses) {
         List<JoinInfo> joinInfos = new ArrayList<>();
+        observedClasses.add(modelClass);
 
         boolean hasAnyList = false;
         for (Field field : getDeclaredNestedFields(modelClass)) {
@@ -326,25 +326,22 @@ class MySQLServiceFieldsProvider {
                     joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList));
                 }
             } else {
-                Class<T> actualTypeArgument = (Class<T>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
                 String connectingTable = nestingInfo.connection().isEmpty() ? connectingTable(getTableName(modelClass), targetTableName) : nestingInfo.connection();
                 String connectingTableLowercase = connectingTable.toLowerCase();
-                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(actualTypeArgument.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
+                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(joiningWithClass.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
                 String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
 
-                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true, hasAnyList, modelClass, actualTypeArgument);
+                JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true, hasAnyList, modelClass, joiningWithClass);
                 joinInfos.add(joinToConnectingTable);
-                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyFrom, columnNameAndAliases, true, hasAnyList, modelClass, actualTypeArgument);
+                JoinInfo joinFromConnectingTableToTarget = new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, connectingTableLowercase, foreignKeyFrom, columnNameAndAliases, true, hasAnyList, modelClass, joiningWithClass);
                 joinInfos.add(joinFromConnectingTableToTarget);
             }
 
             List<JoinInfo> nestedJoins = null;
 
-            if(!observedClasses.contains(modelClass)){
-                observedClasses.add(modelClass);
-                nestedJoins = getJoinInfos(modelClass, observedClasses);
+            if(!observedClasses.contains(joiningWithClass)){
+                nestedJoins = getJoinInfos(joiningWithClass, observedClasses);
             }
-
             if (nestedJoins != null)
                 joinInfos.addAll(nestedJoins);
 
