@@ -1,8 +1,6 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
-import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
-import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
 import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
@@ -35,7 +33,6 @@ public class MySQLModelDescriptor<T> {
      * used to update the primary key based on a select statement (using a map from ResultSet and column aliases)
      * */
     private SpecificFieldValueSetter<T> primaryKeyValueSetter;//todo runtime use
-    private FieldValueGetter primaryKeyFieldValueGetter;
 
     // converts only primary key into MySqlValue
     private FieldMySqlValue primaryKeyFieldMySqlValue;//todo runtime use
@@ -75,7 +72,6 @@ public class MySQLModelDescriptor<T> {
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
 
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(modelClass);
-        primaryKeyFieldValueGetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueGetter(modelClass);
         specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(modelClass);
 
         setAliasFieldMySqlValueMap();
@@ -88,10 +84,9 @@ public class MySQLModelDescriptor<T> {
 
         setColumnsAndAliases();
         setFilteredSelect();
-        setResultSetToInstance();
-//        resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass, this);
-        setMySqlValuesFilter();
+        resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         fieldsMerger = mySQLServiceFieldsProvider.getFieldsMerger(modelClass);
+        resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
     }
 
     private void setColumnsAndAliases() {
@@ -152,10 +147,6 @@ public class MySQLModelDescriptor<T> {
         return primaryKeyFieldValueSetter;
     }
 
-    FieldValueGetter getPrimaryKeyFieldValueGetter() {
-        return primaryKeyFieldValueGetter;
-    }
-
     String getTableName() {
         return tableName;
     }
@@ -172,27 +163,6 @@ public class MySQLModelDescriptor<T> {
         aliasFieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
         nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> aliasFieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
     }
-
-    private void setResultSetToInstance() {
-        boolean hasNestedList = joinInfos.stream().anyMatch(JoinInfo::isListJoin);
-
-        if (hasNestedList) {
-            resultSetToInstance = new ResultSetToInstanceWithListNesting<>(this);
-        } else if (!specificNestedFieldValueSetters.isEmpty()) {
-            resultSetToInstance = new ResultSetToInstanceWithNesting<>(this);
-        } else {
-            resultSetToInstance = new ResultSetToInstance<>(this);
-        }
-    }
-
-    private void setMySqlValuesFilter() {
-        if (getNestedPrimaryFieldMySqlValues().isEmpty()) {
-            mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
-        } else {
-            mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
-        }
-    }
-
 
     public List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {
         return mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass);

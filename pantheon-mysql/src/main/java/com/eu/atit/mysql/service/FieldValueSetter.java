@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 /**
  * Function to set a value into an instance of an object
  */
-public class FieldValueSetter<T> implements BiConsumer<T, Object> {
+public class FieldValueSetter<T> implements BiConsumer<Object, Object> {
     private final Field field;
 
     /**
@@ -17,7 +17,7 @@ public class FieldValueSetter<T> implements BiConsumer<T, Object> {
     }
 
     @Override
-    public void accept(T setOn, Object value) {
+    public void accept(Object setOn, Object value) {
         try {
             field.set(setOn, value);
         } catch (Exception e) {
@@ -27,5 +27,12 @@ public class FieldValueSetter<T> implements BiConsumer<T, Object> {
 
     Field getField() {
         return field;
+    }
+
+    @Override
+    public String toString() {
+        return "FieldValueSetter{" +
+               "field=" + field +
+               '}';
     }
 }

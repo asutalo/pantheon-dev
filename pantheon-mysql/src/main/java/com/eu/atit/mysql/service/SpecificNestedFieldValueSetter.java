@@ -5,45 +5,56 @@ import java.util.List;
 import java.util.Map;
 
 class SpecificNestedFieldValueSetter<T> {
-    private final FieldValueSetter<T> fieldValueSetter;
-    private final MySQLService<?> service;
-
-    SpecificNestedFieldValueSetter(Field fieldToSet, MySQLService<?> service) {
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
-        this.service = service;
-    }
-
-    public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
-        if (!observedClasses.contains(fieldValueSetter.getField().getType())) {
-            observedClasses.add(fieldValueSetter.getField().getType());
-            fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row, observedClasses));
-        } else {
-            fieldValueSetter.accept(setFieldOn, service.lazyInstanceOfT(row));
-        }
-    }
-
-
 //    private final FieldValueSetter<T> fieldValueSetter;
-//    private final ResultSetToInstance<?> resultSetToInstance;
-//    final Instantiator<?> instantiator;
-//    final SpecificFieldValueSetter<?> primaryKeyValueSetter;
+//    private final MySQLService<?> service;
 //
-//    SpecificNestedFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
+//    SpecificNestedFieldValueSetter(Field fieldToSet, MySQLService<?> service) {
 //        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
-//        this.resultSetToInstance = resultSetToInstance;
-//        this.instantiator = instantiator;
-//        this.primaryKeyValueSetter = primaryKeyValueSetter;
+//        this.service = service;
 //    }
 //
 //    public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
 //        if (!observedClasses.contains(fieldValueSetter.getField().getType())) {
 //            observedClasses.add(fieldValueSetter.getField().getType());
-//            fieldValueSetter.accept(setFieldOn, resultSetToInstance.get(row));
+//            fieldValueSetter.accept(setFieldOn, service.fullInstanceOfT(row, observedClasses));
 //        } else {
-//            Object instance = instantiator.get();
-//
-//            primaryKeyValueSetter.accept(instance, row);
-//            fieldValueSetter.accept(setFieldOn, instance);
+//            fieldValueSetter.accept(setFieldOn, service.lazyInstanceOfT(row));
 //        }
 //    }
+
+
+    private final FieldValueSetter<T> fieldValueSetter;
+    private final ResultSetToInstance<?> resultSetToInstance;
+    final Instantiator<?> instantiator;
+    final SpecificFieldValueSetter<?> primaryKeyValueSetter;
+
+    SpecificNestedFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
+        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        this.resultSetToInstance = resultSetToInstance;
+        this.instantiator = instantiator;
+        this.primaryKeyValueSetter = primaryKeyValueSetter;
+    }
+
+    public void accept(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
+        if (!observedClasses.contains(fieldValueSetter.getField().getType())) {
+            observedClasses.add(fieldValueSetter.getField().getType());
+
+            fieldValueSetter.accept(setFieldOn, resultSetToInstance.get(row, observedClasses));
+        } else {
+            Object instance = instantiator.get();
+
+            primaryKeyValueSetter.accept(instance, row);
+            fieldValueSetter.accept(setFieldOn, instance);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "SpecificNestedFieldValueSetter{" +
+               "fieldValueSetter=" + fieldValueSetter +
+               ", resultSetToInstance=" + resultSetToInstance +
+               ", instantiator=" + instantiator +
+               ", primaryKeyValueSetter=" + primaryKeyValueSetter +
+               '}';
+    }
 }

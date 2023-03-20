@@ -16,7 +16,7 @@ public class LazySpecificFieldValueSetter<T> extends SpecificFieldValueSetter<T>
     }
 
     @Override
-    public void accept(T setFieldOn, Map<String, Object> row) {
+    public void accept(Object setFieldOn, Map<String, Object> row) {
         T instance = (T) instantiator.get();
 
         primaryKeyValueSetter.accept(instance, row);//todo doublecheck it works properly for nested primary key

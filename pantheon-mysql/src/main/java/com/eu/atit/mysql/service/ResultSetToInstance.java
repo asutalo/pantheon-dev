@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 class ResultSetToInstance<T> {
-    final MySQLModelDescriptor<T> mySQLModelDescriptor;
+    private final Instantiator<T> instantiator;
+    private final List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
 
-    ResultSetToInstance(MySQLModelDescriptor<T> mySQLModelDescriptor) {
-        this.mySQLModelDescriptor = mySQLModelDescriptor;
+    ResultSetToInstance(Instantiator<T> instantiator, List<SpecificFieldValueSetter<T>> specificFieldValueSetters) {
+        this.instantiator = instantiator;
+        this.specificFieldValueSetters = specificFieldValueSetters;
     }
 
     public List<T> getAll(List<Map<String, Object>> resultSet) {
@@ -21,16 +23,16 @@ class ResultSetToInstance<T> {
     }
 
     T get(Map<String, Object> row) {
-        T instance = mySQLModelDescriptor.getInstantiator().get();
+        T instance = instantiator.get();
 
-        mySQLModelDescriptor.getSpecificFieldValueSetters().forEach(setter -> setter.accept(instance, row));
+        specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));
 
         return instance;
     }
 
     T get(Map<String, Object> row, List<Class<?>> observedClasses) {
-        T instance = mySQLModelDescriptor.getInstantiator().get();
-        mySQLModelDescriptor.getSpecificFieldValueSetters().forEach(setter -> setter.accept(instance, row));
+        T instance = instantiator.get();
+        specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));
 
         return instance;
     }

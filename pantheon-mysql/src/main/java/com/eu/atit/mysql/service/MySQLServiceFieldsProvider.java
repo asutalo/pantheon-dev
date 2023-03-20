@@ -9,7 +9,6 @@ import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
 import com.eu.atit.mysql.service.merging.fields.FieldsMergerDTO;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.eu.atit.pantheon.helper.Pair;
-import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -126,7 +125,7 @@ class MySQLServiceFieldsProvider {
 
     <T> FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
-        if(field.getAnnotation(Nested.class)!=null){
+        if (field.getAnnotation(Nested.class) != null) {
             return getPrimaryKeyFieldMySqlValue(field.getType());
         }
 
@@ -165,11 +164,12 @@ class MySQLServiceFieldsProvider {
 
         return overrides;
     }
-    FieldsMerger getFieldsMerger(Class<?> modelClass){
+
+    FieldsMerger getFieldsMerger(Class<?> modelClass) {
         return getFieldsMerger(modelClass, new ArrayList<>());
     }
 
-    FieldsMerger getFieldsMerger(Class<?> modelClass, List<Class<?>> observedClasses){
+    FieldsMerger getFieldsMerger(Class<?> modelClass, List<Class<?>> observedClasses) {
         observedClasses.add(modelClass);
         FieldsMerger fieldsMerger;
         FieldValueGetter nestedPrimaryKeyValueGetter = getNestedPrimaryKeyFieldValueGetter(modelClass);
@@ -195,10 +195,9 @@ class MySQLServiceFieldsProvider {
 
             FieldsMerger fieldsMerger;
 
-            if(observedClasses.contains(type)){
+            if (observedClasses.contains(type)) {
                 fieldsMerger = new DeadEnd(getPrimaryKeyFieldValueGetter(type), null);
-            }
-            else {
+            } else {
                 fieldsMerger = getFieldsMerger(type, observedClasses);
             }
 
@@ -217,36 +216,25 @@ class MySQLServiceFieldsProvider {
     }
 
     <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass) {
+        return getSpecificNestedFieldValueSetters(tClass, new ArrayList<>());
+    }
+
+    <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass, List<Class<T>> observedClasses) {
+        observedClasses.add(tClass);
         List<SpecificNestedFieldValueSetter<T>> setters = new ArrayList<>();
         for (Field field : getDeclaredNestedFields(tClass)) {
-            field.setAccessible(true);
             Type genericType = field.getGenericType();
-            if (isList(genericType)) {
-                Type actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-                setters.add(new SpecificNestedListFieldValueSetter<>(field, mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(actualTypeArgument))));
-            } else {
-                setters.add(new SpecificNestedFieldValueSetter<>(field, mySQLServiceProvider.provideMySqlServiceNoCache(TypeLiteral.get(field.getType()))));
-            }
+            Class<T> actualTypeArgument = (Class<T>) joiningWith(field, genericType, isList(genericType));
+                field.setAccessible(true);
+                if (isList(genericType)) {
+                    setters.add(new SpecificNestedListFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
+                } else {
+                    setters.add(new SpecificNestedFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
+                }
         }
 
         return setters;
     }
-
-//    <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass, MySQLModelDescriptor mySQLModelDescriptor) {
-//        List<SpecificNestedFieldValueSetter<T>> setters = new ArrayList<>();
-//        for (Field field : getDeclaredNestedFields(tClass)) {
-//            field.setAccessible(true);
-//            Type genericType = field.getGenericType();
-//            if (isList(genericType)) {
-//                Class<?> actualTypeArgument = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-//                setters.add(new SpecificNestedListFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, mySQLModelDescriptor), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
-//            } else {
-//                setters.add(new SpecificNestedFieldValueSetter<>(field, getResultSetToInstance(field.getType(), mySQLModelDescriptor), getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType())));
-//            }
-//        }
-//
-//        return setters;
-//    }
 
     <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {//todo wtf are these
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
@@ -260,7 +248,7 @@ class MySQLServiceFieldsProvider {
         return nestedFieldsMySqlValues;
     }
 
-    String getPrimaryKeyFieldName(Class<?> ofClass){
+    String getPrimaryKeyFieldName(Class<?> ofClass) {
         Field field = getDeclaredPrimaryField(ofClass);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         if (mySqlFieldInfo == null) {
@@ -302,9 +290,9 @@ class MySQLServiceFieldsProvider {
 
             String nestedPrimaryKeyFieldName;
 
-            if(getPrimaryFieldType(joiningWithClass).equals(modelClass)){
+            if (getPrimaryFieldType(joiningWithClass).equals(modelClass)) {
                 nestedPrimaryKeyFieldName = getPrimaryKeyFieldName(modelClass);
-            }else {
+            } else {
                 nestedPrimaryKeyFieldName = getPrimaryKeyFieldName(joiningWithClass);
             }
 
@@ -339,7 +327,7 @@ class MySQLServiceFieldsProvider {
 
             List<JoinInfo> nestedJoins = null;
 
-            if(!observedClasses.contains(joiningWithClass)){
+            if (!observedClasses.contains(joiningWithClass)) {
                 nestedJoins = getJoinInfos(joiningWithClass, observedClasses);
             }
             if (nestedJoins != null)
@@ -354,6 +342,7 @@ class MySQLServiceFieldsProvider {
     <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
         return getJoinInfos(modelClass, new ArrayList<>());
     }
+
     private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
         List<Field> primaryKeys = Arrays.stream(tClass.getDeclaredFields()).filter(field -> {
             MySqlField annotation = field.getAnnotation(MySqlField.class);
@@ -427,7 +416,7 @@ class MySQLServiceFieldsProvider {
 
     private Class<?> joiningWith(Field field, Type genericType, boolean isList) {
         if (isList) {
-            return (Class<?>)((ParameterizedType) genericType).getActualTypeArguments()[0];
+            return (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
         } else {
             return field.getType();
         }
@@ -449,18 +438,30 @@ class MySQLServiceFieldsProvider {
         return getDeclaredPrimaryField(modelClass).getType();
     }
 
-//    public <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass, MySQLModelDescriptor mySQLModelDescriptor) {
-//        ResultSetToInstance<T> resultSetToInstance;
-//        boolean hasNestedList = getJoinInfos(modelClass).stream().anyMatch(JoinInfo::isListJoin);
-//
-//        if (hasNestedList) {
-//            resultSetToInstance = new ResultSetToInstanceWithListNesting<>(mySQLModelDescriptor);
-//        } else if (!getSpecificNestedFieldValueSetters(modelClass, mySQLModelDescriptor).isEmpty()) {
-//            resultSetToInstance = new ResultSetToInstanceWithNesting<>(mySQLModelDescriptor);
-//        } else {
-//            resultSetToInstance = new ResultSetToInstance<>(mySQLModelDescriptor);
-//        }
-//
-//        return resultSetToInstance;
-//    }
+    public <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass, List<Class<T>> observedClasses) {
+        ResultSetToInstance<T> resultSetToInstance;
+        boolean hasNestedList = getJoinInfos(modelClass).stream().anyMatch(JoinInfo::isListJoin);
+
+        List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
+
+        if(observedClasses.contains(modelClass)){
+            specificNestedFieldValueSetters = List.of();
+        }
+        else {
+            specificNestedFieldValueSetters = getSpecificNestedFieldValueSetters(modelClass, observedClasses);
+        }
+        if (hasNestedList) {
+            resultSetToInstance = new ResultSetToInstanceWithListNesting<>(getInstantiator(modelClass), getSpecificFieldValueSetters(modelClass), specificNestedFieldValueSetters, modelClass, getFieldsMerger(modelClass));
+        } else if (!specificNestedFieldValueSetters.isEmpty()) {
+            resultSetToInstance = new ResultSetToInstanceWithNesting<>(getInstantiator(modelClass), getSpecificFieldValueSetters(modelClass), specificNestedFieldValueSetters, modelClass);
+        } else {
+            resultSetToInstance = new ResultSetToInstance<>(getInstantiator(modelClass), getSpecificFieldValueSetters(modelClass));
+        }
+
+        return resultSetToInstance;
+    }
+
+    public <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass) {
+        return getResultSetToInstance(modelClass, new ArrayList<>());
+    }
 }

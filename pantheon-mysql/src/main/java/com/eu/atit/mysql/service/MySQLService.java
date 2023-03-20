@@ -89,10 +89,6 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     @Override
     public List<T> getAll(QueryBuilder filteredSelect) throws SQLException {
         List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
-        System.out.println("fetched");
-        System.out.println("-----------------------");
-        System.out.println(resultSet);
-        System.out.println("-----------------------");
         return mySQLModelDescriptor.getResultSetToInstance().getAll(resultSet);
     }
 
@@ -149,17 +145,17 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return mySQLModelDescriptor.getResultSetToInstance().get(row);
     }
 
-    T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
-        return mySQLModelDescriptor.getResultSetToInstance().get(row, observedClasses);
-
-    }
-
-    T lazyInstanceOfT(Map<String, Object> row) {
-        T instance = mySQLModelDescriptor.getInstantiator().get();
-
-        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);//todo doublecheck it works properly for nested primary key
-        return instance;
-    }
+//    T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
+//        return mySQLModelDescriptor.getResultSetToInstance().get(row, observedClasses);
+//
+//    }
+//
+//    T lazyInstanceOfT(Map<String, Object> row) {
+//        T instance = mySQLModelDescriptor.getInstantiator().get();
+//
+//        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);//todo doublecheck it works properly for nested primary key
+//        return instance;
+//    }
 
     private LinkedList<MySqlValue> mySqlValues(T user) {
         return mySQLModelDescriptor.getMySqlValuesFilter().get(user);

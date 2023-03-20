@@ -18,7 +18,7 @@ public class FieldValueGetter {
     public Object apply(Object t) {
         try {
             return field.get(t);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to get value from field", e);
         }
     }
