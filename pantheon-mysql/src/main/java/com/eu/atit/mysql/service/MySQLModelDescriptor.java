@@ -24,12 +24,6 @@ public class MySQLModelDescriptor<T> {
         return fieldsMerger;
     }
 
-    private boolean hasDescendantWithList;
-
-    public boolean isHasDescendantWithList() {
-        return hasDescendantWithList;
-    }
-
     private Instantiator<T> instantiator;//todo runtime use
 
     /*
