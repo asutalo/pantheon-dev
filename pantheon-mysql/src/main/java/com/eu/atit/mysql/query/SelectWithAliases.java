@@ -19,15 +19,16 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     @Override
     public String apply(String query) {
         StringBuilder selectionStringBuilder = new StringBuilder(query.concat(SELECT));
-        ColumnNameAndAlias columnAndAlias = columnsAndAliases.iterator().next();
+        Set<ColumnNameAndAlias> columnNameAndAliasSet = new HashSet<>(columnsAndAliases); //todo LOL fix this
+        ColumnNameAndAlias columnAndAlias = columnNameAndAliasSet.iterator().next();
 
         selectionStringBuilder.append(columnAndAlias.fieldName());
         selectionStringBuilder.append(AS);
         selectionStringBuilder.append(columnAndAlias.alias());
 
-        columnsAndAliases.remove(columnAndAlias);
+        columnNameAndAliasSet.remove(columnAndAlias);
 
-        for (ColumnNameAndAlias cAndA : columnsAndAliases) {
+        for (ColumnNameAndAlias cAndA : columnNameAndAliasSet) {
 
             selectionStringBuilder.append(SEPARATOR);
             selectionStringBuilder.append(cAndA.fieldName());

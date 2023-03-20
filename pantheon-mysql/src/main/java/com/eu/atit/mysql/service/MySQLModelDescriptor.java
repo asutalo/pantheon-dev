@@ -1,7 +1,8 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
-import com.eu.atit.mysql.service.merging.fields.FieldsMerger;
+import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
+import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
 import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
@@ -16,11 +17,6 @@ public class MySQLModelDescriptor<T> {
     private final Class<T> modelClass;
     private String tableName; //todo runtime use
     private String tableNameLowercase;
-    private FieldsMerger fieldsMerger;//todo runtime us
-
-    public FieldsMerger getFieldsMerger() {
-        return fieldsMerger;
-    }
 
     private Instantiator<T> instantiator;//todo runtime use
 
@@ -80,13 +76,21 @@ public class MySQLModelDescriptor<T> {
 
         specificNestedFieldValueSetters = mySQLServiceFieldsProvider.getSpecificNestedFieldValueSetters(modelClass);
 
+
         joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass);
 
         setColumnsAndAliases();
         setFilteredSelect();
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
-        fieldsMerger = mySQLServiceFieldsProvider.getFieldsMerger(modelClass);
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
+        setMySqlValuesFilter();
+    }
+    private void setMySqlValuesFilter(){
+        if(mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass).isEmpty()){
+            mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
+        } else {
+            mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
+        }
     }
 
     private void setColumnsAndAliases() {

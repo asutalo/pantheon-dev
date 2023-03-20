@@ -2,6 +2,7 @@ package com.eu.atit.mysql.query;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -23,15 +24,16 @@ public class Insert implements QueryPart {
 
     @Override
     public String apply(String query) {
-        MySqlValue mySqlValue = valuesForQuery.get(0);
+        List<MySqlValue> values = new ArrayList<>(valuesForQuery); //todo LOL fix this
+        MySqlValue mySqlValue = values.get(0);
         String mySqlValueKey = mySqlValue.getKey();
 
         StringBuilder keysBuilder = new StringBuilder(mySqlValueKey);
         StringBuilder placeholdersBuilder = new StringBuilder(PLACEHOLDER);
 
-        valuesForQuery.remove(0);
+        values.remove(0);
 
-        for (MySqlValue value : valuesForQuery) {
+        for (MySqlValue value : values) {
             keysBuilder.append(DELIMITER);
             placeholdersBuilder.append(DELIMITER);
 

@@ -35,12 +35,12 @@ public class Main {
 //        studentMySQLService.save(i);
 //        studentMySQLService.getAll().forEach(System.out::println);
 //        diplomaMySQLService.save(new Diploma(i, true));
-        diplomaMySQLService.getAll().forEach(System.out::println);
+//        diplomaMySQLService.getAll().forEach(System.out::println);
 //        typeMySQLService.getAll().forEach(System.out::println);
 //        courseMySQLService.getAll().forEach(System.out::println);
 //
 //
-//        typeExamples(mySQLServiceProvider);
+        typeExamples(mySQLServiceProvider);
     }
 
     private static void typeExamples(MySQLServiceProvider mySQLServiceProvider) throws SQLException {
