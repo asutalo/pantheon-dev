@@ -145,18 +145,6 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return mySQLModelDescriptor.getResultSetToInstance().get(row);
     }
 
-//    T fullInstanceOfT(Map<String, Object> row, List<Class<?>> observedClasses) {
-//        return mySQLModelDescriptor.getResultSetToInstance().get(row, observedClasses);
-//
-//    }
-//
-//    T lazyInstanceOfT(Map<String, Object> row) {
-//        T instance = mySQLModelDescriptor.getInstantiator().get();
-//
-//        mySQLModelDescriptor.getPrimaryKeyValueSetter().accept(instance, row);//todo doublecheck it works properly for nested primary key
-//        return instance;
-//    }
-
     private LinkedList<MySqlValue> mySqlValues(T user) {
         return mySQLModelDescriptor.getMySqlValuesFilter().get(user);
     }

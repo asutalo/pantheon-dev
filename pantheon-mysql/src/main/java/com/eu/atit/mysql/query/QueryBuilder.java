@@ -65,11 +65,6 @@ public class QueryBuilder {
         queryParts.add(new KeyVal(value.getMysqlType(), value.getKey(), value.getValue(), getSeparator(), getCurrentIndex()));
     }
 
-//    void setQueryParts(List<QueryPart> queryParts) {todo check
-//        this.queryParts.clear();
-//        this.queryParts.addAll(queryParts);
-//    }
-
     private String getSeparator() {
         String separator = COMMA;
 

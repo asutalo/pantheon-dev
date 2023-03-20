@@ -11,7 +11,7 @@ import java.util.Map;
 public class MySQLServiceProvider extends DataServiceProvider {
     public MySQLServiceProvider(DataClient dataClient) {
         super(dataClient);
-        serviceFieldProvider = new MySQLServiceFieldsProvider(this);
+        serviceFieldProvider = new MySQLServiceFieldsProvider();
     }
 
     private final Map<TypeLiteral<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
@@ -26,7 +26,6 @@ public class MySQLServiceProvider extends DataServiceProvider {
         if (cachedDescriptor == null) {
             cachedDescriptor = mySQLModelDescriptor(servingType);
             mySQLModelDescriptorMap.put(servingType, cachedDescriptor);
-            cachedDescriptor.init();
 
             MySQLService<?> mySQLService = mySQLService(cachedDescriptor);
             mySQLServiceMap.put(servingType, mySQLService);
@@ -35,27 +34,6 @@ public class MySQLServiceProvider extends DataServiceProvider {
         }
 
         return mySQLServiceMap.get(servingType);
-    }
-
-    private MySQLModelDescriptor<?> provideMySqlModelDescriptorNoCache(TypeLiteral<?> servingType) {
-        MySQLModelDescriptor<?> cachedDescriptor = mySQLModelDescriptorMap.get(servingType);
-        if (cachedDescriptor == null) {
-            cachedDescriptor = mySQLModelDescriptor(servingType);
-            cachedDescriptor.init();
-        }
-
-        return cachedDescriptor;
-    }
-
-    MySQLService<?> provideMySqlServiceNoCache(TypeLiteral<?> servingType) {
-        MySQLService<?> cachedService = mySQLServiceMap.get(servingType);
-        if (cachedService == null) {
-            MySQLModelDescriptor<?> modelDescriptor = provideMySqlModelDescriptorNoCache(servingType);
-
-            cachedService = mySQLService(modelDescriptor);
-        }
-
-        return cachedService;
     }
 
     MySQLService<?> mySQLService(MySQLModelDescriptor<?> mySQLModelDescriptor) {

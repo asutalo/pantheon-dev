@@ -23,11 +23,6 @@ class MySQLServiceFieldsProvider {
     static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
     static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
     static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
-    private final MySQLServiceProvider mySQLServiceProvider;
-
-    public MySQLServiceFieldsProvider(MySQLServiceProvider mySQLServiceProvider) {
-        this.mySQLServiceProvider = mySQLServiceProvider;
-    }
 
     <T> String getTableName(Class<T> tClass) {
         return tClass.getSimpleName();
@@ -213,10 +208,6 @@ class MySQLServiceFieldsProvider {
             }
             return new FieldsMergerDTO(new FieldValueSetter<>(f), crossroads);
         }).toList();
-    }
-
-    <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass) {
-        return getSpecificNestedFieldValueSetters(tClass, new ArrayList<>());
     }
 
     <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass, List<Class<T>> observedClasses) {
