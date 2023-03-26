@@ -71,7 +71,6 @@ public class MySQLModelDescriptor<T> {
         setColumnsAndAliases();
         setFilteredSelect();
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
-        resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         setMySqlValuesFilter();
     }
 

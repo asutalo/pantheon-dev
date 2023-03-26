@@ -14,15 +14,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class MySQLServiceFieldsProvider {
-    static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
-    static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
-    static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
-    static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
-    static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
+    private static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
+    private static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
+    private static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
+    private static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
+    private static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
 
     <T> String getTableName(Class<T> tClass) {
         return tClass.getSimpleName();
@@ -40,21 +44,6 @@ class MySQLServiceFieldsProvider {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(String.format(FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR, tClass), e);
         }
-    }
-
-    <T> FieldValueGetter getPrimaryKeyFieldValueGetter(Class<T> tClass) {
-        Field field = getDeclaredPrimaryField(tClass);
-        return fieldToFieldValueGetter(field);
-    }
-
-    <T> FieldValueGetter getNestedPrimaryKeyFieldValueGetter(Class<T> tClass) {
-        Field field = getDeclaredPrimaryField(tClass);
-        if (field.getAnnotation(Nested.class) != null) {
-            field.setAccessible(true);
-            return new NestedFieldValueGetter(field, getPrimaryKeyFieldValueGetter(field.getType()));
-        }
-
-        return null;
     }
 
     <T> FieldValueSetter<T> getPrimaryKeyFieldValueSetter(Class<T> tClass) {
@@ -80,24 +69,6 @@ class MySQLServiceFieldsProvider {
         }
 
         return nonPrimaryFieldValueSetterMap;
-    }
-
-    <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
-        String tableName = getTableNameLowercase(tClass);
-        Field field = getDeclaredPrimaryField(tClass);
-        field.setAccessible(true);
-
-        if (field.getAnnotation(Nested.class) != null) {
-            return (SpecificFieldValueSetter<T>) new LazySpecificFieldValueSetter<>(field, tableName, getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType()));
-        }
-        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-        String fieldName = mySqlFieldInfo.column();
-
-        if (fieldName.isBlank()) {
-            return new SpecificFieldValueSetter<>(field, tableName);
-        } else {
-            return new SpecificFieldValueSetter<>(field, fieldName, tableName);
-        }
     }
 
     <T> List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters(Class<T> tClass) {
@@ -147,7 +118,64 @@ class MySQLServiceFieldsProvider {
         return getters;
     }
 
-    <T> List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> getSpecificListFieldValueOverrides(Class<T> tClass) {
+    <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {//todo wtf are these
+        List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
+        List<Field> fields = getDeclaredNestedMySqlFields(tClass);
+        fields.forEach(nestedField -> {
+            nestedField.setAccessible(true);
+
+            nestedFieldsMySqlValues.add(new Pair<>(new FieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
+        });
+
+        return nestedFieldsMySqlValues;
+    }
+
+    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
+        return getJoinInfos(modelClass, new ArrayList<>());
+    }
+
+    <T> Class<?> getPrimaryFieldType(Class<T> modelClass) {
+        return getDeclaredPrimaryField(modelClass).getType();
+    }
+
+    <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass) {
+        return getResultSetToInstance(modelClass, new ArrayList<>());
+    }
+
+    private <T> FieldValueGetter getPrimaryKeyFieldValueGetter(Class<T> tClass) {
+        Field field = getDeclaredPrimaryField(tClass);
+        return fieldToFieldValueGetter(field);
+    }
+
+    private <T> FieldValueGetter getNestedPrimaryKeyFieldValueGetter(Class<T> tClass) {
+        Field field = getDeclaredPrimaryField(tClass);
+        if (field.getAnnotation(Nested.class) != null) {
+            field.setAccessible(true);
+            return new NestedFieldValueGetter(field, getPrimaryKeyFieldValueGetter(field.getType()));
+        }
+
+        return null;
+    }
+
+    private <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
+        String tableName = getTableNameLowercase(tClass);
+        Field field = getDeclaredPrimaryField(tClass);
+        field.setAccessible(true);
+
+        if (field.getAnnotation(Nested.class) != null) {
+            return (SpecificFieldValueSetter<T>) new LazySpecificFieldValueSetter<>(field, tableName, getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType()));
+        }
+        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
+        String fieldName = mySqlFieldInfo.column();
+
+        if (fieldName.isBlank()) {
+            return new SpecificFieldValueSetter<>(field, tableName);
+        } else {
+            return new SpecificFieldValueSetter<>(field, fieldName, tableName);
+        }
+    }
+
+    private <T> List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> getSpecificListFieldValueOverrides(Class<T> tClass) {
         List<Pair<SpecificFieldValueOverride<T>, SpecificFieldValueOverride<T>>> overrides = new ArrayList<>();
 
         List<Field> nestedLists = getDeclaredNestedFields(tClass).stream().filter(field -> isList(field.getGenericType())).toList();
@@ -160,11 +188,11 @@ class MySQLServiceFieldsProvider {
         return overrides;
     }
 
-    FieldsMerger getFieldsMerger(Class<?> modelClass) {
+    private FieldsMerger getFieldsMerger(Class<?> modelClass) {
         return getFieldsMerger(modelClass, new ArrayList<>());
     }
 
-    FieldsMerger getFieldsMerger(Class<?> modelClass, List<Class<?>> observedClasses) {
+    private FieldsMerger getFieldsMerger(Class<?> modelClass, List<Class<?>> observedClasses) {
         observedClasses.add(modelClass);
         FieldsMerger fieldsMerger;
         FieldValueGetter nestedPrimaryKeyValueGetter = getNestedPrimaryKeyFieldValueGetter(modelClass);
@@ -179,7 +207,7 @@ class MySQLServiceFieldsProvider {
         return fieldsMerger;
     }
 
-    List<FieldsMergerDTO> myNestedModelsDTOs(Class<?> tClass, List<Class<?>> observedClasses) {
+    private List<FieldsMergerDTO> myNestedModelsDTOs(Class<?> tClass, List<Class<?>> observedClasses) {
         List<Field> flatNested = getDeclaredNestedFields(tClass);
 
         return flatNested.stream().map(f -> {
@@ -198,8 +226,7 @@ class MySQLServiceFieldsProvider {
 
             if (isList(f.getGenericType())) {
                 crossroads = new ListRoad(fieldsMerger, new FieldValueGetter(f));
-            } else if (
-                    getJoinInfos(type).stream().anyMatch(JoinInfo::hasAnyList)) {
+            } else if (getJoinInfos(type).stream().anyMatch(JoinInfo::hasAnyList)) {
 
                 crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(f));
 
@@ -210,36 +237,24 @@ class MySQLServiceFieldsProvider {
         }).toList();
     }
 
-    <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass, List<Class<T>> observedClasses) {
+    private <T> List<SpecificNestedFieldValueSetter<T>> getSpecificNestedFieldValueSetters(Class<T> tClass, List<Class<T>> observedClasses) {
         observedClasses.add(tClass);
         List<SpecificNestedFieldValueSetter<T>> setters = new ArrayList<>();
         for (Field field : getDeclaredNestedFields(tClass)) {
             Type genericType = field.getGenericType();
             Class<T> actualTypeArgument = (Class<T>) joiningWith(field, genericType, isList(genericType));
-                field.setAccessible(true);
-                if (isList(genericType)) {
-                    setters.add(new SpecificNestedListFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
-                } else {
-                    setters.add(new SpecificNestedFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
-                }
+            field.setAccessible(true);
+            if (isList(genericType)) {
+                setters.add(new SpecificNestedListFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
+            } else {
+                setters.add(new SpecificNestedFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
+            }
         }
 
         return setters;
     }
 
-    <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {//todo wtf are these
-        List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
-        List<Field> fields = getDeclaredNestedMySqlFields(tClass);
-        fields.forEach(nestedField -> {
-            nestedField.setAccessible(true);
-
-            nestedFieldsMySqlValues.add(new Pair<>(new FieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
-        });
-
-        return nestedFieldsMySqlValues;
-    }
-
-    String getPrimaryKeyFieldName(Class<?> ofClass) {
+    private String getPrimaryKeyFieldName(Class<?> ofClass) {
         Field field = getDeclaredPrimaryField(ofClass);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         if (mySqlFieldInfo == null) {
@@ -254,7 +269,7 @@ class MySQLServiceFieldsProvider {
         return fieldName;
     }
 
-    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass, List<Class<?>> observedClasses) {
+    private <T> List<JoinInfo> getJoinInfos(Class<T> modelClass, List<Class<?>> observedClasses) {
         List<JoinInfo> joinInfos = new ArrayList<>();
         observedClasses.add(modelClass);
 
@@ -321,17 +336,12 @@ class MySQLServiceFieldsProvider {
             if (!observedClasses.contains(joiningWithClass)) {
                 nestedJoins = getJoinInfos(joiningWithClass, observedClasses);
             }
-            if (nestedJoins != null)
-                joinInfos.addAll(nestedJoins);
+            if (nestedJoins != null) joinInfos.addAll(nestedJoins);
 
         }
 
 
         return joinInfos;
-    }
-
-    <T> List<JoinInfo> getJoinInfos(Class<T> modelClass) {
-        return getJoinInfos(modelClass, new ArrayList<>());
     }
 
     private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
@@ -340,17 +350,15 @@ class MySQLServiceFieldsProvider {
             return annotation != null && annotation.primary();
         }).toList();
 
-        if (primaryKeys.isEmpty())
-            throw new RuntimeException(NO_PRIMARY_KEY_FOUND);
-        else if (primaryKeys.size() > 1)
-            throw new RuntimeException(THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY);
+        if (primaryKeys.isEmpty()) throw new RuntimeException(NO_PRIMARY_KEY_FOUND);
+        else if (primaryKeys.size() > 1) throw new RuntimeException(THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY);
         else if (primaryKeys.get(0).getGenericType().getTypeName().contains("List"))
             throw new RuntimeException(PRIMARY_KEY_CANNOT_BE_A_LIST);
 
         return primaryKeys.get(0);
     }
 
-    private static FieldValueGetter fieldToFieldValueGetter(Field field) {
+    private FieldValueGetter fieldToFieldValueGetter(Field field) {
         field.setAccessible(true);
         return new FieldValueGetter(field);
     }
@@ -425,20 +433,15 @@ class MySQLServiceFieldsProvider {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null && field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
     }
 
-    public <T> Class<?> getPrimaryFieldType(Class<T> modelClass) {
-        return getDeclaredPrimaryField(modelClass).getType();
-    }
-
-    public <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass, List<Class<T>> observedClasses) {
+    private <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass, List<Class<T>> observedClasses) {
         ResultSetToInstance<T> resultSetToInstance;
         boolean hasNestedList = getJoinInfos(modelClass).stream().anyMatch(JoinInfo::isListJoin);
 
         List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
 
-        if(observedClasses.contains(modelClass)){
+        if (observedClasses.contains(modelClass)) {
             specificNestedFieldValueSetters = List.of();
-        }
-        else {
+        } else {
             specificNestedFieldValueSetters = getSpecificNestedFieldValueSetters(modelClass, observedClasses);
         }
         if (hasNestedList) {
@@ -450,9 +453,5 @@ class MySQLServiceFieldsProvider {
         }
 
         return resultSetToInstance;
-    }
-
-    public <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass) {
-        return getResultSetToInstance(modelClass, new ArrayList<>());
     }
 }
