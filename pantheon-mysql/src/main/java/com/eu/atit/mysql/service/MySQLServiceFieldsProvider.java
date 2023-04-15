@@ -1,6 +1,9 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
+import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
+import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
 import com.eu.atit.mysql.service.merging.direction.Crossroads;
 import com.eu.atit.mysql.service.merging.direction.DeadEnd;
 import com.eu.atit.mysql.service.merging.direction.ListRoad;
@@ -17,8 +20,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class MySQLServiceFieldsProvider {
@@ -36,7 +41,7 @@ class MySQLServiceFieldsProvider {
         return getTableName(tClass).toLowerCase();
     }
 
-    <T> Instantiator<T> getInstantiator(Class<T> tClass) {
+    <T> Instantiator<T> getInstantiator(Class<T> tClass) { //todo turn into a full class, there's different usages of instantiator in several places
         try {
             Constructor<T> declaredConstructor = tClass.getDeclaredConstructor();
             declaredConstructor.setAccessible(true);
@@ -52,6 +57,7 @@ class MySQLServiceFieldsProvider {
         return new FieldValueSetter<>(field);
     }
 
+    //todo does not work for nesting
     <T> Map<String, FieldValueSetter<T>> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
         Map<String, FieldValueSetter<T>> nonPrimaryFieldValueSetterMap = new HashMap<>();
 
@@ -289,8 +295,7 @@ class MySQLServiceFieldsProvider {
             validateNestingDirection(nestingInfo, isList);
             Class<?> joiningWithClass = joiningWith(field, genericType, isList);
 
-            String modelClassName = modelClass.getSimpleName();
-            String modelClassNameLowerCase = modelClassName.toLowerCase();
+            String modelClassNameLowerCase = getTableNameLowercase(modelClass);
             String targetTableName = getTableName(joiningWithClass);
             String targetTableLowercase = getTableNameLowercase(joiningWithClass);
 
@@ -393,6 +398,7 @@ class MySQLServiceFieldsProvider {
         return annotation != null && annotation.primary();
     }
 
+    //todo expand to support infinite nesting, right now it's only 1 level deep
     private List<ColumnNameAndAlias> getColumnNameAndAliases(Nested nestingInfo, Class<?> targetClass, String targetTableLowercase) {
         List<ColumnNameAndAlias> columnNameAndAliases;
         if (nestingInfo.eager()) {
@@ -453,5 +459,34 @@ class MySQLServiceFieldsProvider {
         }
 
         return resultSetToInstance;
+    }
+
+    <T> Set<ColumnNameAndAlias> getColumnsAndAliases(Class<T> modelClass) {
+        Set<ColumnNameAndAlias> columnNameAndAliases = new HashSet<>();
+
+        for (SpecificFieldValueSetter<T> specificFieldValueSetter : getSpecificFieldValueSetters(modelClass)) {
+            columnNameAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(getTableNameLowercase(modelClass)));
+        }
+
+        for (JoinInfo joinInfo : getJoinInfos(modelClass)) {
+            columnNameAndAliases.addAll(joinInfo.fieldNameAndAliases());
+        }
+        return columnNameAndAliases;
+    }
+
+    <T> FilteredSelect getFilteredSelect(Class<T> modelClass) {
+        if (getJoinInfos(modelClass).isEmpty()) {
+            return new FilteredSelect(getColumnsAndAliases(modelClass), getTableName(modelClass));
+        } else {
+            return new JoinedFilterSelect(getColumnsAndAliases(modelClass), getTableName(modelClass), getJoinInfos(modelClass));
+        }
+    }
+
+    <T> MySqlValuesFilter<T> getMySqlValuesFilter(Class<T> modelClass) {
+        if(getNestedFieldsMySqlValue(modelClass).isEmpty()){
+            return new NonPrimaryMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass));
+        } else {
+            return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
+        }
     }
 }

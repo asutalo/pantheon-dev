@@ -1,23 +1,14 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
-import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
-import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
-import com.eu.atit.pantheon.helper.Pair;
 import com.google.inject.TypeLiteral;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class MySQLModelDescriptor<T> {
-    private final MySQLServiceFieldsProvider mySQLServiceFieldsProvider;
-    private final Class<T> modelClass;
-    private final String tableName; 
-    private final String tableNameLowercase;
-
+    private final String tableName;
     private final Instantiator<T> instantiator;
 
     /*
@@ -29,67 +20,32 @@ public class MySQLModelDescriptor<T> {
     // converts only primary key into MySqlValue
     private final FieldMySqlValue primaryKeyFieldMySqlValue;
 
-    private final List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues;
-
     // map of aliases pointing to each Fields' MySqlValue
     private final Map<String, FieldMySqlValue> aliasFieldMySqlValueMap = new HashMap<>();
 
-    /*
-     * used to initialise a full POJO including primary key FROM select statement with table names and joins in mind
-     * */
-    private final List<SpecificFieldValueSetter<T>> specificFieldValueSetters;
-    private final Set<ColumnNameAndAlias> columnsAndAliases = new HashSet<>();
-    
-    private final Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //no primary key included but will include not annotated fields as well
+    //todo obsolete
+    private final Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //todo replace will list of ALL setters
 
-    //full traversal down all EAGER nested classes
-    private final List<JoinInfo> joinInfos;
+    private final FilteredSelect filteredSelect;
 
-    private FilteredSelect filteredSelect;
-
-    private ResultSetToInstance<T> resultSetToInstance;
-    private MySqlValuesFilter<T> mySqlValuesFilter;
+    private final ResultSetToInstance<T> resultSetToInstance;
+    private final MySqlValuesFilter<T> mySqlValuesFilter;
 
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
-        modelClass = (Class<T>) modelTypeLiteral.getRawType();
-        this.mySQLServiceFieldsProvider = mySQLServiceFieldsProvider;
+        Class<T> modelClass = (Class<T>) modelTypeLiteral.getRawType();
 
         tableName = mySQLServiceFieldsProvider.getTableName(modelClass);
-        tableNameLowercase = mySQLServiceFieldsProvider.getTableNameLowercase(modelClass);
         instantiator = mySQLServiceFieldsProvider.getInstantiator(modelClass);
-        nonPrimaryKeyFieldMySqlValues = mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(modelClass);
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
 
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(modelClass);
-        specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(modelClass);
 
-        setAliasFieldMySqlValueMap();
+        setAliasFieldMySqlValueMap(mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(modelClass));
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(modelClass);
 
-        joinInfos = mySQLServiceFieldsProvider.getJoinInfos(modelClass);
-
-        setColumnsAndAliases();
-        setFilteredSelect();
+        filteredSelect = mySQLServiceFieldsProvider.getFilteredSelect(modelClass);
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
-        setMySqlValuesFilter();
-    }
-
-    private void setMySqlValuesFilter(){
-        if(mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass).isEmpty()){
-            mySqlValuesFilter = new NonPrimaryMySqlValuesFilter<>(this);
-        } else {
-            mySqlValuesFilter = new MySqlValuesFilterWithNestedPrimaryKey<>(this);
-        }
-    }
-
-    private void setColumnsAndAliases() {
-        for (SpecificFieldValueSetter<T> specificFieldValueSetter : specificFieldValueSetters) {
-            columnsAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(tableNameLowercase));
-        }
-
-        for (JoinInfo joinInfo : joinInfos) {
-            columnsAndAliases.addAll(joinInfo.fieldNameAndAliases());
-        }
+        mySqlValuesFilter = mySQLServiceFieldsProvider.getMySqlValuesFilter(modelClass);
     }
 
     ResultSetToInstance<T> getResultSetToInstance() {
@@ -108,14 +64,6 @@ public class MySQLModelDescriptor<T> {
         return aliasFieldMySqlValueMap;
     }
 
-    public List<FieldMySqlValue> getNonPrimaryKeyFieldMySqlValues() {
-        return nonPrimaryKeyFieldMySqlValues;
-    }
-
-    Set<ColumnNameAndAlias> getColumnsAndAliases() {
-        return columnsAndAliases;
-    }
-
     Map<String, FieldValueSetter<T>> getAllExceptPrimaryFieldValueSetterMap() {
         return allExceptPrimaryFieldValueSetterMap;
     }
@@ -128,29 +76,13 @@ public class MySQLModelDescriptor<T> {
         return tableName;
     }
 
-    List<JoinInfo> getJoinInfos() {
-        return joinInfos;
-    }
-
     FilteredSelect getFilteredSelect() {
         return filteredSelect;
     }
 
-    private void setAliasFieldMySqlValueMap() {
+    private void setAliasFieldMySqlValueMap(List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues) {
         aliasFieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
         nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> aliasFieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
-    }
-
-    public List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedPrimaryFieldMySqlValues() {
-        return mySQLServiceFieldsProvider.getNestedFieldsMySqlValue(modelClass);
-    }
-
-    private void setFilteredSelect() {
-        if (getJoinInfos().isEmpty()) {
-            filteredSelect = new FilteredSelect(this);
-        } else {
-            filteredSelect = new JoinedFilterSelect(this);
-        }
     }
 
     MySqlValuesFilter<T> getMySqlValuesFilter() {

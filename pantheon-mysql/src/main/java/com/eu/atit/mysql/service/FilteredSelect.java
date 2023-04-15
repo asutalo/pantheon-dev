@@ -2,14 +2,16 @@ package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.QueryBuilder;
 
+import java.util.Set;
+
 class FilteredSelect {
 
     private final QueryBuilder filteredSelectQueryBuilder;
 
-    FilteredSelect(MySQLModelDescriptor<?> mySQLModelDescriptor) {
+    FilteredSelect(Set<ColumnNameAndAlias> columnsAndAliases, String tableName) {
         QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select(mySQLModelDescriptor.getColumnsAndAliases());
-        queryBuilder.from(mySQLModelDescriptor.getTableName());
+        queryBuilder.select(columnsAndAliases);
+        queryBuilder.from(tableName);
 
         filteredSelectQueryBuilder = queryBuilder;
     }

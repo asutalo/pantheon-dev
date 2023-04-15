@@ -1,19 +1,22 @@
 package com.eu.atit.mysql.service.filter;
 
 import com.eu.atit.mysql.query.MySqlValue;
-import com.eu.atit.mysql.service.MySQLModelDescriptor;
+import com.eu.atit.mysql.service.FieldMySqlValue;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T> {
-    public NonPrimaryMySqlValuesFilter(MySQLModelDescriptor<T> mySQLModelDescriptor) {
-        super(mySQLModelDescriptor);
+    private final List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues;
+
+    public NonPrimaryMySqlValuesFilter(List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues) {
+        this.nonPrimaryKeyFieldMySqlValues = nonPrimaryKeyFieldMySqlValues;
     }
 
     @Override
     public LinkedList<MySqlValue> get(T object) {
         LinkedList<MySqlValue> mySqlValues = new LinkedList<>();
-        mySQLModelDescriptor.getNonPrimaryKeyFieldMySqlValues().forEach(getter -> mySqlValues.add(getter.apply(object)));
+        nonPrimaryKeyFieldMySqlValues.forEach(getter -> mySqlValues.add(getter.apply(object)));
 
         return mySqlValues;
     }
