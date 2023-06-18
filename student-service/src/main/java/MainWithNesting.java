@@ -6,6 +6,7 @@ import com.eu.atit.mysql.service.ColumnNameAndAlias;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class MainWithNesting {
 
     private static QueryBuilder selectAll() {
         QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.select(new HashSet<>(List.of(new ColumnNameAndAlias("student.name", "student_name"), new ColumnNameAndAlias("type.name", "type_name"))));
+        queryBuilder.select(new LinkedHashSet<>(List.of(new ColumnNameAndAlias("student.name", "student_name"), new ColumnNameAndAlias("type.name", "type_name"))));
         queryBuilder.from("student");
         queryBuilder.leftJoin("type", "id", "student", "id");
         return queryBuilder;

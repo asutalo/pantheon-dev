@@ -3,12 +3,12 @@ package com.eu.atit.mysql.service;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class LazySpecificFieldValueSetter<T> extends SpecificFieldValueSetter<T> {
+public class LazyNestedObjectValueSetter<T> extends SpecificFieldValueSetter<T> {
     private final FieldValueSetter<T> fieldValueSetter;
     private final Instantiator<?> instantiator;
     private final SpecificFieldValueSetter<T> primaryKeyValueSetter;
 
-    public LazySpecificFieldValueSetter(Field fieldToSet, String tableName, Instantiator<?> instantiator, SpecificFieldValueSetter<T> primaryKeyValueSetter) {
+    public LazyNestedObjectValueSetter(Field fieldToSet, String tableName, Instantiator<?> instantiator, SpecificFieldValueSetter<T> primaryKeyValueSetter) {
         super(fieldToSet, tableName);
         fieldValueSetter = new FieldValueSetter<>(fieldToSet);
         this.instantiator = instantiator;

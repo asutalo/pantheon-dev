@@ -7,24 +7,24 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class KeyVal implements QueryPart {
-    static final String VAL = " = ?";
+    static final String IS_VAL = " = ?";
     private final Object value;
-    private final String key;
-    private final String separator;
     private final int index;
     private final MysqlType targetType;
+
+    private final String keyValDecorator;
 
     public KeyVal(MysqlType targetType, String key, Object value, String separator, int index) {
         this.targetType = targetType;
         this.value = value;
-        this.key = key;
-        this.separator = separator;
         this.index = index;
+
+        this.keyValDecorator = separator.concat(key).concat(IS_VAL);
     }
 
     @Override
     public String apply(String query) {
-        return query.concat(separator).concat(key).concat(VAL);
+        return query.concat(keyValDecorator);
     }
 
     @Override
@@ -40,23 +40,31 @@ public class KeyVal implements QueryPart {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        KeyVal keyVal = (KeyVal) o;
-        return index == keyVal.index && Objects.equals(value, keyVal.value) && Objects.equals(key, keyVal.key) && Objects.equals(separator, keyVal.separator) && targetType == keyVal.targetType;
+
+        final KeyVal keyVal = (KeyVal) o;
+
+        if (index != keyVal.index) return false;
+        if (!Objects.equals(value, keyVal.value)) return false;
+        if (targetType != keyVal.targetType) return false;
+        return Objects.equals(keyValDecorator, keyVal.keyValDecorator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, key, separator, index, targetType);
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + index;
+        result = 31 * result + (targetType != null ? targetType.hashCode() : 0);
+        result = 31 * result + (keyValDecorator != null ? keyValDecorator.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "KeyVal{" +
                "value=" + value +
-               ", key='" + key + '\'' +
-               ", separator='" + separator + '\'' +
                ", index=" + index +
                ", targetType=" + targetType +
+               ", keyValDecorator='" + keyValDecorator + '\'' +
                '}';
     }
 }

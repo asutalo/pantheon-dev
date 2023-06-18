@@ -5,18 +5,16 @@ import java.util.Objects;
 import static com.eu.atit.mysql.query.SelectWithAliases.AS;
 
 public class From extends KeyWord implements QueryPart {
+    private final String decorator;
     static final String FROM = System.lineSeparator() + "FROM\t";
-    private final String tableName;
-    private final String tableNameAlias;
 
     public From(String tableName) {
-        this.tableName = tableName;
-        this.tableNameAlias = tableName.toLowerCase();
+        this.decorator = FROM.concat(tableName).concat(AS).concat(tableName.toLowerCase());
     }
 
     @Override
     public String apply(String query) {
-        return query.concat(FROM).concat(tableName).concat(AS).concat(tableNameAlias);
+        return query.concat(decorator);
     }
 
     @Override
@@ -24,19 +22,18 @@ public class From extends KeyWord implements QueryPart {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         From from = (From) o;
-        return Objects.equals(tableName, from.tableName);
+        return Objects.equals(decorator, from.decorator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableName);
+        return Objects.hash(decorator);
     }
 
     @Override
     public String toString() {
         return "From{" +
-               "tableName='" + tableName + '\'' +
-               ", tableNameLowercase='" + tableNameAlias + '\'' +
+               "decorator='" + decorator + '\'' +
                '}';
     }
 }

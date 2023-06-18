@@ -7,36 +7,42 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.eu.atit.mysql.query.KeyVal.IS_VAL;
+
 public class Update implements QueryPart {
-    static final String UPDATE = "UPDATE ";
-    private static final String DELIMITER = ", ";
+    static final String UPDATE = "UPDATE ".concat("\t");
+    static final String DELIMITER = "," + System.lineSeparator() + "\t\t";
     private final String tableName;
     private final List<MySqlValue> valuesForQuery;
     private final List<MySqlValue> valuesForParams;
-    private static final String PLACEHOLDER = " = ?";
+
+    static final String SET = System.lineSeparator().concat("SET\t\t");
+
+    private final String updateDecorator;
 
 
     public Update(String tableName, LinkedList<MySqlValue> values) {
         this.tableName = tableName;
         this.valuesForQuery = new LinkedList<>(values);
         this.valuesForParams = new LinkedList<>(values);
+        this.updateDecorator = UPDATE.concat(tableName).concat(SET);
     }
 
     @Override
     public String apply(String query) {
-        List<MySqlValue> values = new ArrayList<>(valuesForQuery); //todo LOL fix this
+        List<MySqlValue> values = new ArrayList<>(valuesForQuery); // todo LOL fix this
         MySqlValue mySqlValue = values.get(0);
 
-        StringBuilder keysPlaceholderBuilder = new StringBuilder(mySqlValue.getKey().concat(PLACEHOLDER));
+        StringBuilder keysPlaceholderBuilder = new StringBuilder(mySqlValue.getKey().concat(IS_VAL));
 
         values.remove(0);
 
         for (MySqlValue value : values) {
             keysPlaceholderBuilder.append(DELIMITER);
-            keysPlaceholderBuilder.append(value.getKey().concat(" = ?"));
+            keysPlaceholderBuilder.append(value.getKey().concat(IS_VAL));
         }
 
-        return query.concat(UPDATE).concat("\t").concat(tableName).concat(System.lineSeparator()).concat("SET\t\t").concat(keysPlaceholderBuilder.toString());
+        return query.concat(updateDecorator).concat(keysPlaceholderBuilder.toString());
     }
 
     @Override
@@ -55,13 +61,24 @@ public class Update implements QueryPart {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Update update = (Update) o;
-        return Objects.equals(tableName, update.tableName) && Objects.equals(valuesForQuery, update.valuesForQuery) && Objects.equals(valuesForParams, update.valuesForParams);
+
+        final Update update = (Update) o;
+
+        if (!Objects.equals(tableName, update.tableName)) return false;
+        if (!Objects.equals(valuesForQuery, update.valuesForQuery))
+            return false;
+        if (!Objects.equals(valuesForParams, update.valuesForParams))
+            return false;
+        return Objects.equals(updateDecorator, update.updateDecorator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableName, valuesForQuery, valuesForParams);
+        int result = tableName != null ? tableName.hashCode() : 0;
+        result = 31 * result + (valuesForQuery != null ? valuesForQuery.hashCode() : 0);
+        result = 31 * result + (valuesForParams != null ? valuesForParams.hashCode() : 0);
+        result = 31 * result + (updateDecorator != null ? updateDecorator.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -70,6 +87,7 @@ public class Update implements QueryPart {
                "tableName='" + tableName + '\'' +
                ", valuesForQuery=" + valuesForQuery +
                ", valuesForParams=" + valuesForParams +
+               ", updateDecorator='" + updateDecorator + '\'' +
                '}';
     }
 }

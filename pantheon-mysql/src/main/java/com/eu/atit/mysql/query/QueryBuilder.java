@@ -7,9 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QueryBuilder {
@@ -18,12 +18,13 @@ public class QueryBuilder {
     private final List<QueryPart> queryParts = new ArrayList<>();
     private int paramIndex = 0;
 
+    static final String QUERY_END = ";";
+
     public void selectAll() {
         queryParts.add(new SelectAll());
     }
 
-
-    public void select(Set<ColumnNameAndAlias> columnsAndAliases) {
+    public void select(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases) {
         queryParts.add(new SelectWithAliases(columnsAndAliases));
     }
 
@@ -81,7 +82,7 @@ public class QueryBuilder {
             query = queryPart.apply(query);
         }
 
-        return query.concat(";");
+        return query.concat(QUERY_END);
     }
 
     public PreparedStatement prepareStatement(Connection connection) throws SQLException {
@@ -102,6 +103,10 @@ public class QueryBuilder {
         return queryParts;
     }
 
+
+    void addQueryParts(List<QueryPart> queryParts) {
+        this.queryParts.addAll(queryParts);
+    }
     public List<KeyVal> getKeyValues() {
         return queryParts.stream().filter(queryPart -> queryPart instanceof KeyVal).map(queryPart -> (KeyVal) queryPart).collect(Collectors.toList());
     }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +96,7 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    <T> FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<T> tClass) {
+    FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<?> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         if (field.getAnnotation(Nested.class) != null) {
             return getPrimaryKeyFieldMySqlValue(field.getType());
@@ -169,7 +170,7 @@ class MySQLServiceFieldsProvider {
         field.setAccessible(true);
 
         if (field.getAnnotation(Nested.class) != null) {
-            return (SpecificFieldValueSetter<T>) new LazySpecificFieldValueSetter<>(field, tableName, getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType()));
+            return (SpecificFieldValueSetter<T>) new LazyNestedObjectValueSetter<>(field, tableName, getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType()));
         }
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String fieldName = mySqlFieldInfo.column();
@@ -461,8 +462,8 @@ class MySQLServiceFieldsProvider {
         return resultSetToInstance;
     }
 
-    <T> Set<ColumnNameAndAlias> getColumnsAndAliases(Class<T> modelClass) {
-        Set<ColumnNameAndAlias> columnNameAndAliases = new HashSet<>();
+    <T> LinkedHashSet<ColumnNameAndAlias> getColumnsAndAliases(Class<T> modelClass) {
+        LinkedHashSet<ColumnNameAndAlias> columnNameAndAliases = new LinkedHashSet<>();
 
         for (SpecificFieldValueSetter<T> specificFieldValueSetter : getSpecificFieldValueSetters(modelClass)) {
             columnNameAndAliases.add(specificFieldValueSetter.fieldNameAndAlias(getTableNameLowercase(modelClass)));

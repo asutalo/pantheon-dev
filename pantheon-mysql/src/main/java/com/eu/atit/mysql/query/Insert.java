@@ -8,18 +8,25 @@ import java.util.List;
 import java.util.Objects;
 
 public class Insert implements QueryPart {
-    private static final String DELIMITER = ", ";
-    private static final String PLACEHOLDER = "?";
+    static final String DELIMITER = ", ";
+    static final String PLACEHOLDER = "?";
+    static final String INSERT = "INSERT INTO\t";
+    static final String COLUMNS_START = System.lineSeparator().concat("\t\t(");
+    static final String COLUMNS_END = ")".concat(System.lineSeparator());
+    static final String VALUES_START = "VALUES".concat(System.lineSeparator()).concat("\t\t(");
+    static final String VALUES_END = ")";
 
-
-    private final String tableName;
     private final List<MySqlValue> valuesForQuery;
     private final List<MySqlValue> valuesForParams;
 
+    private final String insertIntoDecorator;
+    private static final String valuesDecorator = COLUMNS_END.concat(VALUES_START);;
+
     public Insert(String tableName, LinkedList<MySqlValue> valuesForQuery) {
-        this.tableName = tableName;
         this.valuesForQuery = new LinkedList<>(valuesForQuery);
         this.valuesForParams = new LinkedList<>(valuesForQuery);
+
+        this.insertIntoDecorator = INSERT.concat(tableName);
     }
 
     @Override
@@ -41,7 +48,7 @@ public class Insert implements QueryPart {
             placeholdersBuilder.append(PLACEHOLDER);
         }
 
-        return query.concat("INSERT INTO\t").concat(tableName).concat(System.lineSeparator()).concat("\t\t(").concat(keysBuilder.toString()).concat(")").concat(System.lineSeparator()).concat("VALUES").concat(System.lineSeparator()).concat("\t\t(").concat(placeholdersBuilder.toString()).concat(")");
+        return query.concat(insertIntoDecorator).concat(COLUMNS_START).concat(keysBuilder.toString()).concat(valuesDecorator).concat(placeholdersBuilder.toString()).concat(VALUES_END);
     }
 
     @Override
@@ -59,21 +66,34 @@ public class Insert implements QueryPart {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Insert insert = (Insert) o;
-        return Objects.equals(tableName, insert.tableName) && Objects.equals(valuesForQuery, insert.valuesForQuery) && Objects.equals(valuesForParams, insert.valuesForParams);
+
+        final Insert insert = (Insert) o;
+
+        if (!Objects.equals(valuesForQuery, insert.valuesForQuery))
+            return false;
+        if (!Objects.equals(valuesForParams, insert.valuesForParams))
+            return false;
+        if (!Objects.equals(insertIntoDecorator, insert.insertIntoDecorator))
+            return false;
+        return Objects.equals(valuesDecorator, insert.valuesDecorator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableName, valuesForQuery, valuesForParams);
+        int result = valuesForQuery != null ? valuesForQuery.hashCode() : 0;
+        result = 31 * result + (valuesForParams != null ? valuesForParams.hashCode() : 0);
+        result = 31 * result + (insertIntoDecorator != null ? insertIntoDecorator.hashCode() : 0);
+        result = 31 * result + (valuesDecorator != null ? valuesDecorator.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "Insert{" +
-               "tableName='" + tableName + '\'' +
-               ", valuesForQuery=" + valuesForQuery +
+               "valuesForQuery=" + valuesForQuery +
                ", valuesForParams=" + valuesForParams +
+               ", insertIntoDecorator='" + insertIntoDecorator + '\'' +
+               ", valuesDecorator='" + valuesDecorator + '\'' +
                '}';
     }
 }

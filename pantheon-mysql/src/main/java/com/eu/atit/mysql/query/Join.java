@@ -4,21 +4,14 @@ import static com.eu.atit.mysql.query.SelectWithAliases.AS;
 
 public class Join extends KeyWord implements QueryPart {
     static final String JOIN = System.lineSeparator().concat("JOIN ");
-    static final String ON = "ON ";
+    static final String ON = System.lineSeparator().concat("\t\t\t") + "ON ";
     static final String EQUALS = " = ";
     static final String DOT = ".";
-    private final String targetTableName;
-    private final String targetId;
-    private final String sourceTableName;
-    private final String sourceId;
-    private final String targetTableNameLowercase;
+    final String joinDecorator;
 
     public Join(String targetTableName, String targetId, String sourceTableName, String sourceId) {
-        this.targetTableName = targetTableName;
-        this.targetTableNameLowercase = targetTableName.toLowerCase();
-        this.targetId = targetId;
-        this.sourceTableName = sourceTableName;
-        this.sourceId = sourceId;
+        String targetTableNameLowercase = targetTableName.toLowerCase();
+        this.joinDecorator = targetTableName.concat(AS).concat(targetTableNameLowercase).concat(ON).concat(sourceTableName.toLowerCase()).concat(DOT).concat(sourceId).concat(EQUALS).concat(targetTableNameLowercase).concat(DOT).concat(targetId);
     }
 
     @Override
@@ -27,7 +20,7 @@ public class Join extends KeyWord implements QueryPart {
     }
 
     String joinQuery(String query) {
-        return query.concat(targetTableName).concat(AS).concat(targetTableNameLowercase).concat(System.lineSeparator()).concat("\t\t\t").concat(ON).concat(sourceTableName).concat(DOT).concat(sourceId).concat(EQUALS).concat(targetTableNameLowercase).concat(DOT).concat(targetId);
+        return query.concat(joinDecorator);
     }
 
     @Override
@@ -44,11 +37,7 @@ public class Join extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "Join{" +
-               "targetTableName='" + targetTableName + '\'' +
-               ", targetId='" + targetId + '\'' +
-               ", sourceTableName='" + sourceTableName + '\'' +
-               ", sourceId='" + sourceId + '\'' +
-               ", targetTableNameLowercase='" + targetTableNameLowercase + '\'' +
+               "joinDecorator='" + joinDecorator +
                '}';
     }
 }

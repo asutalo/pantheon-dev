@@ -5,7 +5,7 @@ public class Delete extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(DELETE).concat(System.lineSeparator());
+        return query.concat(DELETE);
     }
 
     @Override

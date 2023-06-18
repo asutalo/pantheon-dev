@@ -2,7 +2,9 @@ package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -10,16 +12,17 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     static final String SELECT = "SELECT\t";
     static final String AS = " AS ";
     static final String SEPARATOR = ",".concat(System.lineSeparator()).concat("\t\t");
-    private final Set<ColumnNameAndAlias> columnsAndAliases;
+    private final LinkedHashSet<ColumnNameAndAlias> columnsAndAliases;
 
-    public SelectWithAliases(Set<ColumnNameAndAlias> columnsAndAliases) {
-        this.columnsAndAliases = new HashSet<>(columnsAndAliases);
+    public SelectWithAliases(LinkedHashSet <ColumnNameAndAlias> columnsAndAliases) {
+        this.columnsAndAliases = columnsAndAliases;
     }
 
     @Override
     public String apply(String query) {
         StringBuilder selectionStringBuilder = new StringBuilder(query.concat(SELECT));
-        Set<ColumnNameAndAlias> columnNameAndAliasSet = new HashSet<>(columnsAndAliases); //todo LOL fix this
+        ArrayList<ColumnNameAndAlias> columnNameAndAliasSet = new ArrayList<>(columnsAndAliases); // todo LOL fix this
+
         ColumnNameAndAlias columnAndAlias = columnNameAndAliasSet.iterator().next();
 
         selectionStringBuilder.append(columnAndAlias.fieldName());

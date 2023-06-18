@@ -2,13 +2,14 @@ package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.QueryBuilder;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 class FilteredSelect {
 
     private final QueryBuilder filteredSelectQueryBuilder;
 
-    FilteredSelect(Set<ColumnNameAndAlias> columnsAndAliases, String tableName) {
+    FilteredSelect(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases, String tableName) {
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.select(columnsAndAliases);
         queryBuilder.from(tableName);

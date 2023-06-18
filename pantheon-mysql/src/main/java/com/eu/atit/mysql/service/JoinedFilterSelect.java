@@ -3,13 +3,14 @@ package com.eu.atit.mysql.service;
 import com.eu.atit.mysql.query.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 public class JoinedFilterSelect extends FilteredSelect {
     private final QueryBuilder joinedFilteredSelectQueryBuilder;
 
-    JoinedFilterSelect(Set<ColumnNameAndAlias> columnsAndAliases, String tableName, List<JoinInfo> joinInfos) {
+    JoinedFilterSelect(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases, String tableName, List<JoinInfo> joinInfos) {
         super(columnsAndAliases, tableName);
 
         QueryBuilder queryBuilder = super.get();

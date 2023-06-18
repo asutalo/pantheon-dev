@@ -5,7 +5,7 @@ public class SelectAll extends KeyWord implements QueryPart {
 
     @Override
     public String apply(String query) {
-        return query.concat(SELECT).concat(System.lineSeparator());
+        return query.concat(SELECT);
     }
 
     @Override
