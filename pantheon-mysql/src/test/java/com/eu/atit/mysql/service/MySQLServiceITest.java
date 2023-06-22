@@ -38,7 +38,6 @@ public class MySQLServiceITest {
     class NonSpecificMethodsTest {
         private static final String ID = "id";
         private static final Class<SomeTestTarget> TEST_CLASS = SomeTestTarget.class;
-        private static final String TEST_CLASS_NAME = TEST_CLASS.getSimpleName();
         private MySQLService<SomeTestTarget> mySqlService;
 
         @BeforeEach
@@ -534,10 +533,10 @@ public class MySQLServiceITest {
                     "SELECT %s AS %s, %s AS %s, %s AS %s FROM %s AS %s LEFT JOIN %s AS %s ON %s = %s WHERE %s = ? AND %s = ?;",
                     SELECT_EMPLOYEE_ID,
                     EMPLOYEE_ID_ALIAS,
-                    SELECT_EMPLOYEE_TYPE_ID,
-                    EMPLOYEE_TYPE_ID_ALIAS,
                     SELECT_EMPLOYEE_NAME,
                     EMPLOYEE_NAME_ALIAS,
+                    SELECT_EMPLOYEE_TYPE_ID,
+                    EMPLOYEE_TYPE_ID_ALIAS,
                     EMPLOYEE_CLASS_NAME,
                     EMPLOYEE_CLASS_NAME_LOWERCASE,
                     EMPLOYEE_TYPE_CLASS_NAME,
@@ -577,10 +576,10 @@ public class MySQLServiceITest {
                     "SELECT %s AS %s, %s AS %s, %s AS %s FROM %s AS %s LEFT JOIN %s AS %s ON %s = %s;",
                     SELECT_EMPLOYEE_ID,
                     EMPLOYEE_ID_ALIAS,
-                    SELECT_EMPLOYEE_TYPE_ID,
-                    EMPLOYEE_TYPE_ID_ALIAS,
                     SELECT_EMPLOYEE_NAME,
                     EMPLOYEE_NAME_ALIAS,
+                    SELECT_EMPLOYEE_TYPE_ID,
+                    EMPLOYEE_TYPE_ID_ALIAS,
                     EMPLOYEE_CLASS_NAME,
                     EMPLOYEE_CLASS_NAME_LOWERCASE,
                     EMPLOYEE_TYPE_CLASS_NAME,
@@ -611,10 +610,10 @@ public class MySQLServiceITest {
                     "SELECT %s AS %s, %s AS %s, %s AS %s FROM %s AS %s LEFT JOIN %s AS %s ON %s = %s WHERE %s = ? AND %s = ?;",
                     SELECT_EMPLOYEE_ID,
                     EMPLOYEE_ID_ALIAS,
-                    SELECT_EMPLOYEE_TYPE_ID,
-                    EMPLOYEE_TYPE_ID_ALIAS,
                     SELECT_EMPLOYEE_NAME,
                     EMPLOYEE_NAME_ALIAS,
+                    SELECT_EMPLOYEE_TYPE_ID,
+                    EMPLOYEE_TYPE_ID_ALIAS,
                     EMPLOYEE_CLASS_NAME,
                     EMPLOYEE_CLASS_NAME_LOWERCASE,
                     EMPLOYEE_TYPE_CLASS_NAME,

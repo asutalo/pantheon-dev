@@ -21,23 +21,22 @@ public class MySQLServiceProvider extends DataServiceProvider {
     @Override
     public MySQLService<?> provide(TypeLiteral<?> servingType) {
 
+        // todo verify if we still need to cache the descriptor
+        // originally there was an issue with the descriptors being incomplete if not cached
+        // (due to internally using mysql service)
         MySQLModelDescriptor<?> cachedDescriptor = mySQLModelDescriptorMap.get(servingType);
 
         if (cachedDescriptor == null) {
             cachedDescriptor = mySQLModelDescriptor(servingType);
             mySQLModelDescriptorMap.put(servingType, cachedDescriptor);
 
-            MySQLService<?> mySQLService = mySQLService(cachedDescriptor);
+            MySQLService<?> mySQLService = new MySQLService<>(dataClient, cachedDescriptor);
             mySQLServiceMap.put(servingType, mySQLService);
 
             return mySQLService;
         }
 
         return mySQLServiceMap.get(servingType);
-    }
-
-    MySQLService<?> mySQLService(MySQLModelDescriptor<?> mySQLModelDescriptor) {
-        return new MySQLService<>(dataClient, mySQLModelDescriptor);
     }
 
     MySQLModelDescriptor<?> mySQLModelDescriptor(TypeLiteral<?> dataType) {
