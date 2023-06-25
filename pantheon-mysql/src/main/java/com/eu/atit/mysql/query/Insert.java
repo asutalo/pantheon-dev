@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,10 +60,12 @@ public class Insert implements QueryPart {
         }
     }
 
+    @IgnoreCoverage
     public List<MySqlValue> getValuesForParams() {
         return valuesForParams;
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

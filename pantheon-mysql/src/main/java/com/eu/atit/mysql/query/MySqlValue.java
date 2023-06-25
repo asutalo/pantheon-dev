@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 import com.mysql.cj.MysqlType;
 
 import java.util.Objects;
@@ -23,26 +24,32 @@ public class MySqlValue {
         this.paramIndex = paramIndex;
     }
 
+    @IgnoreCoverage
     public MysqlType getMysqlType() {
         return mysqlType;
     }
 
+    @IgnoreCoverage
     public String getKey() {
         return key;
     }
 
+    @IgnoreCoverage
     public Object getValue() {
         return value;
     }
 
+    @IgnoreCoverage
     int getParamIndex() {
         return paramIndex;
     }
 
+    @IgnoreCoverage
     void setParamIndex(int paramIndex) {
         this.paramIndex = paramIndex;
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -56,6 +63,7 @@ public class MySqlValue {
         return Objects.equals(value, that.value);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = mysqlType != null ? mysqlType.hashCode() : 0;
@@ -65,6 +73,7 @@ public class MySqlValue {
         return result;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "MySqlValue{" +

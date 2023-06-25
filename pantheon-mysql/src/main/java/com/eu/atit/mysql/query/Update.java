@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -53,10 +55,12 @@ public class Update implements QueryPart {
     }
 
 
+    @IgnoreCoverage
     public List<MySqlValue> getValuesForParams() {
         return valuesForParams;
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -72,6 +76,7 @@ public class Update implements QueryPart {
         return Objects.equals(updateDecorator, update.updateDecorator);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = tableName != null ? tableName.hashCode() : 0;
@@ -81,6 +86,7 @@ public class Update implements QueryPart {
         return result;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "Update{" +

@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.util.Objects;
 
 import static com.eu.atit.mysql.query.SelectWithAliases.AS;
@@ -17,6 +19,7 @@ public class From extends KeyWord implements QueryPart {
         return query.concat(decorator);
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -25,12 +28,12 @@ public class From extends KeyWord implements QueryPart {
         return Objects.equals(decorator, from.decorator);
     }
 
-    @Override
+    @IgnoreCoverage@Override
     public int hashCode() {
         return Objects.hash(decorator);
     }
 
-    @Override
+    @IgnoreCoverage@Override
     public String toString() {
         return "From{" +
                "decorator='" + decorator + '\'' +

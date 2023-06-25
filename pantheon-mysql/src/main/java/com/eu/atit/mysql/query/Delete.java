@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 public class Delete extends KeyWord implements QueryPart {
     static final String DELETE = "DELETE";
 
@@ -8,18 +10,20 @@ public class Delete extends KeyWord implements QueryPart {
         return query.concat(DELETE);
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         return o != null && getClass() == o.getClass();
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         return 0;
     }
 
-    @Override
+    @IgnoreCoverage@Override
     public String toString() {
         return "Delete{}";
     }

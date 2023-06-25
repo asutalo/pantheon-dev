@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -120,6 +121,7 @@ public class QueryBuilder {
         values.forEach(value -> value.setParamIndex(getCurrentIndex()));
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -131,6 +133,7 @@ public class QueryBuilder {
         return queryParts.equals(that.queryParts);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = queryParts.hashCode();
@@ -138,6 +141,7 @@ public class QueryBuilder {
         return result;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "QueryBuilder{" +

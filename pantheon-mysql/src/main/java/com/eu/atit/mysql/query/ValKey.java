@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.query;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 import com.mysql.cj.MysqlType;
 
 import java.sql.PreparedStatement;
@@ -36,6 +37,7 @@ public class ValKey implements QueryPart {
         preparedStatement.setObject(index, value, targetType);
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,11 +46,13 @@ public class ValKey implements QueryPart {
         return index == valKey.index && Objects.equals(value, valKey.value) && Objects.equals(key, valKey.key) && Objects.equals(separator, valKey.separator) && targetType == valKey.targetType;
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         return Objects.hash(value, key, separator, index, targetType);
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "ValKey{" +

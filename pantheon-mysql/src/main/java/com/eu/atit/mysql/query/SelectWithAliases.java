@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,6 +42,7 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
         return selectionStringBuilder.toString();
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,11 +51,13 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
         return Objects.equals(columnsAndAliases, that.columnsAndAliases);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         return Objects.hash(columnsAndAliases);
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "SelectWithAliases{" +
