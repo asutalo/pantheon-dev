@@ -33,16 +33,12 @@ public class MySQLModelDescriptor<T> {
 
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         Class<T> modelClass = (Class<T>) modelTypeLiteral.getRawType();
-
         tableName = mySQLServiceFieldsProvider.getTableName(modelClass);
         instantiator = mySQLServiceFieldsProvider.getInstantiator(modelClass);
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
-
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(modelClass);
-
-        setAliasFieldMySqlValueMap(mySQLServiceFieldsProvider.getNonPrimaryKeyFieldMySqlValues(modelClass));
+        aliasFieldMySqlValueMap.putAll(mySQLServiceFieldsProvider.getAliasFieldMySqlValues(modelClass));
         allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(modelClass);
-
         filteredSelect = mySQLServiceFieldsProvider.getFilteredSelect(modelClass);
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         mySqlValuesFilter = mySQLServiceFieldsProvider.getMySqlValuesFilter(modelClass);
@@ -78,11 +74,6 @@ public class MySQLModelDescriptor<T> {
 
     FilteredSelect getFilteredSelect() {
         return filteredSelect;
-    }
-
-    private void setAliasFieldMySqlValueMap(List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues) {
-        aliasFieldMySqlValueMap.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
-        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> aliasFieldMySqlValueMap.put(fieldMySqlValue.alias(), fieldMySqlValue));
     }
 
     MySqlValuesFilter<T> getMySqlValuesFilter() {

@@ -490,4 +490,16 @@ class MySQLServiceFieldsProvider {
             return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
         }
     }
+
+    <T> Map<String, FieldMySqlValue> getAliasFieldMySqlValues(Class<T> modelClass) {
+        HashMap<String, FieldMySqlValue> toReturn = new HashMap<>();
+        FieldMySqlValue primaryKeyFieldMySqlValue = getPrimaryKeyFieldMySqlValue(modelClass);
+
+        toReturn.put(primaryKeyFieldMySqlValue.alias(), primaryKeyFieldMySqlValue);
+
+        final List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues = getNonPrimaryKeyFieldMySqlValues(modelClass);
+        nonPrimaryKeyFieldMySqlValues.forEach(fieldMySqlValue -> toReturn.put(fieldMySqlValue.alias(), fieldMySqlValue));
+
+        return toReturn;
+    }
 }
