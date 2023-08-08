@@ -1,0 +1,31 @@
+package com.eu.atit.mysql.integrated.model.with_column_names;
+
+import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
+import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.mysql.service.annotations.Table;
+import com.eu.atit.pantheon.annotation.data.Nested;
+import com.mysql.cj.MysqlType;
+
+@Table(name="diploma")
+public final class DiplomaCN implements BaseDiploma {
+    @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
+    private Boolean o;
+    @MySqlField(type = MysqlType.INT, primary = true, column = "student")
+    @Nested(outward = true, eager = true)
+    private StudentCN s;
+
+    public DiplomaCN() {
+    }
+
+    @Override
+    public String toString() {
+        return "DiplomaCN{" +
+               "o=" + o +
+               ", s=" + s +
+               '}';
+    }
+
+    StudentCN getS() {
+        return s;
+    }
+}
