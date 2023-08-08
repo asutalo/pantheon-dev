@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
 import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
@@ -35,7 +36,11 @@ class MySQLServiceFieldsProvider {
     private static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
 
     <T> String getTableName(Class<T> tClass) {
-        return tClass.getSimpleName();
+        Table table = tClass.getAnnotation(Table.class);
+        if(table == null)
+            return tClass.getSimpleName();
+
+        return table.name();
     }
 
     <T> String getTableNameLowercase(Class<T> tClass) {
