@@ -94,8 +94,10 @@ public class QueryBuilder {
         for (QueryPart queryPart : queryParts) {
             queryPart.apply(preparedStatement);
         }
-
+        System.out.println("-------------");
+        System.out.println("Prepared statement:");
         System.out.println(preparedStatement);
+        System.out.println("-------------");
 
         return preparedStatement;
     }
