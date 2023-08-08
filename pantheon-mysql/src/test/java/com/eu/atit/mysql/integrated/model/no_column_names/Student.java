@@ -1,12 +1,13 @@
-package com.eu.atit.mysql.integrated.model;
+package com.eu.atit.mysql.integrated.model.no_column_names;
 
+import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 import java.util.List;
 
-public class Student {
+public class Student implements BaseStudent {
     @MySqlField(type = MysqlType.INT, primary = true)
     private int id;
     @MySqlField(type = MysqlType.VARCHAR)
@@ -43,6 +44,7 @@ public class Student {
                '}';
     }
 
+    @Override
     public int getId() {
         return id;
     }

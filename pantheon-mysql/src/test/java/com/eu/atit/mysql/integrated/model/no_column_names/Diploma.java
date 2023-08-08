@@ -1,11 +1,12 @@
-package com.eu.atit.mysql.integrated.model;
+package com.eu.atit.mysql.integrated.model.no_column_names;
 
+import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 
-public final class Diploma {
+public final class Diploma implements BaseDiploma {
     @MySqlField(type = MysqlType.BOOLEAN)
     private Boolean obtained;
     @MySqlField(type = MysqlType.INT, primary = true)

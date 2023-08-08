@@ -1,4 +1,4 @@
-package com.eu.atit.mysql.integrated.model;
+package com.eu.atit.mysql.integrated.model.no_column_names;
 
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
