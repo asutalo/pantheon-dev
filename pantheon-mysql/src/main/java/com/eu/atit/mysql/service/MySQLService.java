@@ -42,7 +42,6 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         int insertId = mySqlClient.executeInsertQuery(queryBuilder);
 
         mySQLModelDescriptor.getPrimaryKeyFieldValueSetter().accept(toSave, insertId);
-        System.out.println(toSave);
     }
 
     @Override
