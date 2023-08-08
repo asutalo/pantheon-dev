@@ -32,12 +32,12 @@ public class FieldMySqlValue {
     public FieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field parentField) {
         this.field = nestedPrimaryKeyFieldMySqlValue.getField();
         this.mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
-        this.fieldName = fieldName(parentField);
+        this.fieldName = fieldName(parentField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
         variableName = parentField.getName();
         aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
     }
 
-    private String fieldName(Field field) {
+    private String fieldName(Field field, String nestedFieldName) {
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         if (mySqlFieldInfo == null) {
             return field.getName();
@@ -45,7 +45,7 @@ public class FieldMySqlValue {
         String fieldName = mySqlFieldInfo.column();
 
         if (fieldName.isBlank()) {
-            return field.getName();
+            return field.getName() + "_" + nestedFieldName;
         }
 
         return fieldName;
@@ -72,7 +72,7 @@ public class FieldMySqlValue {
             Object fieldValue = field.get(valueOf);
             return new MySqlValue(mysqlType, fieldName, fieldValue);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch field value", e);
+            throw new RuntimeException("Failed to fetch field value for " + fieldName, e);
         }
     }
 
