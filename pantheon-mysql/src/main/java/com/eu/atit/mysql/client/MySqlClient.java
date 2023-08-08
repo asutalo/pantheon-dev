@@ -46,6 +46,16 @@ public class MySqlClient implements DataClient {
         return execute(queryBuilder, otherDmlQueryResultProcessorFunction, connection);
     }
 
+    //todo decide if it should remain public
+    public void executeSql(String[] sqls) throws SQLException {
+        Connection connection = connector.connect();
+        for (String sql : sqls) {
+            connection.prepareStatement(sql).execute();
+        }
+
+        connection.close();
+    }
+
     <T> T execute(QueryBuilder queryBuilder, Function<PreparedStatement, T> preparedStatementExecutor) throws SQLException {
         Connection connection = connector.connect();
         T queryResults = execute(queryBuilder, preparedStatementExecutor, connection);
