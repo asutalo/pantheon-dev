@@ -333,7 +333,7 @@ class MySQLServiceFieldsProvider {
             } else {
                 String connectingTable = nestingInfo.connection().isEmpty() ? connectingTable(getTableName(modelClass), targetTableName) : nestingInfo.connection();
                 String connectingTableLowercase = connectingTable.toLowerCase();
-                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(joiningWithClass.getSimpleName().toLowerCase(), nestedPrimaryKeyFieldName) : nestingInfo.from();
+                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(getTableNameLowercase(joiningWithClass), nestedPrimaryKeyFieldName) : nestingInfo.from();
                 String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
 
                 JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true, hasAnyList, modelClass, joiningWithClass);
@@ -392,7 +392,7 @@ class MySQLServiceFieldsProvider {
 
     private String getOutwardJoinForeignKey(String link, Field field, Class<?> modelClass) {
         if (link.isBlank()) {
-            return connectingTable(field.getType().getSimpleName().toLowerCase(), getPrimaryKeyFieldMySqlValue(modelClass).getFieldName());
+            return connectingTable(getTableNameLowercase(field.getType()), getPrimaryKeyFieldMySqlValue(modelClass).getFieldName());
         } else {
             return link;
         }
