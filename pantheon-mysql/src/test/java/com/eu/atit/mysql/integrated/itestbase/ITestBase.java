@@ -23,41 +23,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ITestBase<S extends BaseStudent, T extends BaseType, D extends BaseDiploma, C extends BaseCourse> {
-    T TEST_TYPE;
-    Class<S> sClass;
-    Class<T> tClass;
-    Class<D> dClass;
-    Class<C> cClass;
-
+public abstract class ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
-    MySQLService<T> typeMySQLService;
-    MySQLService<S> studentMySQLService;
-    MySQLService<D> diplomaMySQLService;
 
     private static final String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
     private static final LinkedList<String> dbParams = new LinkedList<>(List.of("student_service_test", "student_service_test", "devtestuser", "student_service_test@localhost"));
 
     static MySQLServiceProvider mySQLServiceProvider;
-    public void setUp(Class<S> studentClass, Class<T> typeClass, Class<D> diplomaClass, Class<C> courseClass) throws SQLException, URISyntaxException, IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void setUp() throws SQLException, URISyntaxException, IOException {
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
         prepareTestDB(dataClient);
         mySQLServiceProvider = new MySQLServiceProvider(dataClient);
-        sClass = studentClass;
-        tClass = typeClass;
-        dClass = diplomaClass;
-        cClass = courseClass;
-        initTEST_TYPE(typeClass);
+    }
 
-        typeMySQLService = (MySQLService<T>) mySQLServiceProvider.provide(TypeLiteral.get(typeClass));
-        studentMySQLService = (MySQLService<S>) mySQLServiceProvider.provide(TypeLiteral.get(studentClass));
-        diplomaMySQLService = (MySQLService<D>) mySQLServiceProvider.provide(TypeLiteral.get(diplomaClass));
+    <X> void initMySqlService(Class<X> forClass) {
+        if(!mySQLServiceMap.containsKey(forClass)){
+            MySQLService<X> mySqlService = (MySQLService<X>) mySQLServiceProvider.provide(TypeLiteral.get(forClass));
+            mySQLServiceMap.put(forClass, mySqlService);
+        }
+    }
 
-        mySQLServiceMap.put(typeClass, typeMySQLService);
-        mySQLServiceMap.put(studentClass, studentMySQLService);
-        mySQLServiceMap.put(diplomaClass, diplomaMySQLService);
-
-        insert(TEST_TYPE, tClass);
+    <X> List<X> getAll(Class<X> ofClass) throws SQLException {
+        return ((MySQLService<X>) mySQLServiceMap.get(ofClass)).getAll();
     }
 
     <X> X insert(X toInsert, Class<X> insertionClass) throws SQLException {
@@ -70,10 +57,6 @@ public abstract class ITestBase<S extends BaseStudent, T extends BaseType, D ext
     <X> void update(X toUpdate, Class<X> insertionClass) throws SQLException {
         MySQLService<X> mySQLService = (MySQLService<X>) mySQLServiceMap.get(insertionClass);
         mySQLService.update(toUpdate);
-    }
-
-    private void initTEST_TYPE(Class<T> typeClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        TEST_TYPE = typeClass.getDeclaredConstructor(String.class).newInstance("testTypeName");
     }
 
     private void prepareTestDB(MySqlClient dataClient) throws SQLException, URISyntaxException, IOException {
