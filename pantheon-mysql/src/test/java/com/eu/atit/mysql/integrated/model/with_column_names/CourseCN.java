@@ -1,10 +1,11 @@
 package com.eu.atit.mysql.integrated.model.with_column_names;
 
+import com.eu.atit.mysql.integrated.model.base.BaseCourse;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.mysql.cj.MysqlType;
 @Table(name="course")
-public class CourseCN {
+public class CourseCN implements BaseCourse {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private Integer i;
     @MySqlField(type = MysqlType.VARCHAR, column = "name")

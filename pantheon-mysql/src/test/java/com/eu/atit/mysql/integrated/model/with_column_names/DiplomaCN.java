@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated.model.with_column_names;
 
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
+import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.pantheon.annotation.data.Nested;
@@ -15,6 +16,11 @@ public final class DiplomaCN implements BaseDiploma {
     private StudentCN s;
 
     public DiplomaCN() {
+    }
+
+    public DiplomaCN(StudentCN student, Boolean obtained) {
+        s = student;
+        o = obtained;
     }
 
     @Override
@@ -32,5 +38,10 @@ public final class DiplomaCN implements BaseDiploma {
     @Override
     public Boolean obtained() {
         return o;
+    }
+
+    @Override
+    public <BS extends BaseStudent> void setStudent(BS student) {
+        s = (StudentCN) student;
     }
 }

@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated.model.no_column_names;
 
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
+import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
@@ -14,6 +15,11 @@ public final class Diploma implements BaseDiploma {
     private Student student;
 
     public Diploma() {
+    }
+
+    public Diploma(Student student, Boolean obtained) {
+        this.student = student;
+        this.obtained = obtained;
     }
 
     @Override
@@ -31,5 +37,10 @@ public final class Diploma implements BaseDiploma {
     @Override
     public Boolean obtained() {
         return obtained;
+    }
+
+    @Override
+    public<BS extends BaseStudent> void setStudent(BS student) {
+        this.student = (Student) student;
     }
 }
