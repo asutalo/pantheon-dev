@@ -30,9 +30,66 @@ public class ITest {
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(Student.class, Type.class, Diploma.class, Course.class);
         }
+
+
         @Test
-        public void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.shouldInsertNewStudent_withoutDiploma();
+        @Override
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            super.instanceOfT_shouldConvertMapToInstanceOfModel();
+        }
+
+        @Test
+        @Override
+        public void filteredSelect_provideBasicQueryBuilder() {
+            super.filteredSelect_provideBasicQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            super.save_shouldInsertNewRecord();
+        }
+
+        @Test
+        @Override
+        public void update_shouldUpdateExistingSpecificRecord() {
+            super.update_shouldUpdateExistingSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void delete_shouldDeleteSpecificRecord() {
+            super.delete_shouldDeleteSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void get_shouldFetchSpecificRecord_withQueryBuilder() {
+            super.get_shouldFetchSpecificRecord_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void get_shouldSpecificRecord_withFilter() {
+            super.get_shouldSpecificRecord_withFilter();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords() {
+            super.getAll_shouldFetchAllRecords();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withQueryBuilder() {
+            super.getAll_shouldFetchAllRecords_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withFilter() {
+            super.getAll_shouldFetchAllRecords_withFilter();
         }
 
         @Test
@@ -49,14 +106,70 @@ public class ITest {
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class);
         }
-        @Test
-        public void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.shouldInsertNewStudent_withoutDiploma();
-        }
 
         @Test
         public void shouldInsertNewStudent_withDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
+        }
+
+        @Test
+        @Override
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            super.instanceOfT_shouldConvertMapToInstanceOfModel();
+        }
+
+        @Test
+        @Override
+        public void filteredSelect_provideBasicQueryBuilder() {
+            super.filteredSelect_provideBasicQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            super.save_shouldInsertNewRecord();
+        }
+
+        @Test
+        @Override
+        public void update_shouldUpdateExistingSpecificRecord() {
+            super.update_shouldUpdateExistingSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void delete_shouldDeleteSpecificRecord() {
+            super.delete_shouldDeleteSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void get_shouldFetchSpecificRecord_withQueryBuilder() {
+            super.get_shouldFetchSpecificRecord_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void get_shouldSpecificRecord_withFilter() {
+            super.get_shouldSpecificRecord_withFilter();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords() {
+            super.getAll_shouldFetchAllRecords();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withQueryBuilder() {
+            super.getAll_shouldFetchAllRecords_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withFilter() {
+            super.getAll_shouldFetchAllRecords_withFilter();
         }
     }
 
@@ -68,6 +181,66 @@ public class ITest {
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(Type.class);
         }
+
+        @Test
+        @Override
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            super.instanceOfT_shouldConvertMapToInstanceOfModel();
+        }
+
+        @Test
+        @Override
+        public void filteredSelect_provideBasicQueryBuilder() {
+            super.filteredSelect_provideBasicQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            super.save_shouldInsertNewRecord();
+        }
+
+        @Test
+        @Override
+        public void update_shouldUpdateExistingSpecificRecord() {
+            super.update_shouldUpdateExistingSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void delete_shouldDeleteSpecificRecord() {
+            super.delete_shouldDeleteSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void get_shouldFetchSpecificRecord_withQueryBuilder() {
+            super.get_shouldFetchSpecificRecord_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void get_shouldSpecificRecord_withFilter() {
+            super.get_shouldSpecificRecord_withFilter();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords() {
+            super.getAll_shouldFetchAllRecords();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withQueryBuilder() {
+            super.getAll_shouldFetchAllRecords_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withFilter() {
+            super.getAll_shouldFetchAllRecords_withFilter();
+        }
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -77,6 +250,66 @@ public class ITest {
         @BeforeAll
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(Type.class);
+        }
+
+        @Test
+        @Override
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            super.instanceOfT_shouldConvertMapToInstanceOfModel();
+        }
+
+        @Test
+        @Override
+        public void filteredSelect_provideBasicQueryBuilder() {
+            super.filteredSelect_provideBasicQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            super.save_shouldInsertNewRecord();
+        }
+
+        @Test
+        @Override
+        public void update_shouldUpdateExistingSpecificRecord() {
+            super.update_shouldUpdateExistingSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void delete_shouldDeleteSpecificRecord() {
+            super.delete_shouldDeleteSpecificRecord();
+        }
+
+        @Test
+        @Override
+        public void get_shouldFetchSpecificRecord_withQueryBuilder() {
+            super.get_shouldFetchSpecificRecord_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void get_shouldSpecificRecord_withFilter() {
+            super.get_shouldSpecificRecord_withFilter();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords() {
+            super.getAll_shouldFetchAllRecords();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withQueryBuilder() {
+            super.getAll_shouldFetchAllRecords_withQueryBuilder();
+        }
+
+        @Test
+        @Override
+        public void getAll_shouldFetchAllRecords_withFilter() {
+            super.getAll_shouldFetchAllRecords_withFilter();
         }
     }
 
