@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated;
 
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseStudent;
+import com.eu.atit.mysql.integrated.itestbase.ITestBaseType;
 import com.eu.atit.mysql.integrated.model.no_column_names.Course;
 import com.eu.atit.mysql.integrated.model.no_column_names.Diploma;
 import com.eu.atit.mysql.integrated.model.no_column_names.Student;
@@ -56,6 +57,26 @@ public class ITest {
         @Test
         public void shouldInsertNewStudent_withDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
+        }
+    }
+
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("No column names - Type")
+    @Nested
+    class NoColumnNamesTypeTests extends ITestBaseType<Type> {
+        @BeforeAll
+        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+            super.setUp(Type.class);
+        }
+    }
+
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("With column names - Type")
+    @Nested
+    class WithColumnNamesTypeTests extends ITestBaseType<Type> {
+        @BeforeAll
+        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+            super.setUp(Type.class);
         }
     }
 
