@@ -28,4 +28,9 @@ public final class DiplomaCN implements BaseDiploma {
     StudentCN getS() {
         return s;
     }
+
+    @Override
+    public Boolean obtained() {
+        return o;
+    }
 }

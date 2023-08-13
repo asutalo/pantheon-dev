@@ -27,6 +27,10 @@ class SelectQueryResultProcessor implements Function<PreparedStatement, List<Map
                     processRow(columnLabelsAndIndexes, fetchedRows, resultSet);
                 }
             }
+            System.out.println("-------------------------");
+            System.out.println("Fetched rows:");
+            System.out.println(fetchedRows);
+            System.out.println("-------------------------");
             return fetchedRows;
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);

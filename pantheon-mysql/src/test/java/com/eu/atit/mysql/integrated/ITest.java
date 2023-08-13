@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.integrated;
 
+import com.eu.atit.mysql.integrated.itestbase.ITestBaseStudent;
 import com.eu.atit.mysql.integrated.model.no_column_names.Diploma;
 import com.eu.atit.mysql.integrated.model.no_column_names.Student;
 import com.eu.atit.mysql.integrated.model.no_column_names.Type;
@@ -21,28 +22,39 @@ public class ITest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("No column names - Student")
     @Nested
-    class NoColumnNamesStudentTests extends ITestBase<Student, Type, Diploma> {
+    class NoColumnNamesStudentTests extends ITestBaseStudent<Student, Type, Diploma> {
         @BeforeAll
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(Student.class, Type.class, Diploma.class);
         }
         @Test
-        void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        public void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldInsertNewStudent_withoutDiploma();
         }
+
+//        @Test
+//        public void shouldInsertNewStudent_withDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+//            super.shouldInsertNewStudent_withDiploma();
+//        }
     }
+
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("With column names - Student")
     @Nested
-    class WithColumnNamesStudentTests extends ITestBase<StudentCN, TypeCN, DiplomaCN> {
+    class WithColumnNamesStudentTests extends ITestBaseStudent<StudentCN, TypeCN, DiplomaCN> {
         @BeforeAll
         void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.setUp(StudentCN.class, TypeCN.class, DiplomaCN.class);
         }
         @Test
-        void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        public void shouldInsertNewStudent_withoutDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldInsertNewStudent_withoutDiploma();
         }
+
+//        @Test
+//        public void shouldInsertNewStudent_withDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+//            super.shouldInsertNewStudent_withDiploma();
+//        }
     }
 
 }

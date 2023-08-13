@@ -27,4 +27,9 @@ public final class Diploma implements BaseDiploma {
     Student getStudent() {
         return student;
     }
+
+    @Override
+    public Boolean obtained() {
+        return obtained;
+    }
 }

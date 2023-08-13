@@ -1,4 +1,4 @@
-package com.eu.atit.mysql.integrated;
+package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class ITestBase<S extends BaseStudent, T extends BaseType, D extends BaseDiploma> {
-    T TEST_TYPE;
+    public T TEST_TYPE;
 
     Class<S> sClass;
     Class<T> tClass;
@@ -33,7 +33,7 @@ public abstract class ITestBase<S extends BaseStudent, T extends BaseType, D ext
     private static final LinkedList<String> dbParams = new LinkedList<>(List.of("student_service_test", "student_service_test", "devtestuser", "student_service_test@localhost"));
 
     static MySQLServiceProvider mySQLServiceProvider;
-    void setUp(Class<S> studentClass, Class<T> typeClass, Class<D> diplomaClass) throws SQLException, URISyntaxException, IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void setUp(Class<S> studentClass, Class<T> typeClass, Class<D> diplomaClass) throws SQLException, URISyntaxException, IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         MySqlClient dataClient = new MySqlClient(new Connector(DriverManager.getDriver(JDBC_ROOT_URL), JDBC_ROOT_URL, dbParams));
         prepareTestDB(dataClient);
         mySQLServiceProvider = new MySQLServiceProvider(dataClient);
@@ -45,18 +45,6 @@ public abstract class ITestBase<S extends BaseStudent, T extends BaseType, D ext
         typeMySQLService = (MySQLService<T>) mySQLServiceProvider.provide(TypeLiteral.get(typeClass));
         studentMySQLService = (MySQLService<S>) mySQLServiceProvider.provide(TypeLiteral.get(studentClass));
         typeMySQLService.save(TEST_TYPE);
-    }
-
-    void shouldInsertNewStudent_withoutDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-
-        int startingStudentCount = studentMySQLService.getAll().size();
-
-        S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
-
-        studentMySQLService.save(testStudent);
-
-        Assertions.assertTrue(testStudent.getId() > 0);
-        Assertions.assertTrue(studentMySQLService.getAll().size() > startingStudentCount);
     }
 
     private void initTEST_TYPE(Class<T> typeClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

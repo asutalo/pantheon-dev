@@ -49,4 +49,9 @@ public class StudentCN implements BaseStudent {
     public int getId() {
         return i;
     }
+
+    @Override
+    public DiplomaCN getDiploma() {
+        return diplomaCN;
+    }
 }

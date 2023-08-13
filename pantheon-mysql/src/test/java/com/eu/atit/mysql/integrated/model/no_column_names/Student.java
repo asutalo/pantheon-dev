@@ -48,4 +48,9 @@ public class Student implements BaseStudent {
     public int getId() {
         return id;
     }
+
+    @Override
+    public Diploma getDiploma() {
+        return diploma;
+    }
 }
