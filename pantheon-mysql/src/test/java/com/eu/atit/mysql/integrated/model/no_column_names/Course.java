@@ -13,6 +13,10 @@ public class Course implements BaseCourse {
     public Course() {
     }
 
+    public Course(String name) {
+        this.name = name;
+    }
+
     public Course(Integer id, String name) {
         this.id = id;
         this.name = name;
@@ -23,5 +27,20 @@ public class Course implements BaseCourse {
         return "Course[" +
                "id=" + id + ", " +
                "name=" + name + ']';
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }
