@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated.model.with_column_names;
 
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
+import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.pantheon.annotation.data.Nested;
@@ -53,5 +54,15 @@ public class StudentCN implements BaseStudent {
     @Override
     public DiplomaCN getDiploma() {
         return diplomaCN;
+    }
+
+    @Override
+    public void setName(String name) {
+        n = name;
+    }
+
+    @Override
+    public String getName() {
+        return n;
     }
 }

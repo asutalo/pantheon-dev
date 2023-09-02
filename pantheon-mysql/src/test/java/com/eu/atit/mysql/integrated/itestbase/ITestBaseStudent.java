@@ -37,38 +37,61 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         initMySqlService(dClass);
         initMySqlService(cClass);
 
-        insert(TEST_TYPE, tClass);
+        ITestBase.insert(TEST_TYPE, tClass);
     }
 
     public void shouldFetchStudentWithDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        int startingStudentCount = getAll(sClass).size();
+        int startingStudentCount = ITestBase.getAll(sClass).size();
 
-        S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
-
-        insert(testStudent, sClass);
+        S testStudent = insertS();
         Assertions.assertTrue(testStudent.getId() > 0);
 
         D testDiploma = dClass.getDeclaredConstructor(sClass, Boolean.class).newInstance(testStudent, Boolean.TRUE);
 
-        insert(testDiploma, dClass);
+        ITestBase.insert(testDiploma, dClass);
 
-        Assertions.assertTrue(getAll(sClass).size() > startingStudentCount);
+        Assertions.assertTrue(ITestBase.getAll(sClass).size() > startingStudentCount);
     }
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        int startingStudentCount = getAll(sClass).size();
+        ITestBase.insertTest(getS(), sClass);
+    }
 
-        S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
 
-        insert(testStudent, sClass);
+    @Override
+    public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String startingName = "startingName";
+        String updatedName = "updatedName";
+        S testStudent = insertS(startingName);
 
-        Assertions.assertTrue(testStudent.getId() > 0);
-        List<S> actualStudents = getAll(sClass);
-        Assertions.assertTrue(actualStudents.size() > startingStudentCount);
+        testStudent.setName(updatedName);
 
-        List<S> matchingStudents = actualStudents.stream().filter(s -> s.getId() == testStudent.getId()).toList();
-        Assertions.assertEquals(1, matchingStudents.size());
-        Assertions.assertNull(matchingStudents.get(0).getDiploma().obtained());
+        update(testStudent, sClass);
+
+        List<S> matchingTestStudents = ITestBase.getAll(sClass).stream().filter(s -> s.getId() == testStudent.getId()).toList();
+        Assertions.assertEquals(1, matchingTestStudents.size());
+
+        Assertions.assertEquals(matchingTestStudents.get(0).getName(), updatedName);
+
+    }
+
+    private S insertS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
+        S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance(name, TEST_TYPE, null, List.of());
+
+        ITestBase.insert(testStudent, sClass);
+        return testStudent;
+    }
+
+    private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
+        return insertS("testStudentName");
+    }
+
+    private S getS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance(name, TEST_TYPE, null, List.of());
+    }
+
+    private S getS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return getS("testStudentName");
     }
 }

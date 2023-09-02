@@ -51,7 +51,7 @@ public class ITest {
 
         @Test
         @Override
-        public void update_shouldUpdateExistingSpecificRecord() {
+        public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.update_shouldUpdateExistingSpecificRecord();
         }
 
@@ -107,7 +107,7 @@ public class ITest {
         }
 
         @Test
-        public void shouldInsertNewStudent_withDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
 
@@ -131,7 +131,7 @@ public class ITest {
 
         @Test
         @Override
-        public void update_shouldUpdateExistingSpecificRecord() {
+        public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.update_shouldUpdateExistingSpecificRecord();
         }
 
@@ -177,7 +177,7 @@ public class ITest {
     @Nested
     class NoColumnNamesTypeTests extends ITestBaseType<Type> {
         @BeforeAll
-        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        void setUp() throws SQLException, URISyntaxException, IOException {
             super.setUp(Type.class);
         }
 
@@ -201,7 +201,7 @@ public class ITest {
 
         @Test
         @Override
-        public void update_shouldUpdateExistingSpecificRecord() {
+        public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.update_shouldUpdateExistingSpecificRecord();
         }
 
@@ -271,7 +271,7 @@ public class ITest {
 
         @Test
         @Override
-        public void update_shouldUpdateExistingSpecificRecord() {
+        public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.update_shouldUpdateExistingSpecificRecord();
         }
 

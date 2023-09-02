@@ -55,4 +55,9 @@ public class TypeCN implements BaseType {
     public int getI() {
         return i;
     }
+
+    @Override
+    public int getId() {
+        return i;
+    }
 }

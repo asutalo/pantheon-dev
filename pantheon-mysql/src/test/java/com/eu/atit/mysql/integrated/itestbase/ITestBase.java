@@ -2,6 +2,7 @@ package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
+import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.google.inject.TypeLiteral;
@@ -42,11 +43,11 @@ public interface ITestBase {
         }
     }
 
-    default <X> List<X> getAll(Class<X> ofClass) throws SQLException {
+    static <X> List<X> getAll(Class<X> ofClass) throws SQLException {
         return mySQLService(ofClass).getAll();
     }
 
-    default <X> void insert(X toInsert, Class<X> ofClass) throws SQLException {
+    static <X> void insert(X toInsert, Class<X> ofClass) throws SQLException {
         mySQLService(ofClass).save(toInsert);
     }
 
@@ -67,7 +68,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void update_shouldUpdateExistingSpecificRecord(){
+    default void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         Assertions.fail("not implemented");
     }
 
@@ -93,6 +94,19 @@ public interface ITestBase {
 
     default void getAll_shouldFetchAllRecords_withFilter(){
         Assertions.fail("not implemented");
+    }
+
+    static <X extends WithId> void insertTest(X toInsert, Class<X> ofClass) throws SQLException {
+        int startingCount = getAll(ofClass).size();
+
+        insert(toInsert, ofClass);
+
+        Assertions.assertTrue(toInsert.getId() > 0);
+        List<X> actualStudents = getAll(ofClass);
+        Assertions.assertTrue(actualStudents.size() > startingCount);
+
+        List<X> matchingStudents = actualStudents.stream().filter(s -> s.getId() == toInsert.getId()).toList();
+        Assertions.assertEquals(1, matchingStudents.size());
     }
 
     private static <X> MySQLService<X> mySQLService(Class<X> ofClass) {

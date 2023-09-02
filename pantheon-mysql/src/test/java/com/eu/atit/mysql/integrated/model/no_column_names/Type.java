@@ -50,6 +50,7 @@ public class Type implements BaseType {
         return result;
     }
 
+    @Override
     public int getId() {
         return id;
     }

@@ -1,4 +1,5 @@
 package com.eu.atit.mysql.integrated.model.base;
 
-public interface BaseType extends WithId {
+public interface WithId {
+    int getId();
 }
