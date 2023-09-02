@@ -3,6 +3,7 @@ package com.eu.atit.mysql.integrated.itestbase;
 import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.integrated.model.base.WithId;
+import com.eu.atit.mysql.integrated.model.base.WithName;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.google.inject.TypeLiteral;
@@ -55,7 +56,7 @@ public interface ITestBase {
         mySQLService(ofClass).delete(toDelete);
     }
 
-    default <X> void update(X toUpdate, Class<X> ofClass) throws SQLException {
+    static <X> void update(X toUpdate, Class<X> ofClass) throws SQLException {
         mySQLService(ofClass).update(toUpdate);
     }
 
@@ -111,6 +112,19 @@ public interface ITestBase {
 
         List<X> matching = actualElements.stream().filter(s -> s.getId() == toInsert.getId()).toList();
         Assertions.assertEquals(1, matching.size());
+    }
+
+    static <X extends WithId & WithName> void updateTest(X toUpdate, Class<X> ofClass, String updatedName) throws SQLException {
+        insert(toUpdate, ofClass);
+        toUpdate.setName(updatedName);
+
+        update(toUpdate, ofClass);
+
+        Assertions.assertTrue(toUpdate.getId() > 0);
+
+        List<X> matching = getAll(ofClass).stream().filter(s -> s.getId() == toUpdate.getId()).toList();
+        Assertions.assertEquals(1, matching.size());
+        Assertions.assertEquals(matching.get(0).getName(), updatedName);
     }
 
     static <X extends WithId> void deleteTest(X toDelete, Class<X> ofClass) throws SQLException {

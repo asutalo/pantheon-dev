@@ -29,6 +29,14 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         ITestBase.deleteTest(getT("toBeDeleted"), tClass);
     }
 
+    @Override
+    public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String startingName = "startingName";
+        String updatedName = "updatedName";
+        ITestBase.updateTest(getT(startingName), tClass, updatedName);
+
+    }
+
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getT("testTypeName");
     }

@@ -1,9 +1,5 @@
 package com.eu.atit.mysql.integrated.model.base;
 
-public interface BaseStudent extends WithId {
+public interface BaseStudent extends WithId, WithName {
     BaseDiploma getDiploma();
-
-    void setName(String name);
-
-    String getName();
 }

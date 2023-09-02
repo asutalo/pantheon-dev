@@ -60,4 +60,14 @@ public class TypeCN implements BaseType {
     public int getId() {
         return i;
     }
+
+    @Override
+    public void setName(String name) {
+        n = name;
+    }
+
+    @Override
+    public String getName() {
+        return n;
+    }
 }

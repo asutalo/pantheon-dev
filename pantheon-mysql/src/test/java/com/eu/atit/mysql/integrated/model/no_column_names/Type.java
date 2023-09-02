@@ -54,4 +54,14 @@ public class Type implements BaseType {
     public int getId() {
         return id;
     }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }
