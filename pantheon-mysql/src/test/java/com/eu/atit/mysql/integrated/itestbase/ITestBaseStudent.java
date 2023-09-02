@@ -56,16 +56,6 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     }
 
     @Override
-    public void instanceOfT_shouldConvertMapToInstanceOfModel() {
-
-    }
-
-    @Override
-    public void filteredSelect_provideBasicQueryBuilder() {
-
-    }
-
-    @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int startingStudentCount = getAll(sClass).size();
 
@@ -80,40 +70,5 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         List<S> matchingStudents = actualStudents.stream().filter(s -> s.getId() == testStudent.getId()).toList();
         Assertions.assertEquals(1, matchingStudents.size());
         Assertions.assertNull(matchingStudents.get(0).getDiploma().obtained());
-    }
-
-    @Override
-    public void update_shouldUpdateExistingSpecificRecord() {
-
-    }
-
-    @Override
-    public void delete_shouldDeleteSpecificRecord() {
-
-    }
-
-    @Override
-    public void get_shouldFetchSpecificRecord_withQueryBuilder() {
-
-    }
-
-    @Override
-    public void get_shouldSpecificRecord_withFilter() {
-
-    }
-
-    @Override
-    public void getAll_shouldFetchAllRecords() {
-
-    }
-
-    @Override
-    public void getAll_shouldFetchAllRecords_withQueryBuilder() {
-
-    }
-
-    @Override
-    public void getAll_shouldFetchAllRecords_withFilter() {
-
     }
 }

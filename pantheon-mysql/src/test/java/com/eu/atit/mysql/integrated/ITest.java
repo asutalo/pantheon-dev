@@ -31,7 +31,6 @@ public class ITest {
             super.setUp(Student.class, Type.class, Diploma.class, Course.class);
         }
 
-
         @Test
         @Override
         public void instanceOfT_shouldConvertMapToInstanceOfModel() {

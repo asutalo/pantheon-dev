@@ -5,6 +5,7 @@ import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.google.inject.TypeLiteral;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,25 +55,45 @@ public interface ITestBase {
     }
 
 
-    void instanceOfT_shouldConvertMapToInstanceOfModel();
+    default void instanceOfT_shouldConvertMapToInstanceOfModel(){
+        Assertions.fail("not implemented");
+    }
 
-    void filteredSelect_provideBasicQueryBuilder();
+    default void filteredSelect_provideBasicQueryBuilder(){
+        Assertions.fail("not implemented");
+    }
 
-    void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    default void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException{
+        Assertions.fail("not implemented");
+    }
 
-    void update_shouldUpdateExistingSpecificRecord();
+    default void update_shouldUpdateExistingSpecificRecord(){
+        Assertions.fail("not implemented");
+    }
 
-    void delete_shouldDeleteSpecificRecord();
+    default void delete_shouldDeleteSpecificRecord(){
+        Assertions.fail("not implemented");
+    }
 
-    void get_shouldFetchSpecificRecord_withQueryBuilder();
+    default void get_shouldFetchSpecificRecord_withQueryBuilder(){
+        Assertions.fail("not implemented");
+    }
 
-    void get_shouldSpecificRecord_withFilter();
+    default void get_shouldSpecificRecord_withFilter(){
+        Assertions.fail("not implemented");
+    }
 
-    void getAll_shouldFetchAllRecords();
+    default void getAll_shouldFetchAllRecords(){
+        Assertions.fail("not implemented");
+    }
 
-    void getAll_shouldFetchAllRecords_withQueryBuilder();
+    default void getAll_shouldFetchAllRecords_withQueryBuilder(){
+        Assertions.fail("not implemented");
+    }
 
-    void getAll_shouldFetchAllRecords_withFilter();
+    default void getAll_shouldFetchAllRecords_withFilter(){
+        Assertions.fail("not implemented");
+    }
 
     private static <X> MySQLService<X> mySQLService(Class<X> ofClass) {
         return (MySQLService<X>) mySQLServiceMap.get(ofClass);
