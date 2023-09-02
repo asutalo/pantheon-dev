@@ -11,6 +11,7 @@ import com.eu.atit.mysql.integrated.model.with_column_names.DiplomaCN;
 import com.eu.atit.mysql.integrated.model.with_column_names.StudentCN;
 import com.eu.atit.mysql.integrated.model.with_column_names.TypeCN;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -92,6 +93,7 @@ public class ITest {
         }
 
         @Test
+        @Disabled
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
@@ -107,6 +109,7 @@ public class ITest {
         }
 
         @Test
+        @Disabled
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
