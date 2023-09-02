@@ -24,7 +24,16 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         ITestBase.insertTest(getT(), tClass);
     }
 
+    @Override
+    public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        ITestBase.deleteTest(getT("toBeDeleted"), tClass);
+    }
+
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return tClass.getDeclaredConstructor(String.class).newInstance("testTypeName");
+        return getT("testTypeName");
+    }
+
+    private T getT(String name) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return tClass.getDeclaredConstructor(String.class).newInstance(name);
     }
 }

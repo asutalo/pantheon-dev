@@ -58,6 +58,11 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         ITestBase.insertTest(getS(), sClass);
     }
 
+    @Override
+    public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        ITestBase.deleteTest(getS("toBeDeleted"), sClass);
+    }
+
 
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

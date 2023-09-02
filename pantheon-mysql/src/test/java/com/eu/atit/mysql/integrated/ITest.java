@@ -57,7 +57,7 @@ public class ITest {
 
         @Test
         @Override
-        public void delete_shouldDeleteSpecificRecord() {
+        public void delete_shouldDeleteSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.delete_shouldDeleteSpecificRecord();
         }
 
@@ -137,7 +137,7 @@ public class ITest {
 
         @Test
         @Override
-        public void delete_shouldDeleteSpecificRecord() {
+        public void delete_shouldDeleteSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
             super.delete_shouldDeleteSpecificRecord();
         }
 
@@ -207,7 +207,7 @@ public class ITest {
 
         @Test
         @Override
-        public void delete_shouldDeleteSpecificRecord() {
+        public void delete_shouldDeleteSpecificRecord() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.delete_shouldDeleteSpecificRecord();
         }
 
@@ -277,7 +277,7 @@ public class ITest {
 
         @Test
         @Override
-        public void delete_shouldDeleteSpecificRecord() {
+        public void delete_shouldDeleteSpecificRecord() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.delete_shouldDeleteSpecificRecord();
         }
 

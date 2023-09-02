@@ -51,6 +51,10 @@ public interface ITestBase {
         mySQLService(ofClass).save(toInsert);
     }
 
+    static <X> void delete(X toDelete, Class<X> ofClass) throws SQLException {
+        mySQLService(ofClass).delete(toDelete);
+    }
+
     default <X> void update(X toUpdate, Class<X> ofClass) throws SQLException {
         mySQLService(ofClass).update(toUpdate);
     }
@@ -72,7 +76,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void delete_shouldDeleteSpecificRecord(){
+    default void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
         Assertions.fail("not implemented");
     }
 
@@ -102,11 +106,24 @@ public interface ITestBase {
         insert(toInsert, ofClass);
 
         Assertions.assertTrue(toInsert.getId() > 0);
-        List<X> actualStudents = getAll(ofClass);
-        Assertions.assertTrue(actualStudents.size() > startingCount);
+        List<X> actualElements = getAll(ofClass);
+        Assertions.assertTrue(actualElements.size() > startingCount);
 
-        List<X> matchingStudents = actualStudents.stream().filter(s -> s.getId() == toInsert.getId()).toList();
-        Assertions.assertEquals(1, matchingStudents.size());
+        List<X> matching = actualElements.stream().filter(s -> s.getId() == toInsert.getId()).toList();
+        Assertions.assertEquals(1, matching.size());
+    }
+
+    static <X extends WithId> void deleteTest(X toDelete, Class<X> ofClass) throws SQLException {
+        insert(toDelete, ofClass);
+
+        int startingCount = getAll(ofClass).size();
+        Assertions.assertTrue(startingCount > 0);
+
+        delete(toDelete, ofClass);
+        List<X> actualElements = getAll(ofClass);
+        Assertions.assertTrue(actualElements.size() < startingCount);
+        List<X> matching = actualElements.stream().filter(s -> s.getId() == toDelete.getId()).toList();
+        Assertions.assertEquals(0, matching.size());
     }
 
     private static <X> MySQLService<X> mySQLService(Class<X> ofClass) {
