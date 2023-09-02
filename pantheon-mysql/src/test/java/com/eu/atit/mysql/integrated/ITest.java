@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated;
 
 import com.eu.atit.mysql.integrated.itestbase.ITestBase;
+import com.eu.atit.mysql.integrated.itestbase.ITestBaseCourse;
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseStudent;
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseType;
 import com.eu.atit.mysql.integrated.model.no_column_names.Course;
@@ -102,6 +103,32 @@ public class ITest {
                         @Override
                         public String toString() {
                             return "ITestBaseType<TypeCN>";
+                        }
+                    },
+                    new Callable<ITestBaseCourse<Course>>() {
+                        @Override
+                        public ITestBaseCourse<Course> call() throws Exception {
+                            ITestBaseCourse<Course> iTestBaseCourse = new ITestBaseCourse<>();
+                            iTestBaseCourse.setUp(Course.class);
+                            return iTestBaseCourse;
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "ITestBaseCourse<Course>";
+                        }
+                    },
+                    new Callable<ITestBaseCourse<CourseCN>>() {
+                        @Override
+                        public ITestBaseCourse<CourseCN> call() throws Exception {
+                            ITestBaseCourse<CourseCN> iTestBaseCourse = new ITestBaseCourse<>();
+                            iTestBaseCourse.setUp(CourseCN.class);
+                            return iTestBaseCourse;
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "ITestBaseCourse<CourseCN>";
                         }
                     }
             );
