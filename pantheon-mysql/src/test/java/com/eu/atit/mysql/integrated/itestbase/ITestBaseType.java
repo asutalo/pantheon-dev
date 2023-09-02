@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ITestBaseType<T extends BaseType> implements ITestBase {
     Class<T> tClass;
@@ -34,7 +35,11 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         String startingName = "startingName";
         String updatedName = "updatedName";
         ITestBase.updateTest(getT(startingName), tClass, updatedName);
+    }
 
+    @Override
+    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
+        ITestBase.getAllTest(List.of(getT("first"), getT("second"), getT("third")), tClass);
     }
 
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

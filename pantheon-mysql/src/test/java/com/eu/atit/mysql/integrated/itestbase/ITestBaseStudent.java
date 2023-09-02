@@ -63,13 +63,16 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         ITestBase.deleteTest(getS("toBeDeleted"), sClass);
     }
 
-
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String startingName = "startingName";
         String updatedName = "updatedName";
         ITestBase.updateTest(getS(startingName), sClass, updatedName);
+    }
 
+    @Override
+    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
+        ITestBase.getAllTest(List.of(getS("first"), getS("second"), getS("third")), sClass);
     }
 
     private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {

@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,7 +90,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void getAll_shouldFetchAllRecords(){
+    default void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
         Assertions.fail("not implemented");
     }
 
@@ -112,6 +113,24 @@ public interface ITestBase {
 
         List<X> matching = actualElements.stream().filter(s -> s.getId() == toInsert.getId()).toList();
         Assertions.assertEquals(1, matching.size());
+    }
+
+    static <X extends WithId> void getAllTest(List<X> toInserts, Class<X> ofClass) throws SQLException, URISyntaxException, IOException {
+        int startingCount = getAll(ofClass).size();
+
+        List<Integer> insertedIDs = new ArrayList<>();
+        for (X toInsert : toInserts) {
+            insert(toInsert, ofClass);
+            insertedIDs.add(toInsert.getId());
+        }
+
+        List<X> actualElements = getAll(ofClass);
+        Assertions.assertEquals(toInserts.size(), actualElements.size() - startingCount);
+
+        List<X> matching = actualElements.stream().filter(s -> insertedIDs.contains(s.getId())).toList();
+
+        Assertions.assertEquals(toInserts.size(), matching.size());
+        Assertions.assertEquals(insertedIDs, matching.stream().map(WithId::getId).toList());
     }
 
     static <X extends WithId & WithName> void updateTest(X toUpdate, Class<X> ofClass, String updatedName) throws SQLException {
@@ -152,7 +171,7 @@ public interface ITestBase {
         }
     }
 
-    private void prepareTestDB() throws SQLException, URISyntaxException, IOException {
+    private static void prepareTestDB() throws SQLException, URISyntaxException, IOException {
         String creationSql = Files.readString(new File(Objects.requireNonNull(ITestBase.class.getResource("/sql/create_db.sql")).toURI()).toPath());
         String deletionSql = Files.readString(new File(Objects.requireNonNull(ITestBase.class.getResource("/sql/drop_db.sql")).toURI()).toPath());
 

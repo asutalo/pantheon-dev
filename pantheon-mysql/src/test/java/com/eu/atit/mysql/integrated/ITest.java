@@ -76,7 +76,7 @@ public class ITest {
 
         @Test
         @Override
-        public void getAll_shouldFetchAllRecords() {
+        public void getAll_shouldFetchAllRecords() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.getAll_shouldFetchAllRecords();
         }
 
@@ -158,7 +158,7 @@ public class ITest {
 
         @Test
         @Override
-        public void getAll_shouldFetchAllRecords() {
+        public void getAll_shouldFetchAllRecords() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.getAll_shouldFetchAllRecords();
         }
 
@@ -228,7 +228,7 @@ public class ITest {
 
         @Test
         @Override
-        public void getAll_shouldFetchAllRecords() {
+        public void getAll_shouldFetchAllRecords() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.getAll_shouldFetchAllRecords();
         }
 
@@ -250,7 +250,7 @@ public class ITest {
     @Nested
     class WithColumnNamesTypeTests extends ITestBaseType<Type> {
         @BeforeAll
-        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        void setUp() throws SQLException, URISyntaxException, IOException {
             super.setUp(Type.class);
         }
 
@@ -298,7 +298,7 @@ public class ITest {
 
         @Test
         @Override
-        public void getAll_shouldFetchAllRecords() {
+        public void getAll_shouldFetchAllRecords() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.getAll_shouldFetchAllRecords();
         }
 
