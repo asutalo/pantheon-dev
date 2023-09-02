@@ -4,7 +4,8 @@ import com.eu.atit.mysql.integrated.model.base.BaseCourse;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.mysql.cj.MysqlType;
-@Table(name="course")
+
+@Table(name = "course")
 public class CourseCN implements BaseCourse {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private Integer i;
@@ -12,6 +13,10 @@ public class CourseCN implements BaseCourse {
     private String n;
 
     public CourseCN() {
+    }
+
+    public CourseCN(String n) {
+        this.n = n;
     }
 
     public CourseCN(Integer i, String n) {
@@ -24,5 +29,20 @@ public class CourseCN implements BaseCourse {
         return "CourseCN[" +
                "i=" + i + ", " +
                "n=" + n + ']';
+    }
+
+    @Override
+    public int getId() {
+        return i;
+    }
+
+    @Override
+    public void setName(String name) {
+        n = name;
+    }
+
+    @Override
+    public String getName() {
+        return n;
     }
 }
