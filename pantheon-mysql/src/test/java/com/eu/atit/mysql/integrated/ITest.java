@@ -2,6 +2,7 @@ package com.eu.atit.mysql.integrated;
 
 import com.eu.atit.mysql.integrated.itestbase.ITestBase;
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseCourse;
+import com.eu.atit.mysql.integrated.itestbase.ITestBaseDiploma;
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseStudent;
 import com.eu.atit.mysql.integrated.itestbase.ITestBaseType;
 import com.eu.atit.mysql.integrated.model.no_column_names.Course;
@@ -129,6 +130,32 @@ public class ITest {
                         @Override
                         public String toString() {
                             return "ITestBaseCourse<CourseCN>";
+                        }
+                    },
+                    new Callable<ITestBaseDiploma<Diploma, Student, Type>>() {
+                        @Override
+                        public ITestBaseDiploma<Diploma, Student, Type> call() throws Exception {
+                            ITestBaseDiploma<Diploma, Student, Type> iTestBaseDiploma = new ITestBaseDiploma<>();
+                            iTestBaseDiploma.setUp(Diploma.class, Student.class, Type.class);
+                            return iTestBaseDiploma;
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "ITestBaseDiploma<Diploma, Student, Type>";
+                        }
+                    },
+                    new Callable<ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN>>() {
+                        @Override
+                        public ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN> call() throws Exception {
+                            ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN> iTestBaseDiploma = new ITestBaseDiploma<>();
+                            iTestBaseDiploma.setUp(DiplomaCN.class, StudentCN.class, TypeCN.class);
+                            return iTestBaseDiploma;
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN>";
                         }
                     }
             );

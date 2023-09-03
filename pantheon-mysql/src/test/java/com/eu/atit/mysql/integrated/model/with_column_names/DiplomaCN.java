@@ -8,7 +8,7 @@ import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 @Table(name="diploma")
-public final class DiplomaCN implements BaseDiploma {
+public final class DiplomaCN implements BaseDiploma<StudentCN> {
     @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
     private Boolean o;
     @MySqlField(type = MysqlType.INT, primary = true, column = "student")
@@ -43,5 +43,10 @@ public final class DiplomaCN implements BaseDiploma {
     @Override
     public <BS extends BaseStudent> void setStudent(BS student) {
         s = (StudentCN) student;
+    }
+
+    @Override
+    public StudentCN getId() {
+        return s;
     }
 }

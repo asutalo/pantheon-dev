@@ -4,6 +4,7 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.integrated.model.base.WithName;
+import com.eu.atit.mysql.integrated.model.base.WithNestedId;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.google.inject.TypeLiteral;
@@ -103,6 +104,7 @@ public interface ITestBase {
     }
 
     static <X extends WithId> void insertTest(X toInsert, Class<X> ofClass) throws SQLException {
+
         int startingCount = getAll(ofClass).size();
 
         insert(toInsert, ofClass);
@@ -112,6 +114,20 @@ public interface ITestBase {
         Assertions.assertTrue(actualElements.size() > startingCount);
 
         List<X> matching = actualElements.stream().filter(s -> s.getId() == toInsert.getId()).toList();
+        Assertions.assertEquals(1, matching.size());
+    }
+
+    static <X extends WithNestedId<Y>, Y> void insertTest(X toInsert, Class<X> ofClass, Y nestedId) throws SQLException {
+        int startingCount = getAll(ofClass).size();
+
+        insert(toInsert, ofClass);
+
+        Assertions.assertEquals(nestedId, toInsert.getId());
+
+        List<X> actualElements = getAll(ofClass);
+        Assertions.assertTrue(actualElements.size() > startingCount);
+
+        List<X> matching = actualElements.stream().filter(s -> s.getId().equals(toInsert.getId())).toList();
         Assertions.assertEquals(1, matching.size());
     }
 
