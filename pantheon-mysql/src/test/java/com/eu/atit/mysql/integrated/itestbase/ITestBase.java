@@ -117,7 +117,7 @@ public interface ITestBase {
         Assertions.assertEquals(1, matching.size());
     }
 
-    static <X extends WithNestedId<Y>, Y> void insertTest(X toInsert, Class<X> ofClass, Y nestedId) throws SQLException {
+    static <X extends WithNestedId<Y>, Y extends WithId> void insertTest(X toInsert, Class<X> ofClass, Y nestedId) throws SQLException {
         int startingCount = getAll(ofClass).size();
 
         insert(toInsert, ofClass);
@@ -127,7 +127,7 @@ public interface ITestBase {
         List<X> actualElements = getAll(ofClass);
         Assertions.assertTrue(actualElements.size() > startingCount);
 
-        List<X> matching = actualElements.stream().filter(s -> s.getId().equals(toInsert.getId())).toList();
+        List<X> matching = actualElements.stream().filter(s -> s.getId().getId() == nestedId.getId()).toList();
         Assertions.assertEquals(1, matching.size());
     }
 

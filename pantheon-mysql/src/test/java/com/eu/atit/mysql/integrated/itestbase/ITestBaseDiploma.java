@@ -1,6 +1,8 @@
 package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
+import com.eu.atit.mysql.integrated.model.base.BaseStudent;
+import com.eu.atit.mysql.integrated.model.base.BaseType;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -8,7 +10,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ITestBaseDiploma<D extends BaseDiploma<S>, S, T> implements ITestBase {
+public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T extends BaseType> implements ITestBase {
     T TEST_TYPE;
 
     Class<D> dClass;
@@ -36,7 +38,7 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S, T> implements ITestBa
         S testStudent = getS("testStudent");
         ITestBase.insert(testStudent, sClass);
 
-        ITestBase.insertTest(getD(testStudent, false), dClass, testStudent);
+        ITestBase.insertTest(getD(testStudent, true), dClass, testStudent);
     }
 
     @Override

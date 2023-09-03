@@ -1,10 +1,10 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
+import com.eu.atit.pantheon.annotation.data.Nested;
 import com.google.inject.TypeLiteral;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MySQLModelDescriptor<T> {
@@ -31,6 +31,8 @@ public class MySQLModelDescriptor<T> {
     private final ResultSetToInstance<T> resultSetToInstance;
     private final MySqlValuesFilter<T> mySqlValuesFilter;
 
+    private final InsertionExecutor<T> insertionExecutor;
+
     public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         Class<T> modelClass = (Class<T>) modelTypeLiteral.getRawType();
         tableName = mySQLServiceFieldsProvider.getTableName(modelClass);
@@ -42,6 +44,12 @@ public class MySQLModelDescriptor<T> {
         filteredSelect = mySQLServiceFieldsProvider.getFilteredSelect(modelClass);
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         mySqlValuesFilter = mySQLServiceFieldsProvider.getMySqlValuesFilter(modelClass);
+
+        if (primaryKeyFieldValueSetter.getField().getAnnotation(Nested.class) == null) {
+            insertionExecutor = (queryBuilder, mySqlClient, toInsert) -> getPrimaryKeyFieldValueSetter().accept(toInsert, mySqlClient.executeInsertQuery(queryBuilder));
+        } else {
+            insertionExecutor = (queryBuilder, mySqlClient, toInsert) -> mySqlClient.executeInsertQueryWithKnownPrimaryKey(queryBuilder);
+        }
     }
 
     ResultSetToInstance<T> getResultSetToInstance() {
@@ -78,5 +86,9 @@ public class MySQLModelDescriptor<T> {
 
     MySqlValuesFilter<T> getMySqlValuesFilter() {
         return mySqlValuesFilter;
+    }
+
+    public InsertionExecutor<T> insertExecutor() {
+        return insertionExecutor;
     }
 }

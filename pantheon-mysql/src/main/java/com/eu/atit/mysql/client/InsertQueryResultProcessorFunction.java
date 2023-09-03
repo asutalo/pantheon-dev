@@ -7,16 +7,24 @@ import java.sql.Statement;
 import java.util.function.Function;
 
 class InsertQueryResultProcessorFunction implements Function<PreparedStatement, Integer> {
+    interface ResultProcessor {
+        Integer process(PreparedStatement preparedStatement) throws SQLException;
+    }
 
     @Override
     public Integer apply(PreparedStatement preparedStatement) {
+        return execute(preparedStatement, executedStatement -> {
+            ResultSet generatedKeys = executedStatement.getGeneratedKeys();
+            generatedKeys.next();
+
+            return generatedKeys.getInt(Statement.RETURN_GENERATED_KEYS);
+        });
+    }
+
+    Integer execute(PreparedStatement preparedStatement, ResultProcessor processor) {
         try {
             if (preparedStatement.executeUpdate() > 0) {
-                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-                //todo don't fail when returning a value for a provided primary key (known, not generated in insert)
-                generatedKeys.next();
-
-                return generatedKeys.getInt(Statement.RETURN_GENERATED_KEYS);
+                return processor.process(preparedStatement);
             } else {
                 throw new RuntimeException("Insert failed, no rows inserted");
             }

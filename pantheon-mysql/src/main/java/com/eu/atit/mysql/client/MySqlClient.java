@@ -14,6 +14,7 @@ public class MySqlClient implements DataClient {
     private final Connector connector;
     private final SelectQueryResultProcessor selectQueryResultProcessor;
     private final InsertQueryResultProcessorFunction insertQueryResultProcessorFunction;
+    private final InsertQueryKnownPrimaryKeyResultProcessorFunction insertQueryKnownPrimaryKeyResultProcessorFunction;
     private final OtherDmlQueryResultProcessorFunction otherDmlQueryResultProcessorFunction;
 
 
@@ -22,6 +23,7 @@ public class MySqlClient implements DataClient {
 
         selectQueryResultProcessor = new SelectQueryResultProcessor();
         insertQueryResultProcessorFunction = new InsertQueryResultProcessorFunction();
+        insertQueryKnownPrimaryKeyResultProcessorFunction = new InsertQueryKnownPrimaryKeyResultProcessorFunction();
         otherDmlQueryResultProcessorFunction = new OtherDmlQueryResultProcessorFunction();
 
     }
@@ -32,6 +34,14 @@ public class MySqlClient implements DataClient {
 
     public int executeInsertQuery(QueryBuilder queryBuilder) throws SQLException {
         return execute(queryBuilder, insertQueryResultProcessorFunction);
+    }
+
+    public int executeInsertQueryWithKnownPrimaryKey(QueryBuilder queryBuilder) throws SQLException {
+        return execute(queryBuilder, insertQueryKnownPrimaryKeyResultProcessorFunction);
+    }
+
+    public int executeInsertQueryWithKnownPrimaryKey(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, insertQueryKnownPrimaryKeyResultProcessorFunction, connection);
     }
 
     public int executeOtherDmlQuery(QueryBuilder queryBuilder) throws SQLException {
