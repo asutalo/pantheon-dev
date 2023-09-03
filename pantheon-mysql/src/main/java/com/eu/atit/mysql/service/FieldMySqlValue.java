@@ -56,11 +56,6 @@ public class FieldMySqlValue {
         }
     }
 
-    //returns the MySQLValue for the object, allows overriding when we need to get value for nested primary key
-    public MySqlValue getActualMySqlValue(Object valueOf) {
-        return apply(valueOf);
-    }
-
     MySqlValue of(Object val) {
         return new MySqlValue(mysqlType, aliasName, val);
     }

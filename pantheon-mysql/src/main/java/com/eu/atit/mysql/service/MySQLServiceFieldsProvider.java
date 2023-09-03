@@ -5,6 +5,7 @@ import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilterWithNestedPrimaryKey;
 import com.eu.atit.mysql.service.filter.NonPrimaryMySqlValuesFilter;
+import com.eu.atit.mysql.service.filter.NonPrimaryNestedMySqlValuesFilter;
 import com.eu.atit.mysql.service.merging.direction.Crossroads;
 import com.eu.atit.mysql.service.merging.direction.DeadEnd;
 import com.eu.atit.mysql.service.merging.direction.ListRoad;
@@ -140,7 +141,6 @@ class MySQLServiceFieldsProvider {
             MySqlField mySqlField = nestedField.getAnnotation(MySqlField.class);
             if(mySqlField.primary()){
                 nestedFieldsMySqlValues.add(new Pair<>(new NestedPrimaryFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
-
             } else {
                 nestedFieldsMySqlValues.add(new Pair<>(new NestedFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
             }
@@ -499,7 +499,10 @@ class MySQLServiceFieldsProvider {
         if(getNestedFieldsMySqlValue(modelClass).isEmpty()){
             return new NonPrimaryMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass));
         } else {
-            return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
+            if(getDeclaredPrimaryField(modelClass).getAnnotation(Nested.class)!=null)
+                return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
+
+            return new NonPrimaryNestedMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
         }
     }
 

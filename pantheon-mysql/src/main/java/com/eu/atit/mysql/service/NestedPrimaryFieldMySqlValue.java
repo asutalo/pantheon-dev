@@ -35,7 +35,7 @@ public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
     }
 
     @Override
-    public MySqlValue getActualMySqlValue(Object valueOf) {
+    public MySqlValue apply(Object valueOf) {
         try {
             Object nestedPrimaryValue = nestedPrimaryKeyField.get(valueOf);
             Object fieldValue = field.get(nestedPrimaryValue);
