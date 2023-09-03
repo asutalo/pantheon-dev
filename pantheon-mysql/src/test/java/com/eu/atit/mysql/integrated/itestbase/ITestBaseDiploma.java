@@ -3,6 +3,7 @@ package com.eu.atit.mysql.integrated.itestbase;
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.integrated.model.base.BaseType;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +39,18 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
         S testStudent = getS("testStudent");
         ITestBase.insert(testStudent, sClass);
 
-        ITestBase.insertTest(getD(testStudent, true), dClass, testStudent);
+        int startingCount = ITestBase.getAll(dClass).size();
+
+        D toInsert = getD(testStudent, true);
+        ITestBase.insert(toInsert, dClass);
+
+        Assertions.assertEquals(testStudent, toInsert.getId());
+
+        List<D> actualElements = ITestBase.getAll(dClass);
+        Assertions.assertTrue(actualElements.size() > startingCount);
+
+        List<D> matching = actualElements.stream().filter(s -> s.getId().getId() == testStudent.getId()).toList();
+        Assertions.assertEquals(1, matching.size());
     }
 
     @Override
