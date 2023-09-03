@@ -11,7 +11,7 @@ import com.mysql.cj.MysqlType;
 public final class DiplomaCN implements BaseDiploma<StudentCN> {
     @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
     private Boolean o;
-    @MySqlField(type = MysqlType.INT, primary = true, column = "student")
+    @MySqlField(type = MysqlType.INT, primary = true)
     @Nested(outward = true, eager = true)
     private StudentCN s;
 

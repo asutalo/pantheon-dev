@@ -10,12 +10,15 @@ import java.util.Objects;
 /**
  * Function to convert a variable from an object into a MySqlValue
  */
+//todo can we simplify this class and the extensions of it?
 public class FieldMySqlValue {
-    private final Field field;//todo replace with FieldValueGetter to simplify
-    private final String fieldName;
-    private final String variableName;
-    private final String aliasName;
-    private final MysqlType mysqlType;
+    Field field;//todo replace with FieldValueGetter to simplify
+    String fieldName;
+    String variableName;
+    String aliasName;
+    MysqlType mysqlType;
+
+    FieldMySqlValue() {}
 
     /**
      * @param field     reflection of the variable that is used to fetch the value for MySqlValue
@@ -26,6 +29,18 @@ public class FieldMySqlValue {
         this.mysqlType = mysqlType;
         fieldName = field.getName();
         variableName = fieldName;
+        aliasName = alias(tableName, fieldName);
+    }
+
+    /**
+     * @param field     reflection of the variable that is used to fetch the value for MySqlValue
+     * @param mysqlType desired MySql type for the value of the field to have
+     */
+    FieldMySqlValue(Field field, MysqlType mysqlType, String fieldName, String tableName) {
+        this.field = field;
+        this.mysqlType = mysqlType;
+        this.fieldName = fieldName;
+        variableName = field.getName();
         aliasName = alias(tableName, fieldName);
     }
 
@@ -49,18 +64,6 @@ public class FieldMySqlValue {
         }
 
         return fieldName;
-    }
-
-    /**
-     * @param field     reflection of the variable that is used to fetch the value for MySqlValue
-     * @param mysqlType desired MySql type for the value of the field to have
-     */
-    FieldMySqlValue(Field field, MysqlType mysqlType, String fieldName, String tableName) {
-        this.field = field;
-        this.mysqlType = mysqlType;
-        this.fieldName = fieldName;
-        variableName = field.getName();
-        aliasName = alias(tableName, fieldName);
     }
 
     private String alias(String tableName, String fieldName) {

@@ -136,7 +136,13 @@ class MySQLServiceFieldsProvider {
         fields.forEach(nestedField -> {
             nestedField.setAccessible(true);
 
-            nestedFieldsMySqlValues.add(new Pair<>(new FieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
+            MySqlField mySqlField = nestedField.getAnnotation(MySqlField.class);
+            if(mySqlField.primary()){
+                nestedFieldsMySqlValues.add(new Pair<>(new NestedPrimaryFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
+
+            } else {
+                nestedFieldsMySqlValues.add(new Pair<>(new NestedFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
+            }
         });
 
         return nestedFieldsMySqlValues;
