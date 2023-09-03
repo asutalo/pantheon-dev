@@ -41,15 +41,34 @@ public class ITest {
             ITestBase testBase = iTestBase.call();
 
 //        testBase.instanceOfT_shouldConvertMapToInstanceOfModel();
+//            System.out.println("finished instanceOfT_shouldConvertMapToInstanceOfModel");
+
 //        testBase.filteredSelect_provideBasicQueryBuilder();
+//            System.out.println("finished filteredSelect_provideBasicQueryBuilder");
+
             testBase.save_shouldInsertNewRecord();
+            System.out.println("finished save_shouldInsertNewRecord");
+
             testBase.update_shouldUpdateExistingSpecificRecord();
+            System.out.println("finished update_shouldUpdateExistingSpecificRecord");
+
             testBase.delete_shouldDeleteSpecificRecord();
+            System.out.println("finished delete_shouldDeleteSpecificRecord");
+
 //        testBase.get_shouldFetchSpecificRecord_withQueryBuilder();
+//            System.out.println("finished get_shouldFetchSpecificRecord_withQueryBuilder");
+
 //        testBase.get_shouldSpecificRecord_withFilter();
+//            System.out.println("finished get_shouldSpecificRecord_withFilter");
+
             testBase.getAll_shouldFetchAllRecords();
+            System.out.println("finished getAll_shouldFetchAllRecords");
+
 //        testBase.getAll_shouldFetchAllRecords_withQueryBuilder();
+//            System.out.println("finished getAll_shouldFetchAllRecords_withQueryBuilder");
+
 //        testBase.getAll_shouldFetchAllRecords_withFilter();
+//            System.out.println("getAll_shouldFetchAllRecords_withFilter getAll_shouldFetchAllRecords_withQueryBuilder");
         }
 
         private static Stream<Callable<? extends ITestBase>> commonTestsProvider() {
