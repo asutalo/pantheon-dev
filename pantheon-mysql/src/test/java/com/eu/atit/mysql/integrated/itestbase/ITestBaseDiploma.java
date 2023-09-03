@@ -61,7 +61,7 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
 
     @Override
     public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
-//        ITestBase.getAllTest(List.of(getD("first"), getD("second"), getD("third")), dClass);
+        ITestBase.getAllTest(List.of(buildTestDiploma(true), buildTestDiploma(false), buildTestDiploma(true)), dClass);
     }
 
     private D getD(S student, Boolean obtained) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
