@@ -44,28 +44,6 @@ public class FieldMySqlValue {
         aliasName = alias(tableName, fieldName);
     }
 
-    public FieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field parentField) {
-        this.field = nestedPrimaryKeyFieldMySqlValue.getField();
-        this.mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
-        this.fieldName = fieldName(parentField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
-        variableName = parentField.getName();
-        aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
-    }
-
-    private String fieldName(Field field, String nestedFieldName) {
-        MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-        if (mySqlFieldInfo == null) {
-            return field.getName();
-        }
-        String fieldName = mySqlFieldInfo.column();
-
-        if (fieldName.isBlank()) {
-            return field.getName() + "_" + nestedFieldName;
-        }
-
-        return fieldName;
-    }
-
     private String alias(String tableName, String fieldName) {
         return tableName + "." + fieldName;
     }
