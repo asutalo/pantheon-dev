@@ -41,7 +41,7 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
 
     @Override
     public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-//        ITestBase.deleteTest(getD("toBeDeleted"), dClass);
+        ITestBase.deleteTest(buildTestDiploma(true), dClass);
     }
 
     @Override
