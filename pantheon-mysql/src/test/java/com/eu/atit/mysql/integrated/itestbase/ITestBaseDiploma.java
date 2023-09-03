@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
+
 public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T extends BaseType> implements ITestBase {
     T TEST_TYPE;
 
@@ -31,37 +33,37 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
         initMySqlService(sClass);
         initMySqlService(tClass);
 
-        ITestBase.insert(TEST_TYPE, tClass);
+        insert(TEST_TYPE, tClass);
     }
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        ITestBase.insertTest(buildTestDiploma(true), dClass);
+        insertTest(getD(true), dClass);
     }
 
     @Override
     public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        ITestBase.deleteTest(buildTestDiploma(true), dClass);
+        deleteTest(getD(true), dClass);
     }
 
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         boolean starting = false;
         boolean updated = true;
-        D testDiploma = insertTestDiploma(starting);
+        D testDiploma = insertD(starting);
 
         testDiploma.setObtained(updated);
 
-        ITestBase.update(testDiploma, dClass);
+        update(testDiploma, dClass);
 
-        List<D> matching = ITestBase.getAll(dClass).stream().filter(s -> s.getId() == testDiploma.getId()).toList();
+        List<D> matching = getAll(dClass).stream().filter(s -> s.getId() == testDiploma.getId()).toList();
         Assertions.assertEquals(1, matching.size());
         Assertions.assertEquals(matching.get(0).obtained(), updated);
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
-        ITestBase.getAllTest(List.of(buildTestDiploma(true), buildTestDiploma(false), buildTestDiploma(true)), dClass);
+    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        getAllTest(List.of(getD(true), getD(false), getD(true)), dClass);
     }
 
     private D getD(S student, Boolean obtained) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -76,18 +78,15 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
         TEST_TYPE = typeClass.getDeclaredConstructor(String.class).newInstance("testTypeName");
     }
 
-    private D insertTestDiploma(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
-        S testStudent = getS();
-        ITestBase.insert(testStudent, sClass);
-
-        D toInsert = getD(testStudent, b);
-        ITestBase.insert(toInsert, dClass);
+    private D insertD(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        D toInsert = getD(b);
+        insert(toInsert, dClass);
         return toInsert;
     }
 
-    private D buildTestDiploma(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+    private D getD(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
         S testStudent = getS();
-        ITestBase.insert(testStudent, sClass);
+        insert(testStudent, sClass);
 
         return getD(testStudent, b);
     }

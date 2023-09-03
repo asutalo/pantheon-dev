@@ -91,7 +91,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
+    default void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
         Assertions.fail("not implemented");
     }
 
@@ -117,7 +117,7 @@ public interface ITestBase {
         Assertions.assertEquals(1, matching.size());
     }
 
-    static <X extends WithId> void getAllTest(List<X> toInserts, Class<X> ofClass) throws SQLException, URISyntaxException, IOException {
+    static <X extends WithId> void getAllTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
         int startingCount = getAll(ofClass).size();
 
         List<Integer> insertedIDs = new ArrayList<>();

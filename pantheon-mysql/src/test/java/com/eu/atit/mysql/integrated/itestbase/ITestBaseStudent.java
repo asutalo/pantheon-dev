@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
+
 public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D extends BaseDiploma, C extends BaseCourse> implements ITestBase {
     T TEST_TYPE;
     Class<S> sClass;
@@ -37,48 +39,48 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         initMySqlService(dClass);
         initMySqlService(cClass);
 
-        ITestBase.insert(TEST_TYPE, tClass);
+        insert(TEST_TYPE, tClass);
     }
 
     public void shouldFetchStudentWithDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        int startingStudentCount = ITestBase.getAll(sClass).size();
+        int startingStudentCount = getAll(sClass).size();
 
         S testStudent = insertS();
         Assertions.assertTrue(testStudent.getId() > 0);
 
         D testDiploma = dClass.getDeclaredConstructor(sClass, Boolean.class).newInstance(testStudent, Boolean.TRUE);
 
-        ITestBase.insert(testDiploma, dClass);
+        insert(testDiploma, dClass);
 
-        Assertions.assertTrue(ITestBase.getAll(sClass).size() > startingStudentCount);
+        Assertions.assertTrue(getAll(sClass).size() > startingStudentCount);
     }
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        ITestBase.insertTest(getS(), sClass);
+        insertTest(getS(), sClass);
     }
 
     @Override
     public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
-        ITestBase.deleteTest(getS("toBeDeleted"), sClass);
+        deleteTest(getS("toBeDeleted"), sClass);
     }
 
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String startingName = "startingName";
         String updatedName = "updatedName";
-        ITestBase.updateTest(getS(startingName), sClass, updatedName);
+        updateTest(getS(startingName), sClass, updatedName);
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
-        ITestBase.getAllTest(List.of(getS("first"), getS("second"), getS("third")), sClass);
+    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        getAllTest(List.of(getS("first"), getS("second"), getS("third")), sClass);
     }
 
     private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
         S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
 
-        ITestBase.insert(testStudent, sClass);
+        insert(testStudent, sClass);
         return testStudent;
     }
 

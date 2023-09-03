@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
+
 public class ITestBaseType<T extends BaseType> implements ITestBase {
     Class<T> tClass;
 
@@ -22,24 +24,24 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        ITestBase.insertTest(getT(), tClass);
+        insertTest(getT(), tClass);
     }
 
     @Override
     public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        ITestBase.deleteTest(getT("toBeDeleted"), tClass);
+        deleteTest(getT("toBeDeleted"), tClass);
     }
 
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String startingName = "startingName";
         String updatedName = "updatedName";
-        ITestBase.updateTest(getT(startingName), tClass, updatedName);
+        updateTest(getT(startingName), tClass, updatedName);
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException, URISyntaxException, IOException {
-        ITestBase.getAllTest(List.of(getT("first"), getT("second"), getT("third")), tClass);
+    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+        getAllTest(List.of(getT("first"), getT("second"), getT("third")), tClass);
     }
 
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
