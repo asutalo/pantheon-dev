@@ -1,7 +1,6 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.MySqlValue;
-import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 
 import java.lang.reflect.Field;
@@ -55,6 +54,11 @@ public class FieldMySqlValue {
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch field value for " + fieldName, e);
         }
+    }
+
+    //returns the MySQLValue for the object, allows overriding when we need to get value for nested primary key
+    public MySqlValue getActualMySqlValue(Object valueOf) {
+        return apply(valueOf);
     }
 
     MySqlValue of(Object val) {

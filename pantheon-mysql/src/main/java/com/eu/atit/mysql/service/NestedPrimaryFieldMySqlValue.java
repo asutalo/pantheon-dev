@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 
 import java.lang.reflect.Field;
@@ -8,12 +9,14 @@ import java.lang.reflect.Field;
  * Function to convert a variable from an object into a MySqlValue
  */
 public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
-    public NestedPrimaryFieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field parentField) {
+    private final Field nestedPrimaryKeyField;
+    public NestedPrimaryFieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field nestedPrimaryKeyField) {
         super();
+        this.nestedPrimaryKeyField = nestedPrimaryKeyField;
         field = nestedPrimaryKeyFieldMySqlValue.getField();
         mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
-        fieldName = fieldName(parentField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
-        variableName = parentField.getName();
+        fieldName = fieldName(nestedPrimaryKeyField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
+        variableName = nestedPrimaryKeyField.getName();
         aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
     }
 
@@ -29,5 +32,16 @@ public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
         }
 
         return fieldName;
+    }
+
+    @Override
+    public MySqlValue getActualMySqlValue(Object valueOf) {
+        try {
+            Object nestedPrimaryValue = nestedPrimaryKeyField.get(valueOf);
+            Object fieldValue = field.get(nestedPrimaryValue);
+            return new MySqlValue(mysqlType, fieldName, fieldValue);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch field value for " + fieldName, e);
+        }
     }
 }

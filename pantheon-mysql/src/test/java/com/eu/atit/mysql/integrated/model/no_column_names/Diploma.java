@@ -40,6 +40,11 @@ public final class Diploma implements BaseDiploma<Student> {
     }
 
     @Override
+    public void setObtained(Boolean obtained) {
+        this.obtained = obtained;
+    }
+
+    @Override
     public<BS extends BaseStudent> void setStudent(BS student) {
         this.student = (Student) student;
     }

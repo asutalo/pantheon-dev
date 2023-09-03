@@ -41,6 +41,11 @@ public final class DiplomaCN implements BaseDiploma<StudentCN> {
     }
 
     @Override
+    public void setObtained(Boolean obtained) {
+        o = obtained;
+    }
+
+    @Override
     public <BS extends BaseStudent> void setStudent(BS student) {
         s = (StudentCN) student;
     }

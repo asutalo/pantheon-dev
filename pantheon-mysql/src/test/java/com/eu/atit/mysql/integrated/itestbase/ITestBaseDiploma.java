@@ -36,20 +36,13 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        S testStudent = getS("testStudent");
-        ITestBase.insert(testStudent, sClass);
-
         int startingCount = ITestBase.getAll(dClass).size();
-
-        D toInsert = getD(testStudent, true);
-        ITestBase.insert(toInsert, dClass);
-
-        Assertions.assertEquals(testStudent, toInsert.getId());
+        D testDiploma = insertTestDiploma();
 
         List<D> actualElements = ITestBase.getAll(dClass);
         Assertions.assertTrue(actualElements.size() > startingCount);
 
-        List<D> matching = actualElements.stream().filter(s -> s.getId().getId() == testStudent.getId()).toList();
+        List<D> matching = actualElements.stream().filter(s -> s.getId().getId() == testDiploma.getId().getId()).toList();
         Assertions.assertEquals(1, matching.size());
     }
 
@@ -60,9 +53,17 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
 
     @Override
     public void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String startingName = "startingName";
-        String updatedName = "updatedName";
-//        ITestBase.updateTest(getD(startingName), dClass, updatedName);
+        boolean starting = false;
+        boolean updated = true;
+        D testDiploma = insertTestDiploma(starting);
+
+        testDiploma.setObtained(updated);
+
+        ITestBase.update(testDiploma, dClass);
+
+        List<D> matching = ITestBase.getAll(dClass).stream().filter(s -> s.getId().getId() == testDiploma.getId().getId()).toList();
+        Assertions.assertEquals(1, matching.size());
+        Assertions.assertEquals(matching.get(0).obtained(), updated);
     }
 
     @Override
@@ -74,11 +75,24 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
         return dClass.getDeclaredConstructor(sClass, Boolean.class).newInstance(student, obtained);
     }
 
-    private S getS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance(name, TEST_TYPE, null, List.of());
+    private S getS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudent", TEST_TYPE, null, List.of());
     }
 
     private void initTEST_TYPE(Class<T> typeClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         TEST_TYPE = typeClass.getDeclaredConstructor(String.class).newInstance("testTypeName");
+    }
+
+    private D insertTestDiploma(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        S testStudent = getS();
+        ITestBase.insert(testStudent, sClass);
+
+        D toInsert = getD(testStudent, b);
+        ITestBase.insert(toInsert, dClass);
+        return toInsert;
+    }
+
+    private D insertTestDiploma() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        return insertTestDiploma(true);
     }
 }

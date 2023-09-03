@@ -25,7 +25,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.update(mySQLModelDescriptor.getTableName(), mySqlValues);
         queryBuilder.where();
-        queryBuilder.keyIsVal(mySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().apply(toUpdate));
+        queryBuilder.keyIsVal(mySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getActualMySqlValue(toUpdate));
 
         if (mySqlClient.executeOtherDmlQuery(queryBuilder) <= 0) {
             throw new RuntimeException("Update failed");
@@ -48,7 +48,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         queryBuilder.delete();
         queryBuilder.from(mySQLModelDescriptor.getTableName());
         queryBuilder.where();
-        queryBuilder.keyIsVal(mySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().apply(toDelete));
+        queryBuilder.keyIsVal(mySQLModelDescriptor.getPrimaryKeyFieldMySqlValue().getActualMySqlValue(toDelete));
 
         if (mySqlClient.executeOtherDmlQuery(queryBuilder) == 0) {
             throw new RuntimeException("Deletion failed");

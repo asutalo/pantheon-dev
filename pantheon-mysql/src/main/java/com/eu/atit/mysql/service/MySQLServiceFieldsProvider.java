@@ -104,7 +104,8 @@ class MySQLServiceFieldsProvider {
     FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<?> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         if (field.getAnnotation(Nested.class) != null) {
-            return getPrimaryKeyFieldMySqlValue(field.getType());
+            field.setAccessible(true);
+            return new NestedPrimaryFieldMySqlValue(getPrimaryKeyFieldMySqlValue(field.getType()), field);
         }
 
         field.setAccessible(true);
