@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D extends BaseDiploma<S>, C extends BaseCourse> implements ITestBase {
+public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D extends BaseDiploma, C extends BaseCourse> implements ITestBase {
     T TEST_TYPE;
     Class<S> sClass;
     Class<T> tClass;

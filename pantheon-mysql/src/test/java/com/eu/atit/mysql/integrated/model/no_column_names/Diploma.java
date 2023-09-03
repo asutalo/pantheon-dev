@@ -7,7 +7,7 @@ import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 
-public final class Diploma implements BaseDiploma<Student> {
+public final class Diploma implements BaseDiploma {
     @MySqlField(type = MysqlType.BOOLEAN)
     private Boolean obtained;
     @MySqlField(type = MysqlType.INT, primary = true)
@@ -50,7 +50,7 @@ public final class Diploma implements BaseDiploma<Student> {
     }
 
     @Override
-    public Student getId() {
-        return student;
+    public int getId() {
+        return student.getId();
     }
 }

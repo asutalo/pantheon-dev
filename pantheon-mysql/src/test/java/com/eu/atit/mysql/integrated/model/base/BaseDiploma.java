@@ -1,6 +1,6 @@
 package com.eu.atit.mysql.integrated.model.base;
 
-public interface BaseDiploma<Y> extends WithNestedId<Y> {
+public interface BaseDiploma extends WithNestedId {
     Boolean obtained();
 
     void setObtained(Boolean obtained);

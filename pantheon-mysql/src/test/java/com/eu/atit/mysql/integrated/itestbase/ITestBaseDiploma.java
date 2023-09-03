@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T extends BaseType> implements ITestBase {
+public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T extends BaseType> implements ITestBase {
     T TEST_TYPE;
 
     Class<D> dClass;
@@ -36,14 +36,7 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
 
     @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        int startingCount = ITestBase.getAll(dClass).size();
-        D testDiploma = insertTestDiploma();
-
-        List<D> actualElements = ITestBase.getAll(dClass);
-        Assertions.assertTrue(actualElements.size() > startingCount);
-
-        List<D> matching = actualElements.stream().filter(s -> s.getId().getId() == testDiploma.getId().getId()).toList();
-        Assertions.assertEquals(1, matching.size());
+        ITestBase.insertTest(buildTestDiploma(true), dClass);
     }
 
     @Override
@@ -61,7 +54,7 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
 
         ITestBase.update(testDiploma, dClass);
 
-        List<D> matching = ITestBase.getAll(dClass).stream().filter(s -> s.getId().getId() == testDiploma.getId().getId()).toList();
+        List<D> matching = ITestBase.getAll(dClass).stream().filter(s -> s.getId() == testDiploma.getId()).toList();
         Assertions.assertEquals(1, matching.size());
         Assertions.assertEquals(matching.get(0).obtained(), updated);
     }
@@ -92,7 +85,10 @@ public class ITestBaseDiploma<D extends BaseDiploma<S>, S extends BaseStudent, T
         return toInsert;
     }
 
-    private D insertTestDiploma() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
-        return insertTestDiploma(true);
+    private D buildTestDiploma(Boolean b) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        S testStudent = getS();
+        ITestBase.insert(testStudent, sClass);
+
+        return getD(testStudent, b);
     }
 }
