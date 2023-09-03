@@ -117,10 +117,6 @@ public interface ITestBase {
         Assertions.assertEquals(1, matching.size());
     }
 
-    static <X extends WithNestedId<Y>, Y extends WithId> void insertTest(X toInsert, Class<X> ofClass, Y nestedId) throws SQLException {
-
-    }
-
     static <X extends WithId> void getAllTest(List<X> toInserts, Class<X> ofClass) throws SQLException, URISyntaxException, IOException {
         int startingCount = getAll(ofClass).size();
 
