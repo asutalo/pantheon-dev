@@ -1,6 +1,6 @@
 dependencies {
     api project(':pantheon')
-    api 'mysql:mysql-connector-java:8.0.30'
+    api 'com.mysql:mysql-connector-j:8.1.0'
 
     api 'com.google.protobuf:protobuf-java:3.21.7'
     //to override the version in mysql connector which has vulnerabilities

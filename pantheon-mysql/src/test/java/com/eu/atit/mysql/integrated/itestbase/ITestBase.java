@@ -29,7 +29,7 @@ public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
 
     String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
-    LinkedList<String> dbParams = new LinkedList<>(List.of("student_service_test", "student_service_test", "devtestuser", "student_service_test@localhost"));
+    LinkedList<String> dbParams = new LinkedList<>(List.of("test-db", "root", "root", "root@localhost"));
 
     MySqlClient dataClient = new MySqlClient(new Connector(driver(), JDBC_ROOT_URL, dbParams));
 
