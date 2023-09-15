@@ -13,12 +13,7 @@ import com.eu.atit.mysql.integrated.model.with_column_names.CourseCN;
 import com.eu.atit.mysql.integrated.model.with_column_names.DiplomaCN;
 import com.eu.atit.mysql.integrated.model.with_column_names.StudentCN;
 import com.eu.atit.mysql.integrated.model.with_column_names.TypeCN;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -37,38 +32,82 @@ public class ITest {
     class CommonTests {
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
-        void commonTests(Callable<? extends ITestBase> iTestBase) throws Exception {
+        void instanceOfT_shouldConvertMapToInstanceOfModel(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+            testBase.instanceOfT_shouldConvertMapToInstanceOfModel();
+        }
+
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void filteredSelect_provideBasicQueryBuilder(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+            testBase.filteredSelect_provideBasicQueryBuilder();
+        }
+
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void save_shouldInsertNewRecord(Callable<? extends ITestBase> iTestBase) throws Exception {
+            ITestBase testBase = iTestBase.call();
+            testBase.save_shouldInsertNewRecord();
+        }
+
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void update_shouldUpdateExistingSpecificRecord(Callable<? extends ITestBase> iTestBase) throws Exception {
             ITestBase testBase = iTestBase.call();
 
-//        testBase.instanceOfT_shouldConvertMapToInstanceOfModel();
-//            System.out.println("finished instanceOfT_shouldConvertMapToInstanceOfModel");
-
-//        testBase.filteredSelect_provideBasicQueryBuilder();
-//            System.out.println("finished filteredSelect_provideBasicQueryBuilder");
-
-            testBase.save_shouldInsertNewRecord();
-            System.out.println("finished save_shouldInsertNewRecord");
-
             testBase.update_shouldUpdateExistingSpecificRecord();
-            System.out.println("finished update_shouldUpdateExistingSpecificRecord");
+        }
+
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void delete_shouldDeleteSpecificRecord(Callable<? extends ITestBase> iTestBase) throws Exception {
+            ITestBase testBase = iTestBase.call();
 
             testBase.delete_shouldDeleteSpecificRecord();
-            System.out.println("finished delete_shouldDeleteSpecificRecord");
+        }
 
-//        testBase.get_shouldFetchSpecificRecord_withQueryBuilder();
-//            System.out.println("finished get_shouldFetchSpecificRecord_withQueryBuilder");
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void get_shouldFetchSpecificRecord_withQueryBuilder(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+            testBase.get_shouldFetchSpecificRecord_withQueryBuilder();
+        }
 
-//        testBase.get_shouldSpecificRecord_withFilter();
-//            System.out.println("finished get_shouldSpecificRecord_withFilter");
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void get_shouldSpecificRecord_withFilter(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+            testBase.get_shouldSpecificRecord_withFilter();
+        }
+
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void getAll_shouldFetchAllRecords(Callable<? extends ITestBase> iTestBase) throws Exception {
+            ITestBase testBase = iTestBase.call();
 
             testBase.getAll_shouldFetchAllRecords();
-            System.out.println("finished getAll_shouldFetchAllRecords");
+        }
 
-//        testBase.getAll_shouldFetchAllRecords_withQueryBuilder();
-//            System.out.println("finished getAll_shouldFetchAllRecords_withQueryBuilder");
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void getAll_shouldFetchAllRecords_withQueryBuilder(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+            testBase.getAll_shouldFetchAllRecords_withQueryBuilder();
+        }
 
-//        testBase.getAll_shouldFetchAllRecords_withFilter();
-//            System.out.println("getAll_shouldFetchAllRecords_withFilter getAll_shouldFetchAllRecords_withQueryBuilder");
+        @ParameterizedTest
+        @MethodSource("commonTestsProvider")
+        void getAll_shouldFetchAllRecords_withFilter(Callable<? extends ITestBase> iTestBase) throws Exception {
+            Assertions.fail();
+            ITestBase testBase = iTestBase.call();
+
+            testBase.getAll_shouldFetchAllRecords_withFilter();
         }
 
         private static Stream<Callable<? extends ITestBase>> commonTestsProvider() {
