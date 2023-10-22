@@ -18,9 +18,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -112,112 +118,47 @@ public class ITest {
 
         private static Stream<Callable<? extends ITestBase>> commonTestsProvider() {
             return Stream.of(
-                    new Callable<ITestBaseStudent<Student, Type, Diploma, Course>>() {
-                        @Override
-                        public ITestBaseStudent<Student, Type, Diploma, Course> call() throws Exception {
-                            ITestBaseStudent<Student, Type, Diploma, Course> iTestBaseStudent = new ITestBaseStudent<>();
-                            iTestBaseStudent.setUp(Student.class, Type.class, Diploma.class, Course.class);
-                            return iTestBaseStudent;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseStudent<Student, Type, Diploma, Course>";
-                        }
-                    },
-                    new Callable<ITestBaseStudent<StudentCN, TypeCN, DiplomaCN, CourseCN>>() {
-                        @Override
-                        public ITestBaseStudent<StudentCN, TypeCN, DiplomaCN, CourseCN> call() throws Exception {
-                            ITestBaseStudent<StudentCN, TypeCN, DiplomaCN, CourseCN> iTestBaseStudent = new ITestBaseStudent<>();
-                            iTestBaseStudent.setUp(StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class);
-                            return iTestBaseStudent;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseStudent<StudentCN, TypeCN, DiplomaCN, CourseCN>";
-                        }
-                    },
-                    new Callable<ITestBaseType<Type>>() {
-                        @Override
-                        public ITestBaseType<Type> call() throws Exception {
-                            ITestBaseType<Type> iTestBaseType = new ITestBaseType<>();
-                            iTestBaseType.setUp(Type.class);
-                            return iTestBaseType;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseType<Type>";
-                        }
-                    },
-                    new Callable<ITestBaseType<TypeCN>>() {
-                        @Override
-                        public ITestBaseType<TypeCN> call() throws Exception {
-                            ITestBaseType<TypeCN> iTestBaseType = new ITestBaseType<>();
-                            iTestBaseType.setUp(TypeCN.class);
-                            return iTestBaseType;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseType<TypeCN>";
-                        }
-                    },
-                    new Callable<ITestBaseCourse<Course>>() {
-                        @Override
-                        public ITestBaseCourse<Course> call() throws Exception {
-                            ITestBaseCourse<Course> iTestBaseCourse = new ITestBaseCourse<>();
-                            iTestBaseCourse.setUp(Course.class);
-                            return iTestBaseCourse;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseCourse<Course>";
-                        }
-                    },
-                    new Callable<ITestBaseCourse<CourseCN>>() {
-                        @Override
-                        public ITestBaseCourse<CourseCN> call() throws Exception {
-                            ITestBaseCourse<CourseCN> iTestBaseCourse = new ITestBaseCourse<>();
-                            iTestBaseCourse.setUp(CourseCN.class);
-                            return iTestBaseCourse;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseCourse<CourseCN>";
-                        }
-                    },
-                    new Callable<ITestBaseDiploma<Diploma, Student, Type>>() {
-                        @Override
-                        public ITestBaseDiploma<Diploma, Student, Type> call() throws Exception {
-                            ITestBaseDiploma<Diploma, Student, Type> iTestBaseDiploma = new ITestBaseDiploma<>();
-                            iTestBaseDiploma.setUp(Diploma.class, Student.class, Type.class);
-                            return iTestBaseDiploma;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseDiploma<Diploma, Student, Type>";
-                        }
-                    },
-                    new Callable<ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN>>() {
-                        @Override
-                        public ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN> call() throws Exception {
-                            ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN> iTestBaseDiploma = new ITestBaseDiploma<>();
-                            iTestBaseDiploma.setUp(DiplomaCN.class, StudentCN.class, TypeCN.class);
-                            return iTestBaseDiploma;
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "ITestBaseDiploma<DiplomaCN, StudentCN, TypeCN>";
-                        }
-                    }
+                    callable(ITestBaseStudent.class, Student.class, Type.class, Diploma.class, Course.class),
+                    callable(ITestBaseStudent.class, StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class),
+                    callable(ITestBaseType.class, Type.class),
+                    callable(ITestBaseType.class, TypeCN.class),
+                    callable(ITestBaseCourse.class, Course.class),
+                    callable(ITestBaseCourse.class, CourseCN.class),
+                    callable(ITestBaseDiploma.class, Diploma.class, Student.class, Type.class),
+                    callable(ITestBaseDiploma.class, DiplomaCN.class, StudentCN.class, TypeCN.class)
             );
         }
+    }
+    private static <T extends ITestBase> Callable <T> callable(Class<T> tClass, Class<?>... setUpParams) {
+        return new Callable<>() {
+            @Override
+            public T call() throws Exception {
+                Constructor<T> declaredConstructor = tClass.getDeclaredConstructor();
+                T obj = declaredConstructor.newInstance();
+                Method setUp = tClass.getDeclaredMethod("setUp", Arrays.stream(setUpParams).map(x -> Class.class).toArray(Class[]::new));
+                setUp.setAccessible(true);
+                setUp.invoke(obj, (Object[]) setUpParams);
+
+                return obj;
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder();
+                sb.append(tClass.getSimpleName());
+                sb.append(": ");
+                Iterator<Class<?>> iterator = Arrays.stream(setUpParams).iterator();
+
+                while (iterator.hasNext()) {
+                    sb.append(iterator.next().getSimpleName());
+                    if(iterator.hasNext()){
+                        sb.append(", ");
+                    }
+                }
+
+                return sb.toString();
+            }
+        };
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
