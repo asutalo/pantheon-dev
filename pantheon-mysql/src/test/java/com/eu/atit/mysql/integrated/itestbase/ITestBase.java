@@ -28,7 +28,9 @@ import java.util.Objects;
 public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
 
-    String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
+    String JDBC_ROOT_URL = "jdbc:mysql://localhost:3308/";
+//    for mac:
+//    String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
     LinkedList<String> dbParams = new LinkedList<>(List.of("test-db", "root", "root", "root@localhost"));
 
     MySqlClient dataClient = new MySqlClient(new Connector(driver(), JDBC_ROOT_URL, dbParams));

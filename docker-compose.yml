@@ -4,11 +4,14 @@ services:
   mysql-container:
     image: mysql:8.1.0
     environment:
+#      MYSQL_USER: test-db-root
+#      MYSQL_PASSWORD: test-db-root-pass
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: test-db
     ports:
-#      - "3308:3306"
-      - "3306:3306"
+      - "3308:3306"
+#      for mac:
+#      - "3306:3306"
     volumes:
       - "./conf/my.conf:/etc/mysql/conf.d/config-file.cnf"
       - "./data:/var/lib/mysql:rw"
