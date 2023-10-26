@@ -42,6 +42,11 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
     }
 
     @Override
+    public void filteredSelect_provideBasicQueryBuilder() {
+        basicFilteredSelectTest(dClass);
+    }
+
+    @Override
     public void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
         deleteTest(getD(true), dClass);
     }

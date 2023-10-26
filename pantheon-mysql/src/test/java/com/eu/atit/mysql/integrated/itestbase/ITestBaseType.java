@@ -23,6 +23,11 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
     }
 
     @Override
+    public void filteredSelect_provideBasicQueryBuilder() {
+        basicFilteredSelectTest(tClass);
+    }
+
+    @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         insertTest(getT(), tClass);
     }

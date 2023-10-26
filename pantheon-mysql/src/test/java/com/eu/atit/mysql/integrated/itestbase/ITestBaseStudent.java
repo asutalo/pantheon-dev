@@ -56,6 +56,11 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     }
 
     @Override
+    public void filteredSelect_provideBasicQueryBuilder() {
+        basicFilteredSelectTest(sClass);
+    }
+
+    @Override
     public void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         insertTest(getS(), sClass);
     }

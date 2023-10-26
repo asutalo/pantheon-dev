@@ -4,15 +4,21 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.integrated.model.base.WithName;
-import com.eu.atit.mysql.integrated.model.base.WithNestedId;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
+import com.eu.atit.mysql.service.annotations.MySqlField;
+import com.eu.atit.pantheon.annotation.data.Nested;
 import com.google.inject.TypeLiteral;
 import org.junit.jupiter.api.Assertions;
+import org.junit.platform.commons.util.StringUtils;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.sql.Driver;
@@ -20,6 +26,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +36,7 @@ public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
 
     String JDBC_ROOT_URL = "jdbc:mysql://localhost:3308/";
-//    for mac:
+    //    for mac:
 //    String JDBC_ROOT_URL = "jdbc:mysql://localhost:3306/";
     LinkedList<String> dbParams = new LinkedList<>(List.of("test-db", "root", "root", "root@localhost"));
 
@@ -63,7 +70,6 @@ public interface ITestBase {
     static <X> void update(X toUpdate, Class<X> ofClass) throws SQLException {
         mySQLService(ofClass).update(toUpdate);
     }
-
 
     default void instanceOfT_shouldConvertMapToInstanceOfModel(){
         Assertions.fail("not implemented");
@@ -103,6 +109,42 @@ public interface ITestBase {
 
     default void getAll_shouldFetchAllRecords_withFilter(){
         Assertions.fail("not implemented");
+    }
+
+    static <X extends WithId> void basicFilteredSelectTest(Class<X> ofClass) {
+        MySQLService<X> mySQLService = mySQLService(ofClass);
+        String tableName = mySQLService.getTableName();
+
+        List<FieldInfo> fieldInfos = fieldInfos(ofClass, new ArrayList<>(), ofClass, null);
+        Iterator<FieldInfo> fieldInfoIterator = fieldInfos.iterator();
+        StringBuilder expectedQueryBuilder = select();
+        while (fieldInfoIterator.hasNext()){
+            FieldInfo fieldInfo = fieldInfoIterator.next();
+            if(fieldInfo.selectable()){
+                selectField(expectedQueryBuilder, lowercase(fieldInfo.tableName()), lowercase(fieldInfo.fieldName()));
+                if(fieldInfoIterator.hasNext()){
+                    commaNewLine(expectedQueryBuilder);
+                }
+            } else {
+                if(!fieldInfoIterator.hasNext()){
+                    int lastIndex = expectedQueryBuilder.lastIndexOf(",");
+                    if(lastIndex == expectedQueryBuilder.length()-2){
+                        expectedQueryBuilder.delete(lastIndex, expectedQueryBuilder.length());
+                    }
+                }
+            }
+        }
+        from(tableName, expectedQueryBuilder);
+
+
+
+        System.out.println(fieldInfos);
+        Assertions.assertEquals(expectedQueryBuilder.toString(), mySQLService.filteredSelect().buildQueryString());
+//        Assertions.assertTrue(queryBuilder.getQueryParts().isEmpty());
+    }
+
+    private static String lowercase(String s) {
+        return s.toLowerCase();
     }
 
     static <X extends WithId> void insertTest(X toInsert, Class<X> ofClass) throws SQLException {
@@ -185,5 +227,127 @@ public interface ITestBase {
 
         System.out.println("Creating tables");
         dataClient.executeSql(creationSql.split(";"));
+    }
+
+    private static List<FieldInfo> fieldInfos(Class<?> ofClass, ArrayList<Class<?>> observedClasses, Class<?> parentClass, Field nestedField) {
+        if(observedClasses.contains(ofClass)){
+            String fieldName = fieldName(nestedField, nestedField.getAnnotation(MySqlField.class));
+            return List.of(new FieldInfo(mySQLService(parentClass).getTableName(), fieldName, true, mySQLService(ofClass).getTableName(), primaryFieldName(ofClass), primaryFieldName(parentClass), false));
+        } else {
+            observedClasses.add(ofClass);
+
+            Field[] fields = ofClass.getDeclaredFields();
+            String primaryFieldName = primaryFieldName(ofClass);
+            List<FieldInfo> fieldInfos = new ArrayList<>();
+            for (Field field : fields) {
+                MySqlField mySqlField = field.getAnnotation(MySqlField.class);
+                Nested nested = field.getAnnotation(Nested.class);
+                if(nested != null || mySqlField != null) {
+                    if (nested != null){
+                        fieldInfos.addAll(fieldInfos(getNestedType(field), observedClasses, ofClass, field));
+                    } else {
+                        String fieldName = fieldName(field, mySqlField);
+                        if(!ofClass.equals(parentClass) && fieldName.equalsIgnoreCase(primaryFieldName)){
+                            if(isList(nestedField)){
+                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
+                            } else {
+                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName, true, mySQLService(parentClass).getTableName(), nestingFieldName(nestedField, primaryFieldName), primaryFieldName(parentClass), true));
+                            }
+                        } else {
+                            fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
+                        }
+                    }
+                }
+            }
+//        LEFT JOIN Type AS type
+//        ON student.type_id = type.id
+//        LEFT JOIN Diploma AS diploma
+//        ON student.id = diploma.id
+//        LEFT JOIN Student_Course AS student_course
+//        ON student.id = student_course.student_id
+//        LEFT JOIN Course AS course
+//        ON student_course.course_id = course.id;
+            return fieldInfos;
+        }
+    }
+
+
+
+    private static String primaryFieldName(Class<?> ofClass) {
+        for (Field declaredField : ofClass.getDeclaredFields()) {
+            MySqlField mySqlField = declaredField.getAnnotation(MySqlField.class);
+            if(mySqlField!=null && mySqlField.primary()){
+                Nested nested = declaredField.getAnnotation(Nested.class);
+                if(nested == null) {
+                    return fieldName(declaredField, mySqlField);
+                } else {
+                    if(!isList(declaredField)) {
+                        return primaryFieldName(getNestedType(declaredField));
+                    }
+                }
+            }
+        }
+
+        throw new AssertionFailedError("no adequate primary key found for: " + ofClass.getName());
+    }
+
+    private static boolean isList(Field nestedField) {
+        Type genericType = nestedField.getGenericType();
+        return genericType.getTypeName().contains("List");
+    }
+
+    private static Class<?> getNestedType(Field nestedField) {
+        if(isList(nestedField)) {
+            return (Class<?>) ((ParameterizedType) nestedField.getGenericType()).getActualTypeArguments()[0];
+        }
+        return nestedField.getType();
+    }
+
+    private static String nestingFieldName(Field field, String primaryFieldName) {
+        MySqlField mySqlField = field.getAnnotation(MySqlField.class);
+        if(mySqlField==null || StringUtils.isBlank(mySqlField.column())){
+            return mySQLService(field.getType()).getTableName().toLowerCase() + "_" + primaryFieldName;
+        }
+        return fieldName(field, mySqlField);
+    }
+    private static String fieldName(Field field, MySqlField mySqlField) {
+        String fieldName = field.getName();
+
+        if(mySqlField!=null && StringUtils.isNotBlank(mySqlField.column())){
+            fieldName = mySqlField.column();
+        }
+        return fieldName;
+    }
+
+
+
+    private static StringBuilder select() {
+        return new StringBuilder("SELECT\t");
+    }
+
+    private static void commaNewLine(StringBuilder stringBuilder) {
+        stringBuilder.append(",");
+        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append("\t\t");
+    }
+
+    private static void from(String tableName, StringBuilder stringBuilder) {
+        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append("FROM\t");
+        stringBuilder.append(tableName);
+        stringBuilder.append(" AS ");
+        stringBuilder.append(lowercase(tableName));
+        stringBuilder.append(";");
+    }
+
+    private static void selectField(StringBuilder stringBuilder, String tableName, String fieldName) {
+        stringBuilder.append(tableName);
+        stringBuilder.append(".");
+
+        stringBuilder.append(fieldName);
+        stringBuilder.append(" AS ");
+        stringBuilder.append(tableName);
+        stringBuilder.append("_");
+        stringBuilder.append(fieldName);
     }
 }

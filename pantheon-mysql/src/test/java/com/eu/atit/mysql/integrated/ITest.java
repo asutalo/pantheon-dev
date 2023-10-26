@@ -47,7 +47,6 @@ public class ITest {
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
         void filteredSelect_provideBasicQueryBuilder(Callable<? extends ITestBase> iTestBase) throws Exception {
-            Assertions.fail();
             ITestBase testBase = iTestBase.call();
             testBase.filteredSelect_provideBasicQueryBuilder();
         }

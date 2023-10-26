@@ -142,6 +142,10 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return mySQLModelDescriptor.getResultSetToInstance().get(row);
     }
 
+    public String getTableName() {
+        return mySQLModelDescriptor.getTableName();
+    }
+
     private LinkedList<MySqlValue> mySqlValues(T user) {
         return mySQLModelDescriptor.getMySqlValuesFilter().get(user);
     }
