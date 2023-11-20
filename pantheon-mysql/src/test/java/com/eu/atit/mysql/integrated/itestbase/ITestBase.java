@@ -114,6 +114,7 @@ public interface ITestBase {
     static <X extends WithId> void basicFilteredSelectTest(Class<X> ofClass) {
         MySQLService<X> mySQLService = mySQLService(ofClass);
         String tableName = mySQLService.getTableName();
+        List<FieldInfo> joins = new ArrayList<>();
 
         List<FieldInfo> fieldInfos = fieldInfos(ofClass, new ArrayList<>(), ofClass, null);
         Iterator<FieldInfo> fieldInfoIterator = fieldInfos.iterator();
@@ -125,22 +126,51 @@ public interface ITestBase {
                 if(fieldInfoIterator.hasNext()){
                     commaNewLine(expectedQueryBuilder);
                 }
-            } else {
-                if(!fieldInfoIterator.hasNext()){
-                    int lastIndex = expectedQueryBuilder.lastIndexOf(",");
-                    if(lastIndex == expectedQueryBuilder.length()-2){
-                        expectedQueryBuilder.delete(lastIndex, expectedQueryBuilder.length());
-                    }
+            }
+
+            if(fieldInfo.joinedOn()){
+                joins.add(fieldInfo);
+            }
+
+            if(!fieldInfoIterator.hasNext()){
+                int lastIndex = expectedQueryBuilder.lastIndexOf(",");
+                if(lastIndex == expectedQueryBuilder.length()-2){
+                    expectedQueryBuilder.delete(lastIndex, expectedQueryBuilder.length());
                 }
             }
         }
         from(tableName, expectedQueryBuilder);
 
+        for (FieldInfo fieldInfo : joins) {
+            if(fieldInfo.childJoin() == null)
+                join(fieldInfo, expectedQueryBuilder);
+            else {
+                System.out.println(fieldInfo);
+                System.out.println(fieldInfo.childJoin());
+            }
+        }
 
+        expectedQueryBuilder.append(";");
 
-        System.out.println(fieldInfos);
         Assertions.assertEquals(expectedQueryBuilder.toString(), mySQLService.filteredSelect().buildQueryString());
 //        Assertions.assertTrue(queryBuilder.getQueryParts().isEmpty());
+    }
+
+    private static void join(FieldInfo fieldInfo, StringBuilder stringBuilder) {
+        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append("LEFT JOIN ");
+        stringBuilder.append(fieldInfo.tableName());
+        stringBuilder.append(" AS ");
+        stringBuilder.append(fieldInfo.tableName().toLowerCase());
+        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append("\t\t\tON ");
+        stringBuilder.append(fieldInfo.joinedFromTable().toLowerCase());
+        stringBuilder.append(".");
+        stringBuilder.append(fieldInfo.joinedFromField());
+        stringBuilder.append(" = ");
+        stringBuilder.append(fieldInfo.tableName().toLowerCase());
+        stringBuilder.append(".");
+        stringBuilder.append(fieldInfo.joinedOnField());
     }
 
     private static String lowercase(String s) {
@@ -232,7 +262,7 @@ public interface ITestBase {
     private static List<FieldInfo> fieldInfos(Class<?> ofClass, ArrayList<Class<?>> observedClasses, Class<?> parentClass, Field nestedField) {
         if(observedClasses.contains(ofClass)){
             String fieldName = fieldName(nestedField, nestedField.getAnnotation(MySqlField.class));
-            return List.of(new FieldInfo(mySQLService(parentClass).getTableName(), fieldName, true, mySQLService(ofClass).getTableName(), primaryFieldName(ofClass), primaryFieldName(parentClass), false));
+            return List.of(new FieldInfo(mySQLService(parentClass).getTableName(), fieldName, true, mySQLService(ofClass).getTableName(), primaryFieldName(ofClass), primaryFieldName(parentClass), false, null));
         } else {
             observedClasses.add(ofClass);
 
@@ -249,9 +279,11 @@ public interface ITestBase {
                         String fieldName = fieldName(field, mySqlField);
                         if(!ofClass.equals(parentClass) && fieldName.equalsIgnoreCase(primaryFieldName)){
                             if(isList(nestedField)){
-                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
+//                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
+                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName, true, mySQLService(parentClass).getTableName(), null, primaryFieldName(parentClass), true, new FieldInfo(mySQLService(parentClass).getTableName(), null)));
+
                             } else {
-                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName, true, mySQLService(parentClass).getTableName(), nestingFieldName(nestedField, primaryFieldName), primaryFieldName(parentClass), true));
+                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName, true, mySQLService(parentClass).getTableName(), nestingFieldName(nestedField, primaryFieldName), primaryFieldName(parentClass), true, null));
                             }
                         } else {
                             fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
@@ -259,14 +291,10 @@ public interface ITestBase {
                     }
                 }
             }
-//        LEFT JOIN Type AS type
-//        ON student.type_id = type.id
-//        LEFT JOIN Diploma AS diploma
-//        ON student.id = diploma.id
-//        LEFT JOIN Student_Course AS student_course
-//        ON student.id = student_course.student_id
-//        LEFT JOIN Course AS course
-//        ON student_course.course_id = course.id;
+//            LEFT JOIN Student_Course AS student_course
+//            ON student.id = student_course.student_id
+//            LEFT JOIN Course AS course
+//            ON student_course.course_id = course.id;
             return fieldInfos;
         }
     }
@@ -337,7 +365,6 @@ public interface ITestBase {
         stringBuilder.append(tableName);
         stringBuilder.append(" AS ");
         stringBuilder.append(lowercase(tableName));
-        stringBuilder.append(";");
     }
 
     private static void selectField(StringBuilder stringBuilder, String tableName, String fieldName) {
