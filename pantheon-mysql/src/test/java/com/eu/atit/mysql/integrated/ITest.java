@@ -174,6 +174,11 @@ public class ITest {
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
+
+        @Test
+        public void shouldFetchStudentWithCourses() {
+            super.shouldFetchStudentWithCourses();
+        }
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -188,6 +193,11 @@ public class ITest {
         @Test
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
+        }
+
+        @Test
+        public void shouldFetchStudentWithCourses()  {
+            super.shouldFetchStudentWithCourses();
         }
     }
 

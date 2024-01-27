@@ -67,6 +67,10 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         Assertions.assertEquals(testStudent, actualSs.getFirst());
     }
 
+    public void shouldFetchStudentWithCourses() {
+        Assertions.fail();
+    }
+
     @Override
     public void filteredSelect_provideBasicQueryBuilder() {
         Assertions.assertEquals("""
