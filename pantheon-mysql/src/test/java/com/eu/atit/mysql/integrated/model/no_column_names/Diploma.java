@@ -45,7 +45,8 @@ public final class Diploma implements BaseDiploma {
         return Objects.hash(obtained, student);
     }
 
-    Student getStudent() {
+    @Override
+    public Student getStudent() {
         return student;
     }
 

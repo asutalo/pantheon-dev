@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.integrated.model.with_column_names;
 
+import com.eu.atit.mysql.integrated.model.base.BaseCourse;
+import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
@@ -29,7 +31,11 @@ public class StudentCN implements BaseStudent {
     public StudentCN() {
     }
 
-    public StudentCN(String n, TypeCN t, DiplomaCN diplomaCN, List<CourseCN> cours) {
+    public StudentCN(Integer i) {
+        this.i = i;
+    }
+
+    public StudentCN(String n, TypeCN t, DiplomaCN diplomaCN, List<CourseCN> courses) {
         this.n = n;
         this.t = t;
         this.diplomaCN = diplomaCN;
@@ -69,6 +75,17 @@ public class StudentCN implements BaseStudent {
     public DiplomaCN getDiploma() {
         return diplomaCN;
     }
+
+    @Override
+    public <D extends BaseDiploma> void setDiploma(D diploma) {
+        this.diplomaCN = (DiplomaCN) diploma;
+    }
+
+    @Override
+    public <C extends BaseCourse> void setCourses(List<C> courses) {
+        this.courses = (List<CourseCN>) courses;
+    }
+
 
     @Override
     public String getName() {

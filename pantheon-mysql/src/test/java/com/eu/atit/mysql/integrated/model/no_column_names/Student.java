@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.integrated.model.no_column_names;
 
+import com.eu.atit.mysql.integrated.model.base.BaseCourse;
+import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
@@ -27,6 +29,10 @@ public class Student implements BaseStudent {
     public Student() {
     }
 
+    public Student(Integer id) {
+        this.id = id;
+    }
+
     public Student(String name, Type type, Diploma diploma, List<Course> courses) {
         this.name = name;
         this.type = type;
@@ -50,7 +56,7 @@ public class Student implements BaseStudent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return id == student.id && Objects.equals(name, student.name) && Objects.equals(type, student.type) && Objects.equals(diploma, student.diploma) && Objects.equals(courses, student.courses);
+        return id == student.id && Objects.equals(name, student.name) && Objects.equals(type, student.type) && Objects.equals(diploma.getId(), student.id) && Objects.equals(courses, student.courses);
     }
 
     @Override
@@ -66,6 +72,16 @@ public class Student implements BaseStudent {
     @Override
     public Diploma getDiploma() {
         return diploma;
+    }
+
+    @Override
+    public <D extends BaseDiploma> void setDiploma(D diploma) {
+        this.diploma = (Diploma) diploma;
+    }
+
+    @Override
+    public <C extends BaseCourse> void setCourses(List<C> courses) {
+        this.courses = (List<Course>) courses;
     }
 
     @Override

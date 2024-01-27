@@ -66,6 +66,11 @@ public final class DiplomaCN implements BaseDiploma {
     }
 
     @Override
+    public BaseStudent getStudent() {
+        return s;
+    }
+
+    @Override
     public int getId() {
         return s.getId();
     }

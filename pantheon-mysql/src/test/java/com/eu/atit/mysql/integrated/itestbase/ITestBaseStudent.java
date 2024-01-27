@@ -57,7 +57,14 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
 
         insert(testDiploma, dClass);
 
-        Assertions.assertTrue(getAll(sClass).size() > startingStudentCount);
+        List<S> actualSs = getAll(sClass);
+        Assertions.assertTrue(actualSs.size() > startingStudentCount);
+        Assertions.assertEquals(1, actualSs.size());
+
+        testStudent.setDiploma(testDiploma);
+        testStudent.setCourses(List.of(getNulledC()));
+        testDiploma.setStudent(getNulledS(testStudent.getId()));
+        Assertions.assertEquals(testStudent, actualSs.getFirst());
     }
 
     @Override
@@ -123,7 +130,6 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         getOneWithFilterTest(someSs, sClass);
     }
 
-
     private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
         S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
 
@@ -131,8 +137,16 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         return testStudent;
     }
 
+    private S getNulledS(int id) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return sClass.getDeclaredConstructor(Integer.class).newInstance(id);
+    }
+
     private S getS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         return sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance(name, TEST_TYPE, null, List.of());
+    }
+
+    private C getNulledC() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return cClass.getDeclaredConstructor(Integer.class, String.class).newInstance(null, null);
     }
 
     private S getS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

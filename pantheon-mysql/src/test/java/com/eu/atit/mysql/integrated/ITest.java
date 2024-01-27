@@ -171,7 +171,6 @@ public class ITest {
         }
 
         @Test
-        @Disabled
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
@@ -187,7 +186,6 @@ public class ITest {
         }
 
         @Test
-        @Disabled
         public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
             super.shouldFetchStudentWithDiploma();
         }
