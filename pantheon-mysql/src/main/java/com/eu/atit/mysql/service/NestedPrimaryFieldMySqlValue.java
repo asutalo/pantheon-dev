@@ -18,7 +18,7 @@ public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
         mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
         fieldName = fieldName(nestedPrimaryKeyField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
         variableName = nestedPrimaryKeyField.getName();
-        aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
+        aliasName = nestedPrimaryKeyFieldMySqlValue.alias();
     }
 
     private String fieldName(Field field, String nestedFieldName) {

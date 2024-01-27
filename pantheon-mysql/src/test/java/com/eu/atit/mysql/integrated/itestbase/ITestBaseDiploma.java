@@ -102,12 +102,12 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
 
     @Override
     public void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
-        getAllWithFilterTest(someDs, dClass);
+        getAllWithFilterTest(someDs, dClass, lowercaseTableNameOf(sClass) + ".id");
     }
 
     @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
-        getOneWithFilterTest(someDs, dClass);
+        getOneWithFilterTest(someDs, dClass, lowercaseTableNameOf(sClass) + ".id");
     }
 
     private D getD(S student, Boolean obtained) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

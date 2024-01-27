@@ -166,16 +166,20 @@ public interface ITestBase {
     }
 
     static <X extends WithId> void getAllWithFilterTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        getAllWithFilterTest(toInserts, ofClass, lowercaseTableNameOf(ofClass) + ".id");
+    }
+
+    static <X extends WithId> void getAllWithFilterTest(List<X> toInserts, Class<X> ofClass, String idColumn) throws SQLException {
         List<Integer> insertIds = insertAll(toInserts, ofClass);
         MySQLService<X> xMySQLService = mySQLService(ofClass);
-        Assertions.assertEquals(getAll(ofClass).stream().filter(s -> s.getId() == insertIds.getFirst()).toList(), xMySQLService.getAll(Map.of(xMySQLService.getTableName().toLowerCase() + ".id", insertIds.getFirst())));
+        Assertions.assertEquals(getAll(ofClass).stream().filter(s -> s.getId() == insertIds.getFirst()).toList(), xMySQLService.getAll(Map.of(idColumn, insertIds.getFirst())));
     }
 
     static <X extends WithId> void getOneWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
         insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
             QueryBuilder filteredSelect = xMySQLService.filteredSelect();
             filteredSelect.where();
-            filteredSelect.keyIsVal(new MySqlValue(MysqlType.INT, xMySQLService.getTableName().toLowerCase() + ".id", integer));
+            filteredSelect.keyIsVal(new MySqlValue(MysqlType.INT, lowercaseTableNameOf(ofClass) + ".id", integer));
             try {
                 return xMySQLService.get(filteredSelect);
             } catch (SQLException e) {
@@ -184,10 +188,18 @@ public interface ITestBase {
         });
     }
 
+    static <X extends WithId> String lowercaseTableNameOf(Class<X> ofClass) {
+        return mySQLService(ofClass).getTableName().toLowerCase();
+    }
+
     static <X extends WithId> void getOneWithFilterTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        getOneWithFilterTest(toInserts, ofClass, lowercaseTableNameOf(ofClass) + ".id");
+    }
+
+    static <X extends WithId> void getOneWithFilterTest(List<X> toInserts, Class<X> ofClass, String idColumn) throws SQLException {
         insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
             try {
-                return xMySQLService.get(Map.of(xMySQLService.getTableName().toLowerCase() + ".id", integer));
+                return xMySQLService.get(Map.of(idColumn, integer));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
