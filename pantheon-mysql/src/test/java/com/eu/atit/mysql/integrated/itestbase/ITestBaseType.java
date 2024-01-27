@@ -60,6 +60,12 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         getAllWithQueryBuilderTest(someTs, tClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
+        getOneWithQueryBuilderTest(someTs, tClass);
+    }
+
+
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getT("testTypeName");
     }

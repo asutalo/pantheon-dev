@@ -92,7 +92,6 @@ public class ITest {
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
         void get_shouldFetchSpecificRecord_withQueryBuilder(Callable<? extends ITestBase> iTestBase) throws Exception {
-            Assertions.fail();
             ITestBase testBase = iTestBase.call();
             testBase.get_shouldFetchSpecificRecord_withQueryBuilder();
         }

@@ -4,11 +4,14 @@ import com.eu.atit.mysql.client.Connector;
 import com.eu.atit.mysql.client.MySqlClient;
 import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.integrated.model.base.WithName;
+import com.eu.atit.mysql.query.MySqlValue;
+import com.eu.atit.mysql.query.QueryBuilder;
 import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.google.inject.TypeLiteral;
+import com.mysql.cj.MysqlType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.platform.commons.util.StringUtils;
 import org.opentest4j.AssertionFailedError;
@@ -92,7 +95,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void get_shouldFetchSpecificRecord_withQueryBuilder(){
+    default void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
         Assertions.fail("not implemented");
     }
 
@@ -214,8 +217,22 @@ public interface ITestBase {
 
     static <X extends WithId> void getAllWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
         insertAll(toInserts, ofClass);
+        MySQLService<X> xMySQLService = mySQLService(ofClass);
+        Assertions.assertEquals(getAll(ofClass), xMySQLService.getAll(xMySQLService.filteredSelect()));
+    }
 
-        Assertions.assertEquals(getAll(ofClass), mySQLService(ofClass).getAll(mySQLService(ofClass).filteredSelect()));
+    static <X extends WithId> void getOneWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        List<Integer> insertIds = insertAll(toInserts, ofClass);
+        MySQLService<X> xMySQLService = mySQLService(ofClass);
+        QueryBuilder filteredSelect = xMySQLService.filteredSelect();
+        filteredSelect.where();
+
+        Integer expectedId = insertIds.get(1);
+        filteredSelect.keyIsVal(new MySqlValue(MysqlType.INT, xMySQLService.getTableName().toLowerCase() + ".id", expectedId));
+        X actual = xMySQLService.get(filteredSelect);
+
+        Assertions.assertNotNull(actual);
+        Assertions.assertEquals(expectedId, actual.getId());
     }
 
     static <X extends WithId & WithName> void updateTest(X toUpdate, Class<X> ofClass, String updatedName) throws SQLException {

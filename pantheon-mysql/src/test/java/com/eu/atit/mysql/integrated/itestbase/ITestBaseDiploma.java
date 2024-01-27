@@ -95,6 +95,11 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
         getAllWithQueryBuilderTest(someDs, dClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
+        getOneWithQueryBuilderTest(someDs, dClass);
+    }
+
     private D getD(S student, Boolean obtained) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return dClass.getDeclaredConstructor(sClass, Boolean.class).newInstance(student, obtained);
     }

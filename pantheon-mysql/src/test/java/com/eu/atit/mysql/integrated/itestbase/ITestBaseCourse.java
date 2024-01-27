@@ -69,6 +69,12 @@ public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
         getAllWithQueryBuilderTest(someCs, cClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
+        getOneWithQueryBuilderTest(someCs, cClass);
+    }
+
+
     private C getC() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getC("testClassName");
     }

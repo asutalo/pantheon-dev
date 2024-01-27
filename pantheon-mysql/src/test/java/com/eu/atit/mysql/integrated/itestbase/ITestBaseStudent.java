@@ -108,6 +108,12 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         getAllWithQueryBuilderTest(someSs, sClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
+        getOneWithQueryBuilderTest(someSs, sClass);
+    }
+
+
     private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
         S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
 
