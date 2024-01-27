@@ -1,5 +1,6 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.mysql.query.LeftJoin;
 import com.eu.atit.mysql.query.QueryBuilder;
 
 import java.util.ArrayList;
@@ -7,13 +8,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class JoinedFilterSelect extends FilteredSelect {
-    private final QueryBuilder joinedFilteredSelectQueryBuilder;
+    private final List<LeftJoin> leftJoins = new ArrayList<>();
 
     JoinedFilterSelect(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases, String tableName, List<JoinInfo> joinInfos) {
         super(columnsAndAliases, tableName);
-
-        QueryBuilder queryBuilder = super.get();
-
         List<String> combinations = new ArrayList<>();
         for (JoinInfo joinInfo : joinInfos) {
 
@@ -23,15 +21,15 @@ public class JoinedFilterSelect extends FilteredSelect {
             if (!combinations.contains(targetJoinInfo) && !combinations.contains(sourceJoinInfo)) {
                 combinations.add(targetJoinInfo);
                 combinations.add(sourceJoinInfo);
-                queryBuilder.leftJoin(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableAlias(), joinInfo.sourceId());
+                leftJoins.add(new LeftJoin(joinInfo.targetTableName(), joinInfo.targetId(), joinInfo.sourceTableAlias(), joinInfo.sourceId()));
             }
         }
-
-        joinedFilteredSelectQueryBuilder = queryBuilder;
     }
 
     @Override
     QueryBuilder get() {
-        return joinedFilteredSelectQueryBuilder;
+        QueryBuilder queryBuilder = super.get();
+        leftJoins.forEach(queryBuilder::leftJoin);
+        return queryBuilder;
     }
 }

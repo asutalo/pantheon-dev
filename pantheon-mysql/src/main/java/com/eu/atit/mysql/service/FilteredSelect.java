@@ -6,17 +6,19 @@ import java.util.LinkedHashSet;
 
 class FilteredSelect {
 
-    private final QueryBuilder filteredSelectQueryBuilder;
+    private final LinkedHashSet<ColumnNameAndAlias> columnsAndAliases;
+    private final String tableName;
 
     FilteredSelect(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases, String tableName) {
+        this.columnsAndAliases = columnsAndAliases;
+        this.tableName = tableName;
+    }
+
+    QueryBuilder get() {
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.select(columnsAndAliases);
         queryBuilder.from(tableName);
 
-        filteredSelectQueryBuilder = queryBuilder;
-    }
-
-    QueryBuilder get() {
-        return filteredSelectQueryBuilder;
+        return queryBuilder;
     }
 }
