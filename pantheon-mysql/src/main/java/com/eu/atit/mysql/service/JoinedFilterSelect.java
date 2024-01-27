@@ -5,7 +5,6 @@ import com.eu.atit.mysql.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class JoinedFilterSelect extends FilteredSelect {
     private final QueryBuilder joinedFilteredSelectQueryBuilder;

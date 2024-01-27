@@ -15,9 +15,7 @@ import java.util.List;
 import static com.eu.atit.mysql.query.KeyVal.IS_VAL;
 import static com.eu.atit.mysql.query.Update.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateTest {

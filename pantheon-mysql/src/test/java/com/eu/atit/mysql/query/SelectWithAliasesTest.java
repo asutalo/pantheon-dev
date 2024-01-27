@@ -1,19 +1,15 @@
 package com.eu.atit.mysql.query;
 
 import com.eu.atit.mysql.service.ColumnNameAndAlias;
-import com.eu.atit.pantheon.helper.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static com.eu.atit.mysql.query.SelectWithAliases.AS;
-import static com.eu.atit.mysql.query.SelectWithAliases.SELECT;
-import static com.eu.atit.mysql.query.SelectWithAliases.SEPARATOR;
+import static com.eu.atit.mysql.query.SelectWithAliases.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;

@@ -1,10 +1,6 @@
 package com.eu.atit.mysql.integrated;
 
-import com.eu.atit.mysql.integrated.itestbase.ITestBase;
-import com.eu.atit.mysql.integrated.itestbase.ITestBaseCourse;
-import com.eu.atit.mysql.integrated.itestbase.ITestBaseDiploma;
-import com.eu.atit.mysql.integrated.itestbase.ITestBaseStudent;
-import com.eu.atit.mysql.integrated.itestbase.ITestBaseType;
+import com.eu.atit.mysql.integrated.itestbase.*;
 import com.eu.atit.mysql.integrated.model.no_column_names.Course;
 import com.eu.atit.mysql.integrated.model.no_column_names.Diploma;
 import com.eu.atit.mysql.integrated.model.no_column_names.Student;
@@ -17,21 +13,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class ITest {

@@ -1,21 +1,13 @@
 package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.integrated.model.base.BaseCourse;
-import com.eu.atit.mysql.query.QueryBuilder;
-import com.eu.atit.mysql.service.annotations.MySqlField;
-import com.eu.atit.mysql.service.annotations.Table;
-import com.eu.atit.pantheon.annotation.data.Nested;
 import org.junit.jupiter.api.Assertions;
-import org.junit.platform.commons.util.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;

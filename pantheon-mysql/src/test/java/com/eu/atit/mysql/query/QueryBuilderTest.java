@@ -22,18 +22,13 @@ import static com.eu.atit.mysql.query.Join.*;
 import static com.eu.atit.mysql.query.KeyVal.IS_VAL;
 import static com.eu.atit.mysql.query.QueryBuilder.QUERY_END;
 import static com.eu.atit.mysql.query.SelectWithAliases.*;
-import static com.eu.atit.mysql.query.Update.*;
+import static com.eu.atit.mysql.query.Update.SET;
+import static com.eu.atit.mysql.query.Update.UPDATE;
 import static com.eu.atit.mysql.query.Where.WHERE;
 import static com.mysql.cj.MysqlType.INT;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)

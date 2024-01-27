@@ -4,10 +4,8 @@ import com.eu.atit.mysql.service.ColumnNameAndAlias;
 import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class SelectWithAliases extends KeyWord implements QueryPart {
     static final String SELECT = "SELECT\t";

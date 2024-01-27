@@ -3,7 +3,6 @@ package com.eu.atit.mysql.service;
 import com.eu.atit.mysql.query.QueryBuilder;
 
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 class FilteredSelect {
 

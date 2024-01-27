@@ -1,7 +1,6 @@
 package com.eu.atit.mysql.integrated.model.no_column_names;
 
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
-import com.eu.atit.mysql.integrated.model.base.WithId;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
