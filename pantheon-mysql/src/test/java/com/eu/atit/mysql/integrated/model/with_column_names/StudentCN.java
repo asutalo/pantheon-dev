@@ -8,7 +8,7 @@ import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 import java.util.List;
-@Table(name="student")
+@Table(name="Student")
 public class StudentCN implements BaseStudent {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private int i;

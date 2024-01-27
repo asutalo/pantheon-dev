@@ -57,7 +57,23 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
 
     @Override
     public void filteredSelect_provideBasicQueryBuilder() {
-        basicFilteredSelectTest(sClass);
+        Assertions.assertEquals("""
+                SELECT	student.id AS student_id,
+                		student.name AS student_name,
+                		type.id AS type_id,
+                		type.name AS type_name,
+                		diploma.obtained AS diploma_obtained,
+                		course.id AS course_id,
+                		course.name AS course_name
+                FROM	Student AS student
+                LEFT JOIN Type AS type
+                			ON student.type_id = type.id
+                LEFT JOIN Diploma AS diploma
+                			ON student.id = diploma.id
+                LEFT JOIN Student_Course AS student_course
+                			ON student.id = student_course.student_id
+                LEFT JOIN Course AS course
+                			ON student_course.course_id = course.id;""".trim().replace("\r", ""), basicFilteredSelectQuery(sClass).trim().replace("\r", ""));
     }
 
     @Override

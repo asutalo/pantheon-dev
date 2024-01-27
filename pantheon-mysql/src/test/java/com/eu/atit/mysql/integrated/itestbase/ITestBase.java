@@ -111,6 +111,12 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
+    static <X extends WithId> String basicFilteredSelectQuery(Class<X> ofClass) {
+        return mySQLService(ofClass).filteredSelect().buildQueryString();
+    }
+
+
+    //todo finish the generic method below to "simplify" tests
     static <X extends WithId> void basicFilteredSelectTest(Class<X> ofClass) {
         MySQLService<X> mySQLService = mySQLService(ofClass);
         String tableName = mySQLService.getTableName();

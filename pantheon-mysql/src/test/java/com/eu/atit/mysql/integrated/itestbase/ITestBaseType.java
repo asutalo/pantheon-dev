@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.integrated.model.base.BaseType;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +25,10 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
 
     @Override
     public void filteredSelect_provideBasicQueryBuilder() {
-        basicFilteredSelectTest(tClass);
+        Assertions.assertEquals("""
+                SELECT	type.id AS type_id,
+                		type.name AS type_name
+                FROM	Type AS type;""".trim().replace("\r", ""), basicFilteredSelectQuery(tClass).trim().replace("\r", ""));
     }
 
     @Override

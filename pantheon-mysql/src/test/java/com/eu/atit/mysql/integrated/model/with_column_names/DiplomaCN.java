@@ -7,7 +7,7 @@ import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
-@Table(name="diploma")
+@Table(name="Diploma")
 public final class DiplomaCN implements BaseDiploma {
     @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
     private Boolean o;

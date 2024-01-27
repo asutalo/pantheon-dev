@@ -5,7 +5,7 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.mysql.cj.MysqlType;
 
-@Table(name = "course")
+@Table(name = "Course")
 public class CourseCN implements BaseCourse {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private Integer i;

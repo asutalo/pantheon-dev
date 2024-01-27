@@ -33,7 +33,10 @@ public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
 
     @Override
     public void filteredSelect_provideBasicQueryBuilder() {
-        basicFilteredSelectTest(cClass);
+        Assertions.assertEquals("""
+                SELECT	course.id AS course_id,
+                		course.name AS course_name
+                FROM	Course AS course;""".trim().replace("\r", ""), basicFilteredSelectQuery(cClass).trim().replace("\r", ""));
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.mysql.cj.MysqlType;
 
 import java.util.Objects;
 
-@Table(name="type")
+@Table(name="Type")
 public class TypeCN implements BaseType {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private Integer i;
