@@ -1,4 +1,4 @@
 package com.eu.atit.mysql.integrated.model.base;
 
-public interface BaseCourse extends WithId, WithName{
+public interface BaseCourse extends WithId, WithName {
 }

@@ -17,7 +17,8 @@ public class FieldMySqlValue {
     String aliasName;
     MysqlType mysqlType;
 
-    FieldMySqlValue() {}
+    FieldMySqlValue() {
+    }
 
     /**
      * @param field     reflection of the variable that is used to fetch the value for MySqlValue
@@ -99,12 +100,12 @@ public class FieldMySqlValue {
     @Override
     public String toString() {
         return "FieldMySqlValue{" +
-               "field=" + field +
-               ", fieldName='" + fieldName + '\'' +
-               ", variableName='" + variableName + '\'' +
-               ", aliasName='" + aliasName + '\'' +
-               ", mysqlType=" + mysqlType +
-               '}';
+                "field=" + field +
+                ", fieldName='" + fieldName + '\'' +
+                ", variableName='" + variableName + '\'' +
+                ", aliasName='" + aliasName + '\'' +
+                ", mysqlType=" + mysqlType +
+                '}';
     }
 
     Field getField() {

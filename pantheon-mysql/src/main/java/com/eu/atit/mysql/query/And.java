@@ -11,13 +11,15 @@ public class And extends KeyWord implements QueryPart {
         return query.concat(AND);
     }
 
-    @IgnoreCoverage@Override
+    @IgnoreCoverage
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         return o != null && getClass() == o.getClass();
     }
 
-    @IgnoreCoverage@Override
+    @IgnoreCoverage
+    @Override
     public int hashCode() {
         return 0;
     }

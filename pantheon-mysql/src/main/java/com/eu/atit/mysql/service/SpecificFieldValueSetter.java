@@ -29,10 +29,10 @@ class SpecificFieldValueSetter<T> implements BiConsumer<Object, Map<String, Obje
     @Override
     public String toString() {
         return "SpecificFieldValueSetter{" +
-               "fieldName='" + fieldName + '\'' +
-               ", aliasFieldName='" + aliasFieldName + '\'' +
-               ", fieldValueSetter=" + fieldValueSetter +
-               '}';
+                "fieldName='" + fieldName + '\'' +
+                ", aliasFieldName='" + aliasFieldName + '\'' +
+                ", fieldValueSetter=" + fieldValueSetter +
+                '}';
     }
 
     ColumnNameAndAlias fieldNameAndAlias(String tableName) {

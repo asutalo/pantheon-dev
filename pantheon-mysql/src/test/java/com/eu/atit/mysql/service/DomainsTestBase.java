@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 
 public class DomainsTestBase {
     static final int START_VALUE = 1;
+
     String getAlias(Field testField, String testTable) {
         return testTable + "_" + testField.getName();
     }

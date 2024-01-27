@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 class SpecificNestedFieldValueSetter<T> {
-    private final FieldValueSetter<T> fieldValueSetter;
-    private final ResultSetToInstance<?> resultSetToInstance;
     final Instantiator<?> instantiator;
     final SpecificFieldValueSetter<?> primaryKeyValueSetter;
+    private final FieldValueSetter<T> fieldValueSetter;
+    private final ResultSetToInstance<?> resultSetToInstance;
 
     SpecificNestedFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
         fieldValueSetter = new FieldValueSetter<>(fieldToSet);

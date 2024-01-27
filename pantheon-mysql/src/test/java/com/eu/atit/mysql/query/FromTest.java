@@ -17,7 +17,7 @@ class FromTest {
 
     @Test
     void apply() {
-        String expectedQuery = SOME_QUERY +System.lineSeparator()+ "FROM\tSOME_TABLE AS some_table";
+        String expectedQuery = SOME_QUERY + System.lineSeparator() + "FROM\tSOME_TABLE AS some_table";
 
         assertEquals(expectedQuery, from().apply(SOME_QUERY));
     }

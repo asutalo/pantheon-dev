@@ -47,18 +47,6 @@ public interface ITestBase {
 
     MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
-//    todo 2 copies of same method?
-    default void prepDb() throws SQLException, URISyntaxException, IOException {
-        prepareTestDB();
-    }
-
-    default <X> void initMySqlService(Class<X> forClass) {
-        if (!mySQLServiceMap.containsKey(forClass)) {
-            MySQLService<X> mySqlService = (MySQLService<X>) mySQLServiceProvider.provide(TypeLiteral.get(forClass));
-            mySQLServiceMap.put(forClass, mySqlService);
-        }
-    }
-
     static <X> List<X> getAll(Class<X> ofClass) throws SQLException {
         return mySQLService(ofClass).getAll();
     }
@@ -75,50 +63,9 @@ public interface ITestBase {
         mySQLService(ofClass).update(toUpdate);
     }
 
-    default void instanceOfT_shouldConvertMapToInstanceOfModel(){
-        Assertions.fail("not implemented");
-    }
-
-    default void filteredSelect_provideBasicQueryBuilder(){
-        Assertions.fail("not implemented");
-    }
-
-    default void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException{
-        Assertions.fail("not implemented");
-    }
-
-    default void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        Assertions.fail("not implemented");
-    }
-
-    default void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
-        Assertions.fail("not implemented");
-    }
-
-    default void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
-        Assertions.fail("not implemented");
-    }
-
-    default void get_shouldSpecificRecord_withFilter(){
-        Assertions.fail("not implemented");
-    }
-
-    default void getAll_shouldFetchAllRecords() throws SQLException {
-        Assertions.fail("not implemented");
-    }
-
-    default void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
-        Assertions.fail("not implemented");
-    }
-
-    default void getAll_shouldFetchAllRecords_withFilter(){
-        Assertions.fail("not implemented");
-    }
-
     static <X extends WithId> String basicFilteredSelectQuery(Class<X> ofClass) {
         return mySQLService(ofClass).filteredSelect().buildQueryString();
     }
-
 
     //todo finish the generic method below to "simplify" tests
     static <X extends WithId> void basicFilteredSelectTest(Class<X> ofClass) {
@@ -129,22 +76,22 @@ public interface ITestBase {
         List<FieldInfo> fieldInfos = fieldInfos(ofClass, new ArrayList<>(), ofClass, null);
         Iterator<FieldInfo> fieldInfoIterator = fieldInfos.iterator();
         StringBuilder expectedQueryBuilder = select();
-        while (fieldInfoIterator.hasNext()){
+        while (fieldInfoIterator.hasNext()) {
             FieldInfo fieldInfo = fieldInfoIterator.next();
-            if(fieldInfo.selectable()){
+            if (fieldInfo.selectable()) {
                 selectField(expectedQueryBuilder, lowercase(fieldInfo.tableName()), lowercase(fieldInfo.fieldName()));
-                if(fieldInfoIterator.hasNext()){
+                if (fieldInfoIterator.hasNext()) {
                     commaNewLine(expectedQueryBuilder);
                 }
             }
 
-            if(fieldInfo.joinedOn()){
+            if (fieldInfo.joinedOn()) {
                 joins.add(fieldInfo);
             }
 
-            if(!fieldInfoIterator.hasNext()){
+            if (!fieldInfoIterator.hasNext()) {
                 int lastIndex = expectedQueryBuilder.lastIndexOf(",");
-                if(lastIndex == expectedQueryBuilder.length()-2){
+                if (lastIndex == expectedQueryBuilder.length() - 2) {
                     expectedQueryBuilder.delete(lastIndex, expectedQueryBuilder.length());
                 }
             }
@@ -152,7 +99,7 @@ public interface ITestBase {
         from(tableName, expectedQueryBuilder);
 
         for (FieldInfo fieldInfo : joins) {
-            if(fieldInfo.childJoin() == null)
+            if (fieldInfo.childJoin() == null)
                 join(fieldInfo, expectedQueryBuilder);
             else {
                 System.out.println(fieldInfo);
@@ -286,7 +233,7 @@ public interface ITestBase {
     }
 
     private static List<FieldInfo> fieldInfos(Class<?> ofClass, ArrayList<Class<?>> observedClasses, Class<?> parentClass, Field nestedField) {
-        if(observedClasses.contains(ofClass)){
+        if (observedClasses.contains(ofClass)) {
             String fieldName = fieldName(nestedField, nestedField.getAnnotation(MySqlField.class));
             return List.of(new FieldInfo(mySQLService(parentClass).getTableName(), fieldName, true, mySQLService(ofClass).getTableName(), primaryFieldName(ofClass), primaryFieldName(parentClass), false, null));
         } else {
@@ -298,13 +245,13 @@ public interface ITestBase {
             for (Field field : fields) {
                 MySqlField mySqlField = field.getAnnotation(MySqlField.class);
                 Nested nested = field.getAnnotation(Nested.class);
-                if(nested != null || mySqlField != null) {
-                    if (nested != null){
+                if (nested != null || mySqlField != null) {
+                    if (nested != null) {
                         fieldInfos.addAll(fieldInfos(getNestedType(field), observedClasses, ofClass, field));
                     } else {
                         String fieldName = fieldName(field, mySqlField);
-                        if(!ofClass.equals(parentClass) && fieldName.equalsIgnoreCase(primaryFieldName)){
-                            if(isList(nestedField)){
+                        if (!ofClass.equals(parentClass) && fieldName.equalsIgnoreCase(primaryFieldName)) {
+                            if (isList(nestedField)) {
 //                                fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName));
                                 fieldInfos.add(new FieldInfo(mySQLService(ofClass).getTableName(), fieldName, true, mySQLService(parentClass).getTableName(), null, primaryFieldName(parentClass), true, new FieldInfo(mySQLService(parentClass).getTableName(), null)));
 
@@ -325,17 +272,15 @@ public interface ITestBase {
         }
     }
 
-
-
     private static String primaryFieldName(Class<?> ofClass) {
         for (Field declaredField : ofClass.getDeclaredFields()) {
             MySqlField mySqlField = declaredField.getAnnotation(MySqlField.class);
-            if(mySqlField!=null && mySqlField.primary()){
+            if (mySqlField != null && mySqlField.primary()) {
                 Nested nested = declaredField.getAnnotation(Nested.class);
-                if(nested == null) {
+                if (nested == null) {
                     return fieldName(declaredField, mySqlField);
                 } else {
-                    if(!isList(declaredField)) {
+                    if (!isList(declaredField)) {
                         return primaryFieldName(getNestedType(declaredField));
                     }
                 }
@@ -351,7 +296,7 @@ public interface ITestBase {
     }
 
     private static Class<?> getNestedType(Field nestedField) {
-        if(isList(nestedField)) {
+        if (isList(nestedField)) {
             return (Class<?>) ((ParameterizedType) nestedField.getGenericType()).getActualTypeArguments()[0];
         }
         return nestedField.getType();
@@ -359,21 +304,20 @@ public interface ITestBase {
 
     private static String nestingFieldName(Field field, String primaryFieldName) {
         MySqlField mySqlField = field.getAnnotation(MySqlField.class);
-        if(mySqlField==null || StringUtils.isBlank(mySqlField.column())){
+        if (mySqlField == null || StringUtils.isBlank(mySqlField.column())) {
             return mySQLService(field.getType()).getTableName().toLowerCase() + "_" + primaryFieldName;
         }
         return fieldName(field, mySqlField);
     }
+
     private static String fieldName(Field field, MySqlField mySqlField) {
         String fieldName = field.getName();
 
-        if(mySqlField!=null && StringUtils.isNotBlank(mySqlField.column())){
+        if (mySqlField != null && StringUtils.isNotBlank(mySqlField.column())) {
             fieldName = mySqlField.column();
         }
         return fieldName;
     }
-
-
 
     private static StringBuilder select() {
         return new StringBuilder("SELECT\t");
@@ -411,5 +355,57 @@ public interface ITestBase {
             insertedIDs.add(toInsert.getId());
         }
         return insertedIDs;
+    }
+
+    //    todo 2 copies of same method?
+    default void prepDb() throws SQLException, URISyntaxException, IOException {
+        prepareTestDB();
+    }
+
+    default <X> void initMySqlService(Class<X> forClass) {
+        if (!mySQLServiceMap.containsKey(forClass)) {
+            MySQLService<X> mySqlService = (MySQLService<X>) mySQLServiceProvider.provide(TypeLiteral.get(forClass));
+            mySQLServiceMap.put(forClass, mySqlService);
+        }
+    }
+
+    default void instanceOfT_shouldConvertMapToInstanceOfModel() {
+        Assertions.fail("not implemented");
+    }
+
+    default void filteredSelect_provideBasicQueryBuilder() {
+        Assertions.fail("not implemented");
+    }
+
+    default void save_shouldInsertNewRecord() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Assertions.fail("not implemented");
+    }
+
+    default void update_shouldUpdateExistingSpecificRecord() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        Assertions.fail("not implemented");
+    }
+
+    default void delete_shouldDeleteSpecificRecord() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, SQLException {
+        Assertions.fail("not implemented");
+    }
+
+    default void get_shouldFetchSpecificRecord_withQueryBuilder() throws SQLException {
+        Assertions.fail("not implemented");
+    }
+
+    default void get_shouldSpecificRecord_withFilter() {
+        Assertions.fail("not implemented");
+    }
+
+    default void getAll_shouldFetchAllRecords() throws SQLException {
+        Assertions.fail("not implemented");
+    }
+
+    default void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
+        Assertions.fail("not implemented");
+    }
+
+    default void getAll_shouldFetchAllRecords_withFilter() {
+        Assertions.fail("not implemented");
     }
 }

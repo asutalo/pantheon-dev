@@ -38,12 +38,12 @@ public class Student implements BaseStudent {
     @Override
     public String toString() {
         return "Student{" +
-               "id=" + id +
-               ", name='" + name + '\'' +
-               ", type=" + type +
-               ", diploma=" + diploma.getStudent().id +
-               ", courses=" + courses +
-               '}';
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", diploma=" + diploma.getStudent().id +
+                ", courses=" + courses +
+                '}';
     }
 
     @Override
@@ -70,12 +70,12 @@ public class Student implements BaseStudent {
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public void setName(String name) {
+        this.name = name;
     }
 }

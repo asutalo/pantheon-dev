@@ -57,7 +57,7 @@ class QueryBuilderTest {
     void buildSelectAllQuery() {
         String someOtherTable = "someOtherTable";
 
-        String expectedQuery = SelectAll.SELECT + FROM + SOME_TABLE + AS + SOME_TABLE.toLowerCase() + JOIN + someOtherTable + AS + someOtherTable.toLowerCase() + ON + SOME_TABLE.toLowerCase() + DOT + SOME_OTHER_KEY + EQUALS + someOtherTable.toLowerCase() + DOT + SOME_KEY + WHERE + SOME_WHERE_KEY + IS_VAL + AND+ SOME_OTHER_KEY + IS_VAL + QUERY_END;
+        String expectedQuery = SelectAll.SELECT + FROM + SOME_TABLE + AS + SOME_TABLE.toLowerCase() + JOIN + someOtherTable + AS + someOtherTable.toLowerCase() + ON + SOME_TABLE.toLowerCase() + DOT + SOME_OTHER_KEY + EQUALS + someOtherTable.toLowerCase() + DOT + SOME_KEY + WHERE + SOME_WHERE_KEY + IS_VAL + AND + SOME_OTHER_KEY + IS_VAL + QUERY_END;
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
@@ -100,7 +100,7 @@ class QueryBuilderTest {
 
     @Test
     void buildInsertQuery() {
-        String expectedQuery = INSERT + SOME_TABLE + COLUMNS_START + SOME_WHERE_KEY + Insert.DELIMITER + SOME_OTHER_KEY + COLUMNS_END + VALUES_START + PLACEHOLDER + Insert.DELIMITER+ PLACEHOLDER + VALUES_END + QUERY_END;
+        String expectedQuery = INSERT + SOME_TABLE + COLUMNS_START + SOME_WHERE_KEY + Insert.DELIMITER + SOME_OTHER_KEY + COLUMNS_END + VALUES_START + PLACEHOLDER + Insert.DELIMITER + PLACEHOLDER + VALUES_END + QUERY_END;
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
@@ -114,7 +114,7 @@ class QueryBuilderTest {
 
     @Test
     void buildUpdateQuery() {
-        String expectedQuery =  UPDATE + SOME_TABLE + SET + SOME_KEY + IS_VAL + Update.DELIMITER + SOME_OTHER_KEY + IS_VAL + WHERE + SOME_WHERE_KEY + IS_VAL + AND + ADDITIONAL_KEY + IS_VAL + QUERY_END;
+        String expectedQuery = UPDATE + SOME_TABLE + SET + SOME_KEY + IS_VAL + Update.DELIMITER + SOME_OTHER_KEY + IS_VAL + WHERE + SOME_WHERE_KEY + IS_VAL + AND + ADDITIONAL_KEY + IS_VAL + QUERY_END;
 
         MySqlValue mySqlValue = new MySqlValue(INT, SOME_KEY, 2);
         MySqlValue mySqlValue1 = new MySqlValue(INT, SOME_OTHER_KEY, 2);

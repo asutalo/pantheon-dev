@@ -32,7 +32,7 @@ public class FieldValueSetter<T> implements BiConsumer<Object, Object> {
     @Override
     public String toString() {
         return "FieldValueSetter{" +
-               "field=" + field +
-               '}';
+                "field=" + field +
+                '}';
     }
 }

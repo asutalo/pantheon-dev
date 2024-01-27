@@ -27,9 +27,9 @@ public class Type implements BaseType {
     @Override
     public String toString() {
         return "Type{" +
-               "id=" + id +
-               ", name='" + name + '\'' +
-               '}';
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override
@@ -56,12 +56,12 @@ public class Type implements BaseType {
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public void setName(String name) {
+        this.name = name;
     }
 }

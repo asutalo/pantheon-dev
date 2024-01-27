@@ -10,7 +10,7 @@ import com.mysql.cj.MysqlType;
 import java.util.List;
 import java.util.Objects;
 
-@Table(name="Student")
+@Table(name = "Student")
 public class StudentCN implements BaseStudent {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private int i;
@@ -40,12 +40,12 @@ public class StudentCN implements BaseStudent {
     @Override
     public String toString() {
         return "StudentCN{" +
-               "i=" + i +
-               ", n='" + n + '\'' +
-               ", t=" + t +
-               ", diploma=" + diplomaCN.getS().i +
-               ", courses=" + courses +
-               '}';
+                "i=" + i +
+                ", n='" + n + '\'' +
+                ", t=" + t +
+                ", diploma=" + diplomaCN.getS().i +
+                ", courses=" + courses +
+                '}';
     }
 
     @Override
@@ -72,12 +72,12 @@ public class StudentCN implements BaseStudent {
     }
 
     @Override
-    public void setName(String name) {
-        n = name;
+    public String getName() {
+        return n;
     }
 
     @Override
-    public String getName() {
-        return n;
+    public void setName(String name) {
+        n = name;
     }
 }

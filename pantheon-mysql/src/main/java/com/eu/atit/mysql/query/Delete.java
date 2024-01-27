@@ -23,7 +23,8 @@ public class Delete extends KeyWord implements QueryPart {
         return 0;
     }
 
-    @IgnoreCoverage@Override
+    @IgnoreCoverage
+    @Override
     public String toString() {
         return "Delete{}";
     }

@@ -47,10 +47,55 @@ public class ITest {
         new ProcessBuilder("cmd.exe", "/C", "docker-compose down").start().waitFor();
     }
 
+    private static <T extends ITestBase> Callable<T> callable(Class<T> tClass, Class<?>... setUpParams) {
+        return new Callable<>() {
+            @Override
+            public T call() throws Exception {
+                Constructor<T> declaredConstructor = tClass.getDeclaredConstructor();
+                T obj = declaredConstructor.newInstance();
+                Method setUp = tClass.getDeclaredMethod("setUp", Arrays.stream(setUpParams).map(x -> Class.class).toArray(Class[]::new));
+                setUp.setAccessible(true);
+                setUp.invoke(obj, (Object[]) setUpParams);
+
+                return obj;
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder();
+                sb.append(tClass.getSimpleName());
+                sb.append(": ");
+                Iterator<Class<?>> iterator = Arrays.stream(setUpParams).iterator();
+
+                while (iterator.hasNext()) {
+                    sb.append(iterator.next().getSimpleName());
+                    if (iterator.hasNext()) {
+                        sb.append(", ");
+                    }
+                }
+
+                return sb.toString();
+            }
+        };
+    }
+
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("Common tests")
     @Nested
     class CommonTests {
+        private static Stream<Callable<? extends ITestBase>> commonTestsProvider() {
+            return Stream.of(
+                    callable(ITestBaseStudent.class, Student.class, Type.class, Diploma.class, Course.class),
+                    callable(ITestBaseStudent.class, StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class),
+                    callable(ITestBaseType.class, Type.class),
+                    callable(ITestBaseType.class, TypeCN.class),
+                    callable(ITestBaseCourse.class, Course.class),
+                    callable(ITestBaseCourse.class, CourseCN.class),
+                    callable(ITestBaseDiploma.class, Diploma.class, Student.class, Type.class),
+                    callable(ITestBaseDiploma.class, DiplomaCN.class, StudentCN.class, TypeCN.class)
+            );
+        }
+
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
         void instanceOfT_shouldConvertMapToInstanceOfModel(Callable<? extends ITestBase> iTestBase) throws Exception {
@@ -127,50 +172,6 @@ public class ITest {
 
             testBase.getAll_shouldFetchAllRecords_withFilter();
         }
-
-        private static Stream<Callable<? extends ITestBase>> commonTestsProvider() {
-            return Stream.of(
-                    callable(ITestBaseStudent.class, Student.class, Type.class, Diploma.class, Course.class),
-                    callable(ITestBaseStudent.class, StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class),
-                    callable(ITestBaseType.class, Type.class),
-                    callable(ITestBaseType.class, TypeCN.class),
-                    callable(ITestBaseCourse.class, Course.class),
-                    callable(ITestBaseCourse.class, CourseCN.class),
-                    callable(ITestBaseDiploma.class, Diploma.class, Student.class, Type.class),
-                    callable(ITestBaseDiploma.class, DiplomaCN.class, StudentCN.class, TypeCN.class)
-            );
-        }
-    }
-    private static <T extends ITestBase> Callable <T> callable(Class<T> tClass, Class<?>... setUpParams) {
-        return new Callable<>() {
-            @Override
-            public T call() throws Exception {
-                Constructor<T> declaredConstructor = tClass.getDeclaredConstructor();
-                T obj = declaredConstructor.newInstance();
-                Method setUp = tClass.getDeclaredMethod("setUp", Arrays.stream(setUpParams).map(x -> Class.class).toArray(Class[]::new));
-                setUp.setAccessible(true);
-                setUp.invoke(obj, (Object[]) setUpParams);
-
-                return obj;
-            }
-
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append(tClass.getSimpleName());
-                sb.append(": ");
-                Iterator<Class<?>> iterator = Arrays.stream(setUpParams).iterator();
-
-                while (iterator.hasNext()) {
-                    sb.append(iterator.next().getSimpleName());
-                    if(iterator.hasNext()){
-                        sb.append(", ");
-                    }
-                }
-
-                return sb.toString();
-            }
-        };
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

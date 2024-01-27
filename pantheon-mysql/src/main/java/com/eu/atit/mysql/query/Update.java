@@ -14,12 +14,10 @@ import static com.eu.atit.mysql.query.KeyVal.IS_VAL;
 public class Update implements QueryPart {
     static final String UPDATE = "UPDATE ".concat("\t");
     static final String DELIMITER = "," + System.lineSeparator() + "\t\t";
+    static final String SET = System.lineSeparator().concat("SET\t\t");
     private final String tableName;
     private final List<MySqlValue> valuesForQuery;
     private final List<MySqlValue> valuesForParams;
-
-    static final String SET = System.lineSeparator().concat("SET\t\t");
-
     private final String updateDecorator;
 
 
@@ -90,10 +88,10 @@ public class Update implements QueryPart {
     @Override
     public String toString() {
         return "Update{" +
-               "tableName='" + tableName + '\'' +
-               ", valuesForQuery=" + valuesForQuery +
-               ", valuesForParams=" + valuesForParams +
-               ", updateDecorator='" + updateDecorator + '\'' +
-               '}';
+                "tableName='" + tableName + '\'' +
+                ", valuesForQuery=" + valuesForQuery +
+                ", valuesForParams=" + valuesForParams +
+                ", updateDecorator='" + updateDecorator + '\'' +
+                '}';
     }
 }

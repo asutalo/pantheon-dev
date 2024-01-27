@@ -8,7 +8,7 @@ class ResultSetToInstanceWithNesting<T> extends ResultSetToInstance<T> {
     private final List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters;
     private final Class<T> modelClass;
 
-    ResultSetToInstanceWithNesting(Instantiator<T> instantiator, List<SpecificFieldValueSetter<T>> specificFieldValueSetters, List<SpecificNestedFieldValueSetter<T>>specificNestedFieldValueSetters, Class<T> modelClass) {
+    ResultSetToInstanceWithNesting(Instantiator<T> instantiator, List<SpecificFieldValueSetter<T>> specificFieldValueSetters, List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters, Class<T> modelClass) {
         super(instantiator, specificFieldValueSetters);
         this.specificNestedFieldValueSetters = specificNestedFieldValueSetters;
         this.modelClass = modelClass;

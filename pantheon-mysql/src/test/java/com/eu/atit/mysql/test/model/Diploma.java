@@ -18,9 +18,9 @@ public final class Diploma {
     @Override
     public String toString() {
         return "Diploma{" +
-               "obtained=" + obtained +
-               ", student=" + student +
-               '}';
+                "obtained=" + obtained +
+                ", student=" + student +
+                '}';
     }
 
     Student getStudent() {

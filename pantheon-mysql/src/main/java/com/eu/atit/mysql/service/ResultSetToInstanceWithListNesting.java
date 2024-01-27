@@ -8,7 +8,7 @@ import java.util.Map;
 class ResultSetToInstanceWithListNesting<T> extends ResultSetToInstanceWithNesting<T> {
     private final FieldsMerger fieldsMerger;
 
-    ResultSetToInstanceWithListNesting(Instantiator<T> instantiator, List<SpecificFieldValueSetter<T>> specificFieldValueSetters, List<SpecificNestedFieldValueSetter<T>>specificNestedFieldValueSetters, Class<T> modelClass, FieldsMerger fieldsMerger) {
+    ResultSetToInstanceWithListNesting(Instantiator<T> instantiator, List<SpecificFieldValueSetter<T>> specificFieldValueSetters, List<SpecificNestedFieldValueSetter<T>> specificNestedFieldValueSetters, Class<T> modelClass, FieldsMerger fieldsMerger) {
         super(instantiator, specificFieldValueSetters, specificNestedFieldValueSetters, modelClass);
         this.fieldsMerger = fieldsMerger;
     }

@@ -25,13 +25,24 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MySQLServiceITest {
+    @Captor
+    ArgumentCaptor<QueryBuilder> queryBuilderCaptor;
     @Mock
     private MySqlClient mockMySqlClient;
     @InjectMocks
     private MySQLServiceProvider mySQLServiceProvider;
 
-    @Captor
-    ArgumentCaptor<QueryBuilder> queryBuilderCaptor;
+    private static String getAlias(Class<?> testClass, String fieldName) {
+        return testClass.getSimpleName().toLowerCase().concat("_").concat(fieldName);
+    }
+
+    private static String getSelector(Class<?> testClass, String fieldName) {
+        return testClass.getSimpleName().toLowerCase().concat(".").concat(fieldName);
+    }
+
+    private String getActualQuery(QueryBuilder actualQueryBuilder) {
+        return actualQueryBuilder.buildQueryString().replaceAll(System.lineSeparator(), " ").replaceAll("\\t", " ").replaceAll(" +", " ");
+    }
 
     @DisplayName("Non class specific methods")
     @Nested
@@ -489,7 +500,7 @@ public class MySQLServiceITest {
         private static final Class<Employee> EMPLOYEE_CLASS = Employee.class;
         private static final String EMPLOYEE_CLASS_NAME = EMPLOYEE_CLASS.getSimpleName();
         private static final String EMPLOYEE_CLASS_NAME_LOWERCASE = EMPLOYEE_CLASS_NAME.toLowerCase();
-
+        private static final String EMPLOYEE_BONUS_CLASS_NAME_LOWERCASE = EMPLOYEE_CLASS_NAME.toLowerCase();
         private static final String EMPLOYEE_ID = "employeeId";
         private static final String EMPLOYEE_NAME = "employeeName";
         private static final String SOME_EMPLOYEE_NAME = "someName";
@@ -511,7 +522,6 @@ public class MySQLServiceITest {
         private static final String EMPLOYEE_TYPE_NAME_ALIAS = getAlias(EMPLOYEE_TYPE_CLASS, EMPLOYEE_TYPE_NAME);
         private static final Class<EmployeeBonus> EMPLOYEE_BONUS_CLASS = EmployeeBonus.class;
         private static final String EMPLOYEE_BONUS_CLASS_NAME = EMPLOYEE_BONUS_CLASS.getSimpleName();
-        private static final String EMPLOYEE_BONUS_CLASS_NAME_LOWERCASE = EMPLOYEE_CLASS_NAME.toLowerCase();
         private static final String EMPLOYEE_BONUS_ID = "employee";
         private static final String EMPLOYEE_BONUS_AMOUNT = "amount";
         private static final int SOME_EMPLOYEE_BONUS_AMOUNT = 555;
@@ -781,10 +791,10 @@ public class MySQLServiceITest {
             @Override
             public String toString() {
                 return "Employee{" +
-                       "employeeId=" + employeeId +
-                       ", employeeName='" + employeeName + '\'' +
-                       ", employeeType=" + employeeType +
-                       '}';
+                        "employeeId=" + employeeId +
+                        ", employeeName='" + employeeName + '\'' +
+                        ", employeeType=" + employeeType +
+                        '}';
             }
         }
 
@@ -812,17 +822,5 @@ public class MySQLServiceITest {
                 return result;
             }
         }
-    }
-
-    private String getActualQuery(QueryBuilder actualQueryBuilder) {
-        return actualQueryBuilder.buildQueryString().replaceAll(System.lineSeparator(), " ").replaceAll("\\t", " ").replaceAll(" +", " ");
-    }
-
-    private static String getAlias(Class<?> testClass, String fieldName) {
-        return testClass.getSimpleName().toLowerCase().concat("_").concat(fieldName);
-    }
-
-    private static String getSelector(Class<?> testClass, String fieldName) {
-        return testClass.getSimpleName().toLowerCase().concat(".").concat(fieldName);
     }
 }

@@ -68,17 +68,17 @@ public class JoinInfo {
     @Override
     public String toString() {
         return "JoinInfo{" +
-               "targetTableName='" + targetTableName + '\'' +
-               ", targetTableAlias='" + targetTableAlias + '\'' +
-               ", targetId='" + targetId + '\'' +
-               ", sourceTableAlias='" + sourceTableAlias + '\'' +
-               ", sourceId='" + sourceId + '\'' +
-               ", columnNameAndAliases=" + columnNameAndAliases +
-               ", isListJoin=" + isListJoin +
-               ", hasAnyList=" + hasAnyList +
-               ", parent=" + parent +
-               ", child=" + child +
-               '}';
+                "targetTableName='" + targetTableName + '\'' +
+                ", targetTableAlias='" + targetTableAlias + '\'' +
+                ", targetId='" + targetId + '\'' +
+                ", sourceTableAlias='" + sourceTableAlias + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", columnNameAndAliases=" + columnNameAndAliases +
+                ", isListJoin=" + isListJoin +
+                ", hasAnyList=" + hasAnyList +
+                ", parent=" + parent +
+                ", child=" + child +
+                '}';
     }
 
     @Override

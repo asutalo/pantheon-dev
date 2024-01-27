@@ -7,10 +7,6 @@ import java.sql.Statement;
 import java.util.function.Function;
 
 class InsertQueryResultProcessorFunction implements Function<PreparedStatement, Integer> {
-    interface ResultProcessor {
-        Integer process(PreparedStatement preparedStatement) throws SQLException;
-    }
-
     @Override
     public Integer apply(PreparedStatement preparedStatement) {
         return execute(preparedStatement, executedStatement -> {
@@ -31,5 +27,9 @@ class InsertQueryResultProcessorFunction implements Function<PreparedStatement, 
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
         }
+    }
+
+    interface ResultProcessor {
+        Integer process(PreparedStatement preparedStatement) throws SQLException;
     }
 }

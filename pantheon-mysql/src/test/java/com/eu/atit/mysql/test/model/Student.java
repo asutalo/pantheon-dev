@@ -28,11 +28,11 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-               "id=" + id +
-               ", name='" + name + '\'' +
-               ", type=" + type +
-               ", diploma=" + diploma.getStudent().id +
-               ", courses=" + courses +
-               '}';
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", diploma=" + diploma.getStudent().id +
+                ", courses=" + courses +
+                '}';
     }
 }

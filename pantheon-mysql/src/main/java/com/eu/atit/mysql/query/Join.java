@@ -42,7 +42,7 @@ public class Join extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "Join{" +
-               "joinDecorator='" + joinDecorator +
-               '}';
+                "joinDecorator='" + joinDecorator +
+                '}';
     }
 }

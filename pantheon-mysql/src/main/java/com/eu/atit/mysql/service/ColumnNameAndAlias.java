@@ -25,7 +25,7 @@ public class ColumnNameAndAlias {
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (ColumnNameAndAlias) obj;
         return Objects.equals(this.columnName, that.columnName) &&
-               Objects.equals(this.alias, that.alias);
+                Objects.equals(this.alias, that.alias);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class ColumnNameAndAlias {
     @Override
     public String toString() {
         return "ColumnNameAndAlias[" +
-               "columnName=" + columnName + ", " +
-               "alias=" + alias + ']';
+                "columnName=" + columnName + ", " +
+                "alias=" + alias + ']';
     }
 
 }

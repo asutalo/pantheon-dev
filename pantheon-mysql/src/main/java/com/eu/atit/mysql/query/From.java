@@ -7,8 +7,8 @@ import java.util.Objects;
 import static com.eu.atit.mysql.query.SelectWithAliases.AS;
 
 public class From extends KeyWord implements QueryPart {
-    private final String decorator;
     static final String FROM = System.lineSeparator() + "FROM\t";
+    private final String decorator;
 
     public From(String tableName) {
         this.decorator = FROM.concat(tableName).concat(AS).concat(tableName.toLowerCase());
@@ -28,15 +28,17 @@ public class From extends KeyWord implements QueryPart {
         return Objects.equals(decorator, from.decorator);
     }
 
-    @IgnoreCoverage@Override
+    @IgnoreCoverage
+    @Override
     public int hashCode() {
         return Objects.hash(decorator);
     }
 
-    @IgnoreCoverage@Override
+    @IgnoreCoverage
+    @Override
     public String toString() {
         return "From{" +
-               "decorator='" + decorator + '\'' +
-               '}';
+                "decorator='" + decorator + '\'' +
+                '}';
     }
 }

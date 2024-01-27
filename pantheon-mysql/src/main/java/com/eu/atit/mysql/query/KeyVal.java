@@ -51,6 +51,7 @@ public class KeyVal implements QueryPart {
         if (targetType != keyVal.targetType) return false;
         return Objects.equals(keyValDecorator, keyVal.keyValDecorator);
     }
+
     @IgnoreCoverage
     @Override
     public int hashCode() {
@@ -65,10 +66,10 @@ public class KeyVal implements QueryPart {
     @Override
     public String toString() {
         return "KeyVal{" +
-               "value=" + value +
-               ", index=" + index +
-               ", targetType=" + targetType +
-               ", keyValDecorator='" + keyValDecorator + '\'' +
-               '}';
+                "value=" + value +
+                ", index=" + index +
+                ", targetType=" + targetType +
+                ", keyValDecorator='" + keyValDecorator + '\'' +
+                '}';
     }
 }

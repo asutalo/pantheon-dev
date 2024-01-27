@@ -29,8 +29,8 @@ public class CourseCN implements BaseCourse {
     @Override
     public String toString() {
         return "CourseCN[" +
-               "i=" + i + ", " +
-               "n=" + n + ']';
+                "i=" + i + ", " +
+                "n=" + n + ']';
     }
 
     @Override
@@ -52,12 +52,12 @@ public class CourseCN implements BaseCourse {
     }
 
     @Override
-    public void setName(String name) {
-        n = name;
+    public String getName() {
+        return n;
     }
 
     @Override
-    public String getName() {
-        return n;
+    public void setName(String name) {
+        n = name;
     }
 }

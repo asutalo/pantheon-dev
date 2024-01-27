@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class QueryBuilder {
+    static final String QUERY_END = ";";
     private static final String NONE = "";
     private static final String COMMA = ", ";
     private final List<QueryPart> queryParts = new ArrayList<>();
     private int paramIndex = 0;
-
-    static final String QUERY_END = ";";
 
     public void selectAll() {
         queryParts.add(new SelectAll());
@@ -110,6 +109,7 @@ public class QueryBuilder {
     void addQueryParts(List<QueryPart> queryParts) {
         this.queryParts.addAll(queryParts);
     }
+
     public List<KeyVal> getKeyValues() {
         return queryParts.stream().filter(queryPart -> queryPart instanceof KeyVal).map(queryPart -> (KeyVal) queryPart).collect(Collectors.toList());
     }
@@ -147,8 +147,8 @@ public class QueryBuilder {
     @Override
     public String toString() {
         return "QueryBuilder{" +
-               "queryParts=" + queryParts +
-               ", paramIndex=" + paramIndex +
-               '}';
+                "queryParts=" + queryParts +
+                ", paramIndex=" + paramIndex +
+                '}';
     }
 }

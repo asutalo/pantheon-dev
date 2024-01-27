@@ -9,7 +9,7 @@ import com.mysql.cj.MysqlType;
 
 import java.util.Objects;
 
-@Table(name="Diploma")
+@Table(name = "Diploma")
 public final class DiplomaCN implements BaseDiploma {
     @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
     private Boolean o;
@@ -28,9 +28,9 @@ public final class DiplomaCN implements BaseDiploma {
     @Override
     public String toString() {
         return "DiplomaCN{" +
-               "o=" + o +
-               ", s=" + s +
-               '}';
+                "o=" + o +
+                ", s=" + s +
+                '}';
     }
 
     @Override

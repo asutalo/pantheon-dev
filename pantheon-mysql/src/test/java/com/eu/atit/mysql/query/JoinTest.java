@@ -2,6 +2,7 @@ package com.eu.atit.mysql.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
@@ -20,9 +21,9 @@ class JoinTest {
     @Test
     void apply() {
         String query = "query";
-        String expectedQuery = query  + System.lineSeparator() +
-                               "JOIN someTable AS sometable"  + System.lineSeparator() +
-                               "\t\t\tON someothertable.someOtherKey = sometable.someKey";
+        String expectedQuery = query + System.lineSeparator() +
+                "JOIN someTable AS sometable" + System.lineSeparator() +
+                "\t\t\tON someothertable.someOtherKey = sometable.someKey";
 
         assertEquals(expectedQuery, join.apply(query));
     }

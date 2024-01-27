@@ -17,12 +17,11 @@ public class Insert implements QueryPart {
     static final String COLUMNS_END = ")".concat(System.lineSeparator());
     static final String VALUES_START = "VALUES".concat(System.lineSeparator()).concat("\t\t(");
     static final String VALUES_END = ")";
-
+    private static final String valuesDecorator = COLUMNS_END.concat(VALUES_START);
     private final List<MySqlValue> valuesForQuery;
     private final List<MySqlValue> valuesForParams;
-
     private final String insertIntoDecorator;
-    private static final String valuesDecorator = COLUMNS_END.concat(VALUES_START);;
+    ;
 
     public Insert(String tableName, LinkedList<MySqlValue> valuesForQuery) {
         this.valuesForQuery = new LinkedList<>(valuesForQuery);
@@ -94,10 +93,10 @@ public class Insert implements QueryPart {
     @Override
     public String toString() {
         return "Insert{" +
-               "valuesForQuery=" + valuesForQuery +
-               ", valuesForParams=" + valuesForParams +
-               ", insertIntoDecorator='" + insertIntoDecorator + '\'' +
-               ", valuesDecorator='" + valuesDecorator + '\'' +
-               '}';
+                "valuesForQuery=" + valuesForQuery +
+                ", valuesForParams=" + valuesForParams +
+                ", insertIntoDecorator='" + insertIntoDecorator + '\'' +
+                ", valuesDecorator='" + valuesDecorator + '\'' +
+                '}';
     }
 }

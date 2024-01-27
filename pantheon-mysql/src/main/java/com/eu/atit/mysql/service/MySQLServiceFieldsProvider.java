@@ -38,7 +38,7 @@ class MySQLServiceFieldsProvider {
 
     <T> String getTableName(Class<T> tClass) {
         Table table = tClass.getAnnotation(Table.class);
-        if(table == null)
+        if (table == null)
             return tClass.getSimpleName();
 
         return table.name();
@@ -139,7 +139,7 @@ class MySQLServiceFieldsProvider {
             nestedField.setAccessible(true);
 
             MySqlField mySqlField = nestedField.getAnnotation(MySqlField.class);
-            if(mySqlField.primary()){
+            if (mySqlField.primary()) {
                 nestedFieldsMySqlValues.add(new Pair<>(new NestedPrimaryFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
             } else {
                 nestedFieldsMySqlValues.add(new Pair<>(new NestedFieldMySqlValue(getPrimaryKeyFieldMySqlValue(nestedField.getType()), nestedField), fieldToFieldValueGetter(nestedField)));
@@ -496,10 +496,10 @@ class MySQLServiceFieldsProvider {
     }
 
     <T> MySqlValuesFilter<T> getMySqlValuesFilter(Class<T> modelClass) {
-        if(getNestedFieldsMySqlValue(modelClass).isEmpty()){
+        if (getNestedFieldsMySqlValue(modelClass).isEmpty()) {
             return new NonPrimaryMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass));
         } else {
-            if(getDeclaredPrimaryField(modelClass).getAnnotation(Nested.class)!=null)
+            if (getDeclaredPrimaryField(modelClass).getAnnotation(Nested.class) != null)
                 return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
 
             return new NonPrimaryNestedMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));

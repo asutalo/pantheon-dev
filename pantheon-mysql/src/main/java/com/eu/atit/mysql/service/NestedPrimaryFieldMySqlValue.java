@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
  */
 public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
     private final Field nestedPrimaryKeyField;
+
     public NestedPrimaryFieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field nestedPrimaryKeyField) {
         super();
         this.nestedPrimaryKeyField = nestedPrimaryKeyField;
@@ -28,7 +29,7 @@ public class NestedPrimaryFieldMySqlValue extends FieldMySqlValue {
         String fieldName = mySqlFieldInfo.column();
 
         if (fieldName.isBlank()) {
-            return nestedFieldName ;
+            return nestedFieldName;
         }
 
         return fieldName;

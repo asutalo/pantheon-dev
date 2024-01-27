@@ -30,9 +30,9 @@ class InsertTest {
         when(mockMySqlValue.getKey()).thenReturn("name").thenReturn("age");
 
         String expectedQuery = "INSERT INTO\tSOME_TABLE" + System.lineSeparator() +
-                               "\t\t(name, age)" + System.lineSeparator() +
-                               "VALUES" + System.lineSeparator() +
-                               "\t\t(?, ?)";
+                "\t\t(name, age)" + System.lineSeparator() +
+                "VALUES" + System.lineSeparator() +
+                "\t\t(?, ?)";
 
         assertEquals(expectedQuery, insert().apply(SOME_QUERY));
     }

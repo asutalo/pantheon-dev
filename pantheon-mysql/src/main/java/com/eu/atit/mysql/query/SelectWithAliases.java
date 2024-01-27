@@ -15,7 +15,7 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     static final String SEPARATOR = ",".concat(System.lineSeparator()).concat("\t\t");
     private final LinkedHashSet<ColumnNameAndAlias> columnsAndAliases;
 
-    public SelectWithAliases(LinkedHashSet <ColumnNameAndAlias> columnsAndAliases) {
+    public SelectWithAliases(LinkedHashSet<ColumnNameAndAlias> columnsAndAliases) {
         this.columnsAndAliases = columnsAndAliases;
     }
 
@@ -61,7 +61,7 @@ public class SelectWithAliases extends KeyWord implements QueryPart {
     @Override
     public String toString() {
         return "SelectWithAliases{" +
-               "columnsAndAliases=" + columnsAndAliases +
-               '}';
+                "columnsAndAliases=" + columnsAndAliases +
+                '}';
     }
 }

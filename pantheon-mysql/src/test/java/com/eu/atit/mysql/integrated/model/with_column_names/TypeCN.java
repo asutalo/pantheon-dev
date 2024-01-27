@@ -7,7 +7,7 @@ import com.mysql.cj.MysqlType;
 
 import java.util.Objects;
 
-@Table(name="Type")
+@Table(name = "Type")
 public class TypeCN implements BaseType {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
     private Integer i;
@@ -29,9 +29,9 @@ public class TypeCN implements BaseType {
     @Override
     public String toString() {
         return "TypeCN{" +
-               "i=" + i +
-               ", n='" + n + '\'' +
-               '}';
+                "i=" + i +
+                ", n='" + n + '\'' +
+                '}';
     }
 
     @Override
@@ -62,12 +62,12 @@ public class TypeCN implements BaseType {
     }
 
     @Override
-    public void setName(String name) {
-        n = name;
+    public String getName() {
+        return n;
     }
 
     @Override
-    public String getName() {
-        return n;
+    public void setName(String name) {
+        n = name;
     }
 }

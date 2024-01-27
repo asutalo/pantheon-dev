@@ -27,8 +27,8 @@ public class Course implements BaseCourse {
     @Override
     public String toString() {
         return "Course[" +
-               "id=" + id + ", " +
-               "name=" + name + ']';
+                "id=" + id + ", " +
+                "name=" + name + ']';
     }
 
     @Override
@@ -50,12 +50,12 @@ public class Course implements BaseCourse {
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public void setName(String name) {
+        this.name = name;
     }
 }

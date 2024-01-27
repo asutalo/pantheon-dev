@@ -56,11 +56,11 @@ public class ValKey implements QueryPart {
     @Override
     public String toString() {
         return "ValKey{" +
-               "value=" + value +
-               ", key='" + key + '\'' +
-               ", separator='" + separator + '\'' +
-               ", index=" + index +
-               ", targetType=" + targetType +
-               '}';
+                "value=" + value +
+                ", key='" + key + '\'' +
+                ", separator='" + separator + '\'' +
+                ", index=" + index +
+                ", targetType=" + targetType +
+                '}';
     }
 }

@@ -27,9 +27,9 @@ public final class Diploma implements BaseDiploma {
     @Override
     public String toString() {
         return "Diploma{" +
-               "obtained=" + obtained +
-               ", student=" + student +
-               '}';
+                "obtained=" + obtained +
+                ", student=" + student +
+                '}';
     }
 
     @Override
@@ -50,6 +50,11 @@ public final class Diploma implements BaseDiploma {
     }
 
     @Override
+    public <BS extends BaseStudent> void setStudent(BS student) {
+        this.student = (Student) student;
+    }
+
+    @Override
     public Boolean obtained() {
         return obtained;
     }
@@ -57,11 +62,6 @@ public final class Diploma implements BaseDiploma {
     @Override
     public void setObtained(Boolean obtained) {
         this.obtained = obtained;
-    }
-
-    @Override
-    public<BS extends BaseStudent> void setStudent(BS student) {
-        this.student = (Student) student;
     }
 
     @Override

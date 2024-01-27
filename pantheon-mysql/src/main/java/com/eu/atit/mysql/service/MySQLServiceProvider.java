@@ -9,14 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MySQLServiceProvider extends DataServiceProvider {
+    private final Map<TypeLiteral<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
+    private final Map<TypeLiteral<?>, MySQLModelDescriptor<?>> mySQLModelDescriptorMap = new HashMap<>();
+    private final MySQLServiceFieldsProvider serviceFieldProvider;
     public MySQLServiceProvider(DataClient dataClient) {
         super(dataClient);
         serviceFieldProvider = new MySQLServiceFieldsProvider();
     }
-
-    private final Map<TypeLiteral<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
-    private final Map<TypeLiteral<?>, MySQLModelDescriptor<?>> mySQLModelDescriptorMap = new HashMap<>();
-    private final MySQLServiceFieldsProvider serviceFieldProvider;
 
     @Override
     public MySQLService<?> provide(TypeLiteral<?> servingType) {
