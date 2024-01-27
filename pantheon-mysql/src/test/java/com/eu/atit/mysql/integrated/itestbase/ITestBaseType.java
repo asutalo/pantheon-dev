@@ -65,6 +65,11 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         getOneWithQueryBuilderTest(someTs, tClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
+        getOneWithFilterTest(someTs, tClass);
+    }
+
 
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getT("testTypeName");

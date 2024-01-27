@@ -28,6 +28,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
@@ -163,15 +164,34 @@ public interface ITestBase {
     }
 
     static <X extends WithId> void getOneWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
+            QueryBuilder filteredSelect = xMySQLService.filteredSelect();
+            filteredSelect.where();
+            filteredSelect.keyIsVal(new MySqlValue(MysqlType.INT, xMySQLService.getTableName().toLowerCase() + ".id", integer));
+            try {
+                return xMySQLService.get(filteredSelect);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    static <X extends WithId> void getOneWithFilterTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
+            try {
+                return xMySQLService.get(Map.of(xMySQLService.getTableName().toLowerCase() + ".id", integer));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static <X extends WithId> void insertAllAndVerifyOne(List<X> toInserts, Class<X> ofClass, BiFunction<Integer, MySQLService<X>, X> getActual)  throws SQLException {
         List<Integer> insertIds = insertAll(toInserts, ofClass);
+        Integer expectedId = insertIds.getFirst();
         MySQLService<X> xMySQLService = mySQLService(ofClass);
-        QueryBuilder filteredSelect = xMySQLService.filteredSelect();
-        filteredSelect.where();
 
-        Integer expectedId = insertIds.get(1);
-        filteredSelect.keyIsVal(new MySqlValue(MysqlType.INT, xMySQLService.getTableName().toLowerCase() + ".id", expectedId));
-        X actual = xMySQLService.get(filteredSelect);
-
+        X actual = getActual.apply(expectedId, xMySQLService);
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(expectedId, actual.getId());
     }
@@ -186,7 +206,7 @@ public interface ITestBase {
 
         List<X> matching = getAll(ofClass).stream().filter(s -> s.getId() == toUpdate.getId()).toList();
         Assertions.assertEquals(1, matching.size());
-        Assertions.assertEquals(matching.get(0).getName(), updatedName);
+        Assertions.assertEquals(matching.getFirst().getName(), updatedName);
     }
 
     static <X extends WithId> void deleteTest(X toDelete, Class<X> ofClass) throws SQLException {
@@ -387,7 +407,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void get_shouldSpecificRecord_withFilter() {
+    default void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
         Assertions.fail("not implemented");
     }
 

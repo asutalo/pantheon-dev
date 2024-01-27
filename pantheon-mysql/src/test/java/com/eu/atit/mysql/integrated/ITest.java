@@ -133,10 +133,9 @@ public class ITest {
 
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
-        void get_shouldSpecificRecord_withFilter(Callable<? extends ITestBase> iTestBase) throws Exception {
-            Assertions.fail();
+        void get_shouldFetchSpecificRecord_withFilter(Callable<? extends ITestBase> iTestBase) throws Exception {
             ITestBase testBase = iTestBase.call();
-            testBase.get_shouldSpecificRecord_withFilter();
+            testBase.get_shouldFetchSpecificRecord_withFilter();
         }
 
         @ParameterizedTest

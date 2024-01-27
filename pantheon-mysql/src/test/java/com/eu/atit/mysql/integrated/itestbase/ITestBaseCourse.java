@@ -66,6 +66,11 @@ public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
         getOneWithQueryBuilderTest(someCs, cClass);
     }
 
+    @Override
+    public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
+        getOneWithFilterTest(someCs, cClass);
+    }
+
 
     private C getC() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getC("testClassName");
