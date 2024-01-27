@@ -17,7 +17,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,9 +31,21 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class ITest {
+    @BeforeAll
+    static void setUp() throws IOException, InterruptedException {
+        new ProcessBuilder("cmd.exe", "/C", "docker-compose up --detach").start().waitFor();
+
+        Thread.sleep(5000);
+    }
+
+    @AfterAll
+    static void cleanUp() throws IOException, InterruptedException {
+        new ProcessBuilder("cmd.exe", "/C", "docker-compose down").start().waitFor();
+    }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("Common tests")
