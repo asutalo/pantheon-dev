@@ -8,6 +8,8 @@ import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 import java.util.List;
+import java.util.Objects;
+
 @Table(name="Student")
 public class StudentCN implements BaseStudent {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
@@ -44,6 +46,19 @@ public class StudentCN implements BaseStudent {
                ", diploma=" + diplomaCN.getS().i +
                ", courses=" + courses +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StudentCN studentCN = (StudentCN) o;
+        return i == studentCN.i && Objects.equals(n, studentCN.n) && Objects.equals(t, studentCN.t) && Objects.equals(diplomaCN, studentCN.diplomaCN) && Objects.equals(courses, studentCN.courses);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(i, n, t, diplomaCN, courses);
     }
 
     @Override

@@ -44,6 +44,7 @@ public interface ITestBase {
 
     MySQLServiceProvider mySQLServiceProvider = new MySQLServiceProvider(dataClient);
 
+//    todo 2 copies of same method?
     default void prepDb() throws SQLException, URISyntaxException, IOException {
         prepareTestDB();
     }
@@ -99,11 +100,11 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
+    default void getAll_shouldFetchAllRecords() throws SQLException {
         Assertions.fail("not implemented");
     }
 
-    default void getAll_shouldFetchAllRecords_withQueryBuilder(){
+    default void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
         Assertions.fail("not implemented");
     }
 
@@ -200,11 +201,7 @@ public interface ITestBase {
     static <X extends WithId> void getAllTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
         int startingCount = getAll(ofClass).size();
 
-        List<Integer> insertedIDs = new ArrayList<>();
-        for (X toInsert : toInserts) {
-            insert(toInsert, ofClass);
-            insertedIDs.add(toInsert.getId());
-        }
+        List<Integer> insertedIDs = insertAll(toInserts, ofClass);
 
         List<X> actualElements = getAll(ofClass);
         Assertions.assertEquals(toInserts.size(), actualElements.size() - startingCount);
@@ -213,6 +210,12 @@ public interface ITestBase {
 
         Assertions.assertEquals(toInserts.size(), matching.size());
         Assertions.assertEquals(insertedIDs, matching.stream().map(WithId::getId).toList());
+    }
+
+    static <X extends WithId> void getAllWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        insertAll(toInserts, ofClass);
+
+        Assertions.assertEquals(getAll(ofClass), mySQLService(ofClass).getAll(mySQLService(ofClass).filteredSelect()));
     }
 
     static <X extends WithId & WithName> void updateTest(X toUpdate, Class<X> ofClass, String updatedName) throws SQLException {
@@ -382,5 +385,14 @@ public interface ITestBase {
         stringBuilder.append(tableName);
         stringBuilder.append("_");
         stringBuilder.append(fieldName);
+    }
+
+    private static <X extends WithId> List<Integer> insertAll(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        List<Integer> insertedIDs = new ArrayList<>();
+        for (X toInsert : toInserts) {
+            insert(toInsert, ofClass);
+            insertedIDs.add(toInsert.getId());
+        }
+        return insertedIDs;
     }
 }

@@ -5,6 +5,8 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.annotations.Table;
 import com.mysql.cj.MysqlType;
 
+import java.util.Objects;
+
 @Table(name = "Course")
 public class CourseCN implements BaseCourse {
     @MySqlField(type = MysqlType.INT, primary = true, column = "id")
@@ -29,6 +31,19 @@ public class CourseCN implements BaseCourse {
         return "CourseCN[" +
                "i=" + i + ", " +
                "n=" + n + ']';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CourseCN courseCN = (CourseCN) o;
+        return Objects.equals(i, courseCN.i) && Objects.equals(n, courseCN.n);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(i, n);
     }
 
     @Override

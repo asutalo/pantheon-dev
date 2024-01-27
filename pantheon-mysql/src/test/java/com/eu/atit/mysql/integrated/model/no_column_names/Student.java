@@ -7,6 +7,7 @@ import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Student implements BaseStudent {
     @MySqlField(type = MysqlType.INT, primary = true)
@@ -43,6 +44,19 @@ public class Student implements BaseStudent {
                ", diploma=" + diploma.getStudent().id +
                ", courses=" + courses +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return id == student.id && Objects.equals(name, student.name) && Objects.equals(type, student.type) && Objects.equals(diploma, student.diploma) && Objects.equals(courses, student.courses);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, type, diploma, courses);
     }
 
     @Override

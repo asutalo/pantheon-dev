@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
@@ -20,6 +21,8 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     Class<T> tClass;
     Class<D> dClass;
     Class<C> cClass;
+
+    List<S> someSs = new ArrayList<>();
 
     private void initTEST_TYPE(Class<T> typeClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         TEST_TYPE = typeClass.getDeclaredConstructor(String.class).newInstance("testTypeName");
@@ -40,6 +43,8 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         initMySqlService(cClass);
 
         insert(TEST_TYPE, tClass);
+
+        someSs.addAll(List.of(getS("first"), getS("second"), getS("third")));
     }
 
     public void shouldFetchStudentWithDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -94,8 +99,13 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        getAllTest(List.of(getS("first"), getS("second"), getS("third")), sClass);
+    public void getAll_shouldFetchAllRecords() throws SQLException {
+        getAllTest(someSs, sClass);
+    }
+
+    @Override
+    public void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
+        getAllWithQueryBuilderTest(someSs, sClass);
     }
 
     private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {

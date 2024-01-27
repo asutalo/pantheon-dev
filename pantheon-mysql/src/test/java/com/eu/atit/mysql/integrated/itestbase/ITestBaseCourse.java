@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -21,14 +22,16 @@ import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
 
 public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
     Class<C> cClass;
+    List<C> someCs = new ArrayList<>();
 
 
-    public void setUp(Class<C> courseClass) throws SQLException, URISyntaxException, IOException {
+    public void setUp(Class<C> courseClass) throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         prepDb();
 
         cClass = courseClass;
 
         initMySqlService(cClass);
+        someCs.addAll(List.of(getC("first"), getC("second"), getC("third")));
     }
 
     @Override
@@ -57,8 +60,13 @@ public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        getAllTest(List.of(getC("first"), getC("second"), getC("third")), cClass);
+    public void getAll_shouldFetchAllRecords() throws SQLException {
+        getAllTest(someCs, cClass);
+    }
+
+    @Override
+    public void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
+        getAllWithQueryBuilderTest(someCs, cClass);
     }
 
     private C getC() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

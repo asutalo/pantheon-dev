@@ -7,6 +7,8 @@ import com.eu.atit.mysql.service.annotations.Table;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.mysql.cj.MysqlType;
 
+import java.util.Objects;
+
 @Table(name="Diploma")
 public final class DiplomaCN implements BaseDiploma {
     @MySqlField(type = MysqlType.BOOLEAN, column = "obtained")
@@ -29,6 +31,19 @@ public final class DiplomaCN implements BaseDiploma {
                "o=" + o +
                ", s=" + s +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object o1) {
+        if (this == o1) return true;
+        if (o1 == null || getClass() != o1.getClass()) return false;
+        DiplomaCN diplomaCN = (DiplomaCN) o1;
+        return Objects.equals(o, diplomaCN.o) && Objects.equals(s, diplomaCN.s);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(o, s);
     }
 
     StudentCN getS() {

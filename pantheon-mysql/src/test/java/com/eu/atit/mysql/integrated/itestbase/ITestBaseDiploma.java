@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
@@ -20,6 +21,7 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
     Class<S> sClass;
     Class<T> tClass;
 
+    List<D> someDs = new ArrayList<>();
 
     public void setUp(Class<D> diplomaClass, Class<S> studentClass, Class<T> typeClass) throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         prepDb();
@@ -34,6 +36,7 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
         initMySqlService(tClass);
 
         insert(TEST_TYPE, tClass);
+        someDs.addAll(List.of(getD(true), getD(false), getD(true)));
     }
 
     @Override
@@ -79,12 +82,17 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
 
         List<D> matching = getAll(dClass).stream().filter(s -> s.getId() == testDiploma.getId()).toList();
         Assertions.assertEquals(1, matching.size());
-        Assertions.assertEquals(matching.get(0).obtained(), updated);
+        Assertions.assertEquals(matching.getFirst().obtained(), updated);
     }
 
     @Override
-    public void getAll_shouldFetchAllRecords() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, SQLException {
-        getAllTest(List.of(getD(true), getD(false), getD(true)), dClass);
+    public void getAll_shouldFetchAllRecords() throws SQLException {
+        getAllTest(someDs, dClass);
+    }
+
+    @Override
+    public void getAll_shouldFetchAllRecords_withQueryBuilder() throws SQLException {
+        getAllWithQueryBuilderTest(someDs, dClass);
     }
 
     private D getD(S student, Boolean obtained) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
