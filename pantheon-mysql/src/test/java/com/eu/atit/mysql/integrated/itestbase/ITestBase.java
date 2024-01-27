@@ -29,6 +29,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
@@ -163,6 +165,12 @@ public interface ITestBase {
         Assertions.assertEquals(getAll(ofClass), xMySQLService.getAll(xMySQLService.filteredSelect()));
     }
 
+    static <X extends WithId> void getAllWithFilterTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
+        List<Integer> insertIds = insertAll(toInserts, ofClass);
+        MySQLService<X> xMySQLService = mySQLService(ofClass);
+        Assertions.assertEquals(getAll(ofClass).stream().filter(s -> s.getId() == insertIds.getFirst()).toList(), xMySQLService.getAll(Map.of(xMySQLService.getTableName().toLowerCase() + ".id", insertIds.getFirst())));
+    }
+
     static <X extends WithId> void getOneWithQueryBuilderTest(List<X> toInserts, Class<X> ofClass) throws SQLException {
         insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
             QueryBuilder filteredSelect = xMySQLService.filteredSelect();
@@ -186,7 +194,7 @@ public interface ITestBase {
         });
     }
 
-    private static <X extends WithId> void insertAllAndVerifyOne(List<X> toInserts, Class<X> ofClass, BiFunction<Integer, MySQLService<X>, X> getActual)  throws SQLException {
+    private static <X extends WithId> void insertAllAndVerifyOne(List<X> toInserts, Class<X> ofClass, BiFunction<Integer, MySQLService<X>, X> getActual) throws SQLException {
         List<Integer> insertIds = insertAll(toInserts, ofClass);
         Integer expectedId = insertIds.getFirst();
         MySQLService<X> xMySQLService = mySQLService(ofClass);
@@ -419,7 +427,7 @@ public interface ITestBase {
         Assertions.fail("not implemented");
     }
 
-    default void getAll_shouldFetchAllRecords_withFilter() {
+    default void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
         Assertions.fail("not implemented");
     }
 }

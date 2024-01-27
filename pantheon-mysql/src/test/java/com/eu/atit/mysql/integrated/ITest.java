@@ -156,9 +156,7 @@ public class ITest {
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
         void getAll_shouldFetchAllRecords_withFilter(Callable<? extends ITestBase> iTestBase) throws Exception {
-            Assertions.fail();
             ITestBase testBase = iTestBase.call();
-
             testBase.getAll_shouldFetchAllRecords_withFilter();
         }
     }

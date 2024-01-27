@@ -101,6 +101,11 @@ public class ITestBaseDiploma<D extends BaseDiploma, S extends BaseStudent, T ex
     }
 
     @Override
+    public void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
+        getAllWithFilterTest(someDs, dClass);
+    }
+
+    @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
         getOneWithFilterTest(someDs, dClass);
     }

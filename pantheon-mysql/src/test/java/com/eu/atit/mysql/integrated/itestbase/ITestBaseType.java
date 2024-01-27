@@ -66,6 +66,11 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
     }
 
     @Override
+    public void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
+        getAllWithFilterTest(someTs, tClass);
+    }
+
+    @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
         getOneWithFilterTest(someTs, tClass);
     }

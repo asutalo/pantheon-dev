@@ -67,6 +67,11 @@ public class ITestBaseCourse<C extends BaseCourse> implements ITestBase {
     }
 
     @Override
+    public void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
+        getAllWithFilterTest(someCs, cClass);
+    }
+
+    @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
         getOneWithFilterTest(someCs, cClass);
     }

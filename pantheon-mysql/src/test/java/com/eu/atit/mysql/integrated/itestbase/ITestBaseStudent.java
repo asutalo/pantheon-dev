@@ -114,6 +114,11 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     }
 
     @Override
+    public void getAll_shouldFetchAllRecords_withFilter() throws SQLException {
+        getAllWithFilterTest(someSs, sClass);
+    }
+
+    @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
         getOneWithFilterTest(someSs, sClass);
     }
