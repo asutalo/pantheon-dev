@@ -1,26 +1,20 @@
 package com.eu.atit.mysql.integrated;
 
 import com.eu.atit.mysql.integrated.itestbase.*;
-import com.eu.atit.mysql.integrated.model.no_column_names.Course;
-import com.eu.atit.mysql.integrated.model.no_column_names.Diploma;
-import com.eu.atit.mysql.integrated.model.no_column_names.Student;
-import com.eu.atit.mysql.integrated.model.no_column_names.Type;
-import com.eu.atit.mysql.integrated.model.with_column_names.CourseCN;
-import com.eu.atit.mysql.integrated.model.with_column_names.DiplomaCN;
-import com.eu.atit.mysql.integrated.model.with_column_names.StudentCN;
-import com.eu.atit.mysql.integrated.model.with_column_names.TypeCN;
+import com.eu.atit.mysql.integrated.model.no_column_names.*;
+import com.eu.atit.mysql.integrated.model.with_column_names.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -166,18 +160,38 @@ public class ITest {
     @Nested
     class NoColumnNamesStudentTests extends ITestBaseStudent<Student, Type, Diploma, Course> {
         @BeforeAll
-        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.setUp(Student.class, Type.class, Diploma.class, Course.class);
+        void setUp() throws SQLException, URISyntaxException, IOException {
+            super.setUpDb(Student.class, Type.class, Diploma.class, Course.class);
+            super.initMySqlService(StudentCourse.class);
         }
-
+        //todo dedupe in shouldFetchStudentWithDiploma method
         @Test
-        public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.shouldFetchStudentWithDiploma();
-        }
+        public void shouldFetchFullStudentObject() throws SQLException {
+            Type testType = new Type("some type");
+            List<Course> testCourses = List.of(new Course("some course"), new Course("some other course"));
+            ITestBase.insert(testType, Type.class);
+            Student testStudent = new Student("some student", testType, null, null);
+            ITestBase.insert(testStudent, Student.class);
 
-        @Test
-        public void shouldFetchStudentWithCourses() {
-            super.shouldFetchStudentWithCourses();
+            for (Course course : testCourses) {
+                ITestBase.insert(course, Course.class);
+                // facilitate 1:N connection
+                ITestBase.insert(new StudentCourse(testStudent.getId(), course.getId()), StudentCourse.class);
+            }
+
+            Diploma testDiploma = new Diploma(testStudent, true);
+            ITestBase.insert(testDiploma, Diploma.class);
+
+            //we initialised the student object with empty courses and diploma as they didn't exist at time of insertion
+            //existing courses will come back in reverse due to joining table not being sorted by keys so needs to be reversed to match 
+            testStudent.setCourses(testCourses.reversed());
+            testStudent.setDiploma(testDiploma);
+
+            List<Student> all = ITestBase.getAll(Student.class);
+            Assertions.assertEquals(1, all.size());
+
+            Student actual = all.getFirst();
+            Assertions.assertEquals(testStudent, actual);
         }
     }
 
@@ -186,18 +200,38 @@ public class ITest {
     @Nested
     class WithColumnNamesStudentTests extends ITestBaseStudent<StudentCN, TypeCN, DiplomaCN, CourseCN> {
         @BeforeAll
-        void setUp() throws SQLException, URISyntaxException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.setUp(StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class);
+        void setUp() throws SQLException, URISyntaxException, IOException {
+            super.setUpDb(StudentCN.class, TypeCN.class, DiplomaCN.class, CourseCN.class);
+            super.initMySqlService(StudentCourseCN.class);
         }
 
         @Test
-        public void shouldFetchStudentWithDiploma() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-            super.shouldFetchStudentWithDiploma();
-        }
+        public void shouldFetchFullStudentObject() throws SQLException {
+            TypeCN testType = new TypeCN("some type");
+            List<CourseCN> testCourses = List.of(new CourseCN("some course"), new CourseCN("some other course"));
+            ITestBase.insert(testType, TypeCN.class);
+            StudentCN testStudent = new StudentCN("some student", testType, null, null);
+            ITestBase.insert(testStudent, StudentCN.class);
 
-        @Test
-        public void shouldFetchStudentWithCourses()  {
-            super.shouldFetchStudentWithCourses();
+            for (CourseCN course : testCourses) {
+                ITestBase.insert(course, CourseCN.class);
+                // facilitate 1:N connection
+                ITestBase.insert(new StudentCourseCN(testStudent.getId(), course.getId()), StudentCourseCN.class);
+            }
+
+            DiplomaCN testDiploma = new DiplomaCN(testStudent, true);
+            ITestBase.insert(testDiploma, DiplomaCN.class);
+
+            //we initialised the student object with empty courses and diploma as they didn't exist at time of insertion
+            //existing courses will come back in reverse due to joining table not being sorted by keys so needs to be reversed to match 
+            testStudent.setCourses(testCourses.reversed());
+            testStudent.setDiploma(testDiploma);
+
+            List<StudentCN> all = ITestBase.getAll(StudentCN.class);
+            Assertions.assertEquals(1, all.size());
+
+            StudentCN actual = all.getFirst();
+            Assertions.assertEquals(testStudent, actual);
         }
     }
 

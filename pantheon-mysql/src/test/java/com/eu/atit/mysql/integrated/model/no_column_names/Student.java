@@ -42,13 +42,17 @@ public class Student implements BaseStudent {
 
     @Override
     public String toString() {
-        return "Student{" +
+        String s = "Student{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", type=" + type +
-                ", diploma=" + diploma.getStudent().id +
-                ", courses=" + courses +
-                '}';
+                ", type=" + type;
+        if (diploma != null) {
+            s += ", diploma=" + diploma;
+        } else {
+            s += ", diploma=null";
+        }
+        return s + (", courses=" + courses +
+                '}');
     }
 
     @Override

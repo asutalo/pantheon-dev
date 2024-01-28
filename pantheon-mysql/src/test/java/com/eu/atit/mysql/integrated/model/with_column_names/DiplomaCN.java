@@ -29,7 +29,7 @@ public final class DiplomaCN implements BaseDiploma {
     public String toString() {
         return "DiplomaCN{" +
                 "o=" + o +
-                ", s=" + s +
+                ", s.id=" + s.getId() +
                 '}';
     }
 
@@ -38,7 +38,7 @@ public final class DiplomaCN implements BaseDiploma {
         if (this == o1) return true;
         if (o1 == null || getClass() != o1.getClass()) return false;
         DiplomaCN diplomaCN = (DiplomaCN) o1;
-        return Objects.equals(o, diplomaCN.o) && Objects.equals(s, diplomaCN.s);
+        return Objects.equals(o, diplomaCN.o) && Objects.equals(s.getId(), diplomaCN.s.getId());
     }
 
     @Override

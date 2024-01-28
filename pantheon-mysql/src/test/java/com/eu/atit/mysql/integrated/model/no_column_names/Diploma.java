@@ -28,7 +28,7 @@ public final class Diploma implements BaseDiploma {
     public String toString() {
         return "Diploma{" +
                 "obtained=" + obtained +
-                ", student=" + student +
+                ", student.id=" + student.getId() +
                 '}';
     }
 
@@ -37,7 +37,7 @@ public final class Diploma implements BaseDiploma {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Diploma diploma = (Diploma) o;
-        return Objects.equals(obtained, diploma.obtained) && Objects.equals(student, diploma.student);
+        return Objects.equals(obtained, diploma.obtained) && Objects.equals(student.getId(), diploma.student.getId());
     }
 
     @Override

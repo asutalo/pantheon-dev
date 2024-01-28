@@ -44,11 +44,18 @@ public class StudentCN implements BaseStudent {
 
     @Override
     public String toString() {
-        return "StudentCN{" +
+        String s = "StudentCN{" +
                 "i=" + i +
                 ", n='" + n + '\'' +
-                ", t=" + t +
-                ", diploma=" + diplomaCN.getS().i +
+                ", t=" + t;
+
+        if (diplomaCN != null) {
+            s += ", diplomaCN=" + diplomaCN;
+        } else {
+            s += ", diplomaCN=null";
+        }
+
+        return s +
                 ", courses=" + courses +
                 '}';
     }

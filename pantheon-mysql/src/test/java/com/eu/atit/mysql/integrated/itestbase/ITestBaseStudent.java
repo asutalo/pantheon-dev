@@ -29,24 +29,29 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
     }
 
     public void setUp(Class<S> studentClass, Class<T> typeClass, Class<D> diplomaClass, Class<C> courseClass) throws SQLException, URISyntaxException, IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        setUpDb(studentClass, typeClass, diplomaClass, courseClass);
+
+        initTEST_TYPE(typeClass);
+        insert(TEST_TYPE, tClass);
+
+        someSs.addAll(List.of(getS("first"), getS("second"), getS("third")));
+    }
+
+    public void setUpDb(Class<S> studentClass, Class<T> typeClass, Class<D> diplomaClass, Class<C> courseClass) throws SQLException, URISyntaxException, IOException {
         prepDb();
 
         sClass = studentClass;
         tClass = typeClass;
         dClass = diplomaClass;
         cClass = courseClass;
-        initTEST_TYPE(typeClass);
 
         initMySqlService(sClass);
         initMySqlService(tClass);
         initMySqlService(dClass);
         initMySqlService(cClass);
-
-        insert(TEST_TYPE, tClass);
-
-        someSs.addAll(List.of(getS("first"), getS("second"), getS("third")));
     }
 
+    //todo repurpose for two new tests
     public void shouldFetchStudentWithDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int startingStudentCount = getAll(sClass).size();
 
