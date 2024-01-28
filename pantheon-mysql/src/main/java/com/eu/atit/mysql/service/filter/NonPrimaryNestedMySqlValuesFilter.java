@@ -8,6 +8,8 @@ import com.eu.atit.pantheon.helper.Pair;
 import java.util.LinkedList;
 import java.util.List;
 
+//todo rename as it can be primary as well if primary.known == true
+//actually, this one might be valid as in here the primary key is indeed NOT nested... still confusing
 public class NonPrimaryNestedMySqlValuesFilter<T> extends NonPrimaryMySqlValuesFilter<T> {
     private final List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldMySqlValues;
 

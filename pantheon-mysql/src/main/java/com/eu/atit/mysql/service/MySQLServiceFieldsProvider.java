@@ -125,6 +125,18 @@ class MySQLServiceFieldsProvider {
         return getters;
     }
 
+    <T> List<FieldMySqlValue> getFieldMySqlValues(Class<T> tClass) {
+        List<FieldMySqlValue> getters = new ArrayList<>();
+
+        for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
+            if (!isPrimary(field) || isPrimaryKeyValueKnown(field)) {
+                getters.add(fieldToFieldMySqlValue(tClass, field));
+            }
+        }
+
+        return getters;
+    }
+
     <T> List<Pair<FieldMySqlValue, FieldValueGetter>> getNestedFieldsMySqlValue(Class<T> tClass) {//todo wtf are these
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
         List<Field> fields = getDeclaredNestedMySqlFields(tClass);
@@ -404,6 +416,10 @@ class MySQLServiceFieldsProvider {
         return annotation != null && annotation.primary();
     }
 
+    private boolean isPrimaryKeyValueKnown(Field field) {
+        return isPrimary(field) && field.getAnnotation(MySqlField.class).known();
+    }
+
     //todo expand to support infinite nesting, right now it's only 1 level deep
     private List<ColumnNameAndAlias> getColumnNameAndAliases(Nested nestingInfo, Class<?> targetClass, String targetTableLowercase) {
         List<ColumnNameAndAlias> columnNameAndAliases;
@@ -490,12 +506,12 @@ class MySQLServiceFieldsProvider {
 
     <T> MySqlValuesFilter<T> getMySqlValuesFilter(Class<T> modelClass) {
         if (getNestedFieldsMySqlValue(modelClass).isEmpty()) {
-            return new NonPrimaryMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass));
+            return new NonPrimaryMySqlValuesFilter<>(getFieldMySqlValues(modelClass));
         } else {
             if (getDeclaredPrimaryField(modelClass).getAnnotation(Nested.class) != null)
                 return new MySqlValuesFilterWithNestedPrimaryKey<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
 
-            return new NonPrimaryNestedMySqlValuesFilter<>(getNonPrimaryKeyFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
+            return new NonPrimaryNestedMySqlValuesFilter<>(getFieldMySqlValues(modelClass), getNestedFieldsMySqlValue(modelClass));
         }
     }
 

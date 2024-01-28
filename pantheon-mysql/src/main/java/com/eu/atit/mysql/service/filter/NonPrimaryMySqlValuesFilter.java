@@ -6,6 +6,7 @@ import com.eu.atit.mysql.service.FieldMySqlValue;
 import java.util.LinkedList;
 import java.util.List;
 
+//todo rename as it can be primary as well if primary.known == true
 public class NonPrimaryMySqlValuesFilter<T> extends MySqlValuesFilter<T> {
     private final List<FieldMySqlValue> nonPrimaryKeyFieldMySqlValues;
 

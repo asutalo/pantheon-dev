@@ -1,9 +1,11 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.mysql.service.filter.MySqlValuesFilter;
 import com.eu.atit.pantheon.annotation.data.Nested;
 import com.google.inject.TypeLiteral;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +47,8 @@ public class MySQLModelDescriptor<T> {
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         mySqlValuesFilter = mySQLServiceFieldsProvider.getMySqlValuesFilter(modelClass);
 
-        if (primaryKeyFieldValueSetter.getField().getAnnotation(Nested.class) == null) {
+        Field primaryField = primaryKeyFieldValueSetter.getField();
+        if (primaryField.getAnnotation(Nested.class) == null && !primaryField.getAnnotation(MySqlField.class).known()) {
             insertionExecutor = (queryBuilder, mySqlClient, toInsert) -> getPrimaryKeyFieldValueSetter().accept(toInsert, mySqlClient.executeInsertQuery(queryBuilder));
         } else {
             insertionExecutor = (queryBuilder, mySqlClient, toInsert) -> mySqlClient.executeInsertQueryWithKnownPrimaryKey(queryBuilder);
