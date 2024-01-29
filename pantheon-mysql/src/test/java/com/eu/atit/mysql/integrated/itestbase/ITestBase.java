@@ -10,6 +10,7 @@ import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.TypeLiteral;
 import com.mysql.cj.MysqlType;
 import org.junit.jupiter.api.Assertions;
@@ -242,6 +243,14 @@ public interface ITestBase {
         Assertions.assertEquals(0, matching.size());
     }
 
+    static <X> String toFieldName(Class<X> ofClass, String field) {
+        return ofClass.getSimpleName().toLowerCase() + "_" + field;
+    }
+
+    static <X> X init(Class<X> ofClass, Map<String, Object> from) {
+        return mySQLService(ofClass).instanceOfT(from);
+    }
+
     private static <X> MySQLService<X> mySQLService(Class<X> ofClass) {
         return (MySQLService<X>) mySQLServiceMap.get(ofClass);
     }
@@ -403,7 +412,7 @@ public interface ITestBase {
         }
     }
 
-    default void instanceOfT_shouldConvertMapToInstanceOfModel() {
+    default void instanceOfT_shouldConvertMapToInstanceOfModel() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Assertions.fail("not implemented");
     }
 

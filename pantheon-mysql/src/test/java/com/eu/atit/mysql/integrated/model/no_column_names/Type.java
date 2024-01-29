@@ -15,7 +15,7 @@ public class Type implements BaseType {
     public Type() {
     }
 
-    public Type(int id, String name) {
+    public Type(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -13,7 +13,7 @@ class FieldValueSetterTest extends DomainsTestBase {
         SimpleTestClass simpleTestClass = new SimpleTestClass();
         Field testField = getField();
 
-        new FieldValueSetter<>(testField).accept(simpleTestClass, expected);
+        new FieldValueSetter(testField).accept(simpleTestClass, expected);
         int actual = simpleTestClass.getVal();
 
         Assertions.assertNotEquals(START_VALUE, actual);
@@ -25,6 +25,6 @@ class FieldValueSetterTest extends DomainsTestBase {
         SimpleTestClass simpleTestClass = new SimpleTestClass();
         Field testField = getField();
 
-        Assertions.assertThrows(RuntimeException.class, () -> new FieldValueSetter<>(testField).accept(simpleTestClass, "notApplicable"));
+        Assertions.assertThrows(RuntimeException.class, () -> new FieldValueSetter(testField).accept(simpleTestClass, "notApplicable"));
     }
 }

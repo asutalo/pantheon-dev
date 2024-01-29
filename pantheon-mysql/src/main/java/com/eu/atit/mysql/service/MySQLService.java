@@ -102,17 +102,18 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
      * */
     @Override
     public T instanceOfT(Map<String, Object> values) {
-        //todo does not support nesting atm
-        T instance = mySQLModelDescriptor.getInstantiator().get();
-
-        values.forEach((key, val) -> {
-            FieldValueSetter<T> fieldValueSetter = mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key);
-            if (fieldValueSetter != null) {
-                fieldValueSetter.accept(instance, val);
-            }
-        });
-
-        return instance;
+        return fullInstanceOfT(values);
+//        //todo does not support nesting atm
+//        T instance = mySQLModelDescriptor.getInstantiator().get();
+//
+//        values.forEach((key, val) -> {
+//            FieldValueSetter fieldValueSetter = mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key);
+//            if (fieldValueSetter != null) {
+//                fieldValueSetter.accept(instance, val);
+//            }
+//        });
+//
+//        return instance;
     }
 
     private QueryBuilder filteredSelect(Map<String, Object> filter) {

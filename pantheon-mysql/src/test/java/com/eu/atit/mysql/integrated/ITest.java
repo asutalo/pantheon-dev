@@ -83,7 +83,6 @@ public class ITest {
         @ParameterizedTest
         @MethodSource("commonTestsProvider")
         void instanceOfT_shouldConvertMapToInstanceOfModel(Callable<? extends ITestBase> iTestBase) throws Exception {
-            Assertions.fail();
             ITestBase testBase = iTestBase.call();
             testBase.instanceOfT_shouldConvertMapToInstanceOfModel();
         }

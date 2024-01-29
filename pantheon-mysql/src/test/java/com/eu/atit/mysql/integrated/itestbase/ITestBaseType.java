@@ -1,14 +1,20 @@
 package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.integrated.model.base.BaseType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
 
@@ -75,6 +81,17 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         getOneWithFilterTest(someTs, tClass);
     }
 
+    @Override
+    public void instanceOfT_shouldConvertMapToInstanceOfModel() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        String someName = "someName";
+        int someId = 1;
+        T expected = tClass.getDeclaredConstructor(Integer.class, String.class).newInstance(someId, someName);
+
+        Map<String, Object> fieldsAndValues = Map.of(toFieldName(tClass, "id"), someId, toFieldName(tClass, "name"), someName);
+
+        T actual = init(tClass, fieldsAndValues);
+        Assertions.assertEquals(expected, actual);
+    }
 
     private T getT() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return getT("testTypeName");

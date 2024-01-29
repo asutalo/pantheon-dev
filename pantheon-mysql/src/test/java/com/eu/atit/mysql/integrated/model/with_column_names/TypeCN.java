@@ -17,7 +17,7 @@ public class TypeCN implements BaseType {
     public TypeCN() {
     }
 
-    public TypeCN(int i, String n) {
+    public TypeCN(Integer i, String n) {
         this.i = i;
         this.n = n;
     }
