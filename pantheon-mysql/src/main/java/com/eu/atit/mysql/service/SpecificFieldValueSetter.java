@@ -7,16 +7,16 @@ import java.util.function.BiConsumer;
 class SpecificFieldValueSetter<T> implements BiConsumer<Object, Map<String, Object>> {
     private final String fieldName;
     private final String aliasFieldName;
-    private final FieldValueSetter<T> fieldValueSetter;
+    private final FieldValueSetter fieldValueSetter;
 
     SpecificFieldValueSetter(Field fieldToSet, String tableName) {
         fieldName = fieldToSet.getName();
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        fieldValueSetter = new FieldValueSetter(fieldToSet);
         aliasFieldName = alias(fieldName, tableName);
     }
 
     SpecificFieldValueSetter(Field fieldToSet, String fieldName, String tableName) {
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        fieldValueSetter = new FieldValueSetter(fieldToSet);
         this.fieldName = fieldName;
         aliasFieldName = alias(fieldName, tableName);
     }

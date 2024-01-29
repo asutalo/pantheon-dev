@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSetter<T> {
-    private final FieldValueSetter<T> fieldValueSetter;
+    private final FieldValueSetter fieldValueSetter;
     private final ResultSetToInstance<?> resultSetToInstance;
     private final Type actualTypeArgument;
 
     SpecificNestedListFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
         super(fieldToSet, resultSetToInstance, instantiator, primaryKeyValueSetter);
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        fieldValueSetter = new FieldValueSetter(fieldToSet);
         this.resultSetToInstance = resultSetToInstance;
         Type genericType = fieldToSet.getGenericType();
         actualTypeArgument = ((ParameterizedType) genericType).getActualTypeArguments()[0];

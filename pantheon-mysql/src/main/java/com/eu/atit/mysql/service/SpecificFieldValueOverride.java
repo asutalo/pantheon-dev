@@ -4,12 +4,12 @@ import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 
 class SpecificFieldValueOverride<T> implements BiConsumer<T, T> {
-    final FieldValueSetter<T> fieldValueSetter;
+    final FieldValueSetter fieldValueSetter;
     final FieldValueGetter fieldValueGetter;
 
     SpecificFieldValueOverride(Field fieldToSet) {
         fieldValueGetter = new FieldValueGetter(fieldToSet);
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        fieldValueSetter = new FieldValueSetter(fieldToSet);
     }
 
     @Override

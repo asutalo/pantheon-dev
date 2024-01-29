@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 /**
  * Function to set a value into an instance of an object
  */
-public class FieldValueSetter<T> implements BiConsumer<Object, Object> {
+public class FieldValueSetter implements BiConsumer<Object, Object> {
     private final Field field;
 
     /**

@@ -17,7 +17,7 @@ public class MySQLModelDescriptor<T> {
      * only used to set ID on the pojo which is returned from here
      * enables us to set an exact value directly onto the primary key, i.e. int obtained as a result of an insert statement
      * */
-    private final FieldValueSetter<T> primaryKeyFieldValueSetter;
+    private final FieldValueSetter primaryKeyFieldValueSetter;
 
     // converts only primary key into MySqlValue
     private final FieldMySqlValue primaryKeyFieldMySqlValue;
@@ -26,7 +26,7 @@ public class MySQLModelDescriptor<T> {
     private final Map<String, FieldMySqlValue> aliasFieldMySqlValueMap = new HashMap<>();
 
     //todo obsolete
-    private final Map<String, FieldValueSetter<T>> allExceptPrimaryFieldValueSetterMap; //todo replace will list of ALL setters
+    private final Map<String, FieldValueSetter> allExceptPrimaryFieldValueSetterMap; //todo replace will list of ALL setters
 
     private final FilteredSelect filteredSelect;
 
@@ -71,11 +71,11 @@ public class MySQLModelDescriptor<T> {
         return aliasFieldMySqlValueMap;
     }
 
-    Map<String, FieldValueSetter<T>> getAllExceptPrimaryFieldValueSetterMap() {
+    Map<String, FieldValueSetter> getAllExceptPrimaryFieldValueSetterMap() {
         return allExceptPrimaryFieldValueSetterMap;
     }
 
-    FieldValueSetter<T> getPrimaryKeyFieldValueSetter() {
+    FieldValueSetter getPrimaryKeyFieldValueSetter() {
         return primaryKeyFieldValueSetter;
     }
 

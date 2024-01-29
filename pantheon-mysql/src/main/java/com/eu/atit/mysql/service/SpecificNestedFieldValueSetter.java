@@ -7,11 +7,11 @@ import java.util.Map;
 class SpecificNestedFieldValueSetter<T> {
     final Instantiator<?> instantiator;
     final SpecificFieldValueSetter<?> primaryKeyValueSetter;
-    private final FieldValueSetter<T> fieldValueSetter;
+    private final FieldValueSetter fieldValueSetter;
     private final ResultSetToInstance<?> resultSetToInstance;
 
     SpecificNestedFieldValueSetter(Field fieldToSet, ResultSetToInstance<?> resultSetToInstance, Instantiator<?> instantiator, SpecificFieldValueSetter<?> primaryKeyValueSetter) {
-        fieldValueSetter = new FieldValueSetter<>(fieldToSet);
+        fieldValueSetter = new FieldValueSetter(fieldToSet);
         this.resultSetToInstance = resultSetToInstance;
         this.instantiator = instantiator;
         this.primaryKeyValueSetter = primaryKeyValueSetter;

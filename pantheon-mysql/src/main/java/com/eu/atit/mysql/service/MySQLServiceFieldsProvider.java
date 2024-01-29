@@ -51,15 +51,15 @@ class MySQLServiceFieldsProvider {
         }
     }
 
-    <T> FieldValueSetter<T> getPrimaryKeyFieldValueSetter(Class<T> tClass) {
+    <T> FieldValueSetter getPrimaryKeyFieldValueSetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         field.setAccessible(true);
-        return new FieldValueSetter<>(field);
+        return new FieldValueSetter(field);
     }
 
     //todo does not work for nesting
-    <T> Map<String, FieldValueSetter<T>> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
-        Map<String, FieldValueSetter<T>> nonPrimaryFieldValueSetterMap = new HashMap<>();
+    <T> Map<String, FieldValueSetter> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
+        Map<String, FieldValueSetter> nonPrimaryFieldValueSetterMap = new HashMap<>();
 
         for (Field field : tClass.getDeclaredFields()) {
             field.setAccessible(true);
@@ -67,10 +67,10 @@ class MySQLServiceFieldsProvider {
 
             if (mySqlFieldInfo != null) {
                 if (!mySqlFieldInfo.primary()) {
-                    nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter<>(field));
+                    nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter(field));
+                } else {
+                    nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter(field));
                 }
-            } else {
-                nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter<>(field));
             }
         }
 
@@ -257,7 +257,7 @@ class MySQLServiceFieldsProvider {
             } else {
                 crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(f));
             }
-            return new FieldsMergerDTO(new FieldValueSetter<>(f), crossroads);
+            return new FieldsMergerDTO(new FieldValueSetter(f), crossroads);
         }).toList();
     }
 

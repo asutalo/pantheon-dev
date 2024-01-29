@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.function.Function;
 
 public class FieldsMergerDTO {
-    private final FieldValueSetter<Object> fieldValueSetter;
+    private final FieldValueSetter fieldValueSetter;
     private final Function<List<Object>, Object> crossroads;
 
-    public FieldsMergerDTO(FieldValueSetter<Object> fieldValueSetter, Crossroads crossroads) {
+    public FieldsMergerDTO(FieldValueSetter fieldValueSetter, Crossroads crossroads) {
         this.fieldValueSetter = fieldValueSetter;
         this.crossroads = crossroads;
     }
 
-    public FieldValueSetter<Object> fieldValueSetter() {
+    public FieldValueSetter fieldValueSetter() {
         return fieldValueSetter;
     }
 
