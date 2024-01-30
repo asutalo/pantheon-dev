@@ -1,20 +1,15 @@
 package com.eu.atit.mysql.integrated.itestbase;
 
 import com.eu.atit.mysql.integrated.model.base.BaseType;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
 
