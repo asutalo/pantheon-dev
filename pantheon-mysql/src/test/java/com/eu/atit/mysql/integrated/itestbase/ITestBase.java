@@ -62,11 +62,6 @@ public interface ITestBase {
         return mySQLService(ofClass).filteredSelect().buildQueryString();
     }
 
-
-    private static String lowercase(String s) {
-        return s.toLowerCase();
-    }
-
     static <X extends WithId> void insertTest(X toInsert, Class<X> ofClass) throws SQLException {
 
         int startingCount = getAll(ofClass).size();
