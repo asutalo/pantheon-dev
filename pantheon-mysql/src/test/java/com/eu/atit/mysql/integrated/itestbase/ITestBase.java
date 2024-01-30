@@ -10,7 +10,6 @@ import com.eu.atit.mysql.service.MySQLService;
 import com.eu.atit.mysql.service.MySQLServiceProvider;
 import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.eu.atit.pantheon.annotation.data.Nested;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.TypeLiteral;
 import com.mysql.cj.MysqlType;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +29,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public interface ITestBase {
     Map<Class<?>, MySQLService<?>> mySQLServiceMap = new HashMap<>();
