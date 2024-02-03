@@ -82,7 +82,7 @@ public class ITestBaseType<T extends BaseType> implements ITestBase {
         int someId = 1;
         T expected = tClass.getDeclaredConstructor(Integer.class, String.class).newInstance(someId, someName);
 
-        Map<String, Object> fieldsAndValues = Map.of(toFieldName(tClass, "id"), someId, toFieldName(tClass, "name"), someName);
+        Map<String, Object> fieldsAndValues = Map.of("id", someId, "name", someName);
 
         T actual = init(tClass, fieldsAndValues);
         Assertions.assertEquals(expected, actual);

@@ -30,6 +30,12 @@ class ResultSetToInstance<T> {
         return instance;
     }
 
+    T getExact(Map<String, Object> t) {
+        T instance = instantiator.get();
+        specificFieldValueSetters.forEach(setter -> setter.acceptExact(instance, t));
+        return instance;
+    }
+
     T get(Map<String, Object> row, List<Class<?>> observedClasses) {
         T instance = instantiator.get();
         specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));

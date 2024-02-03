@@ -65,7 +65,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         List<Map<String, Object>> resultSet = mySqlClient.executeSelectQuery(filteredSelect);
 
         if (resultSet.size() == 1) {
-            return instanceOfT(resultSet.get(0));
+            return fullInstanceOfT(resultSet.get(0));
         }
 
         throw new IllegalStateException("No elements found");
@@ -96,6 +96,26 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return getAll(queryBuilder);
     }
 
+    /*
+     * Used to initialise a pojo that will be inserted/updated
+     * Does not include primary keys to avoid nulling it out
+     * */
+    @Override
+    public T instanceOfT(Map<String, Object> values) {
+        return mySQLModelDescriptor.getResultSetToInstance().getExact(values);
+
+//        T instance = mySQLModelDescriptor.getInstantiator().get();
+//
+//        values.forEach((key, val) -> {
+//            FieldValueSetter fieldValueSetter = mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key);
+//            if (fieldValueSetter != null) {
+//                fieldValueSetter.accept(instance, val);
+//            }
+//        });
+//
+//        return instance;
+    }
+
     private QueryBuilder filteredSelect(Map<String, Object> filter) {
         List<MySqlValue> filterMySqlValues = new ArrayList<>();
 
@@ -120,9 +140,8 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
         return queryBuilder;
     }
 
-    @Override
-    public T instanceOfT(Map<String, Object> values) {
-        return mySQLModelDescriptor.getResultSetToInstance().get(values);
+    T fullInstanceOfT(Map<String, Object> row) {
+        return mySQLModelDescriptor.getResultSetToInstance().get(row);
     }
 
     public String getTableName() {

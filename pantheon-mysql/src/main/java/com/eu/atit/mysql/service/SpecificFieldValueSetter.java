@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-class SpecificFieldValueSetter<T> implements BiConsumer<Object, Map<String, Object>> {
+class SpecificFieldValueSetter<T> {
     private final String fieldName;
     private final String aliasFieldName;
     private final FieldValueSetter fieldValueSetter;
@@ -21,9 +21,12 @@ class SpecificFieldValueSetter<T> implements BiConsumer<Object, Map<String, Obje
         aliasFieldName = alias(fieldName, tableName);
     }
 
-    @Override
     public void accept(Object setFieldOn, Map<String, Object> row) {
         fieldValueSetter.accept(setFieldOn, row.get(aliasFieldName));
+    }
+
+    public void acceptExact(Object setFieldOn, Map<String, Object> row) {
+        fieldValueSetter.accept(setFieldOn, row.get(fieldName));
     }
 
     @Override
