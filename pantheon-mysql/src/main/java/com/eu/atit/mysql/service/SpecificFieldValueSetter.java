@@ -9,8 +9,11 @@ class SpecificFieldValueSetter<T> {
     private final String aliasFieldName;
     private final FieldValueSetter fieldValueSetter;
 
+    private final String actualFieldName;
+
     SpecificFieldValueSetter(Field fieldToSet, String tableName) {
         fieldName = fieldToSet.getName();
+        actualFieldName = fieldName;
         fieldValueSetter = new FieldValueSetter(fieldToSet);
         aliasFieldName = alias(fieldName, tableName);
     }
@@ -19,6 +22,7 @@ class SpecificFieldValueSetter<T> {
         fieldValueSetter = new FieldValueSetter(fieldToSet);
         this.fieldName = fieldName;
         aliasFieldName = alias(fieldName, tableName);
+        actualFieldName = fieldToSet.getName();
     }
 
     public void accept(Object setFieldOn, Map<String, Object> row) {
@@ -26,7 +30,7 @@ class SpecificFieldValueSetter<T> {
     }
 
     public void acceptExact(Object setFieldOn, Map<String, Object> row) {
-        fieldValueSetter.accept(setFieldOn, row.get(fieldName));
+        fieldValueSetter.accept(setFieldOn, row.get(actualFieldName));
     }
 
     @Override

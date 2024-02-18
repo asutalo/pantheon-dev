@@ -26,6 +26,28 @@ class ResultSetToInstanceWithNesting<T> extends ResultSetToInstance<T> {
     }
 
     @Override
+    T getExact(Map<String, Object> row) {
+        T instance = super.getExact(row);
+
+        for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : specificNestedFieldValueSetters) {
+            specificNestedFieldValueSetter.acceptExact(instance, row, new ArrayList<>(List.of(modelClass)));
+        }
+
+        return instance;
+    }
+
+    @Override
+    T getExact(Map<String, Object> row, List<Class<?>> observedClasses) {
+        T instance = super.getExact(row, observedClasses);
+
+        for (SpecificNestedFieldValueSetter<T> specificNestedFieldValueSetter : specificNestedFieldValueSetters) {
+            specificNestedFieldValueSetter.acceptExact(instance, row, observedClasses);
+        }
+
+        return instance;
+    }
+
+    @Override
     T get(Map<String, Object> row, List<Class<?>> observedClasses) {
         T instance = super.get(row, observedClasses);
 

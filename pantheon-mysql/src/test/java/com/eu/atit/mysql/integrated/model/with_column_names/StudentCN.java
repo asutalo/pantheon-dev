@@ -35,6 +35,14 @@ public class StudentCN implements BaseStudent {
         this.i = i;
     }
 
+    public StudentCN(Integer i, String n, TypeCN t, DiplomaCN diplomaCN, List<CourseCN> courses) {
+        this.i = i;
+        this.n = n;
+        this.t = t;
+        this.diplomaCN = diplomaCN;
+        this.courses = courses;
+    }
+
     public StudentCN(String n, TypeCN t, DiplomaCN diplomaCN, List<CourseCN> courses) {
         this.n = n;
         this.t = t;

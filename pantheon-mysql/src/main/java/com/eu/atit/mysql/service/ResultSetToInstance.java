@@ -22,6 +22,7 @@ class ResultSetToInstance<T> {
         return elements;
     }
 
+    //todo does this even work for more than one level of nesting? A->B->C?
     T get(Map<String, Object> row) {
         T instance = instantiator.get();
 
@@ -30,7 +31,13 @@ class ResultSetToInstance<T> {
         return instance;
     }
 
+    //todo does this even work for more than one level of nesting? A->B->C?
     T getExact(Map<String, Object> t) {
+        T instance = instantiator.get();
+        specificFieldValueSetters.forEach(setter -> setter.acceptExact(instance, t));
+        return instance;
+    }
+    T getExact(Map<String, Object> t, List<Class<?>> observedClasses) {
         T instance = instantiator.get();
         specificFieldValueSetters.forEach(setter -> setter.acceptExact(instance, t));
         return instance;
@@ -40,6 +47,6 @@ class ResultSetToInstance<T> {
         T instance = instantiator.get();
         specificFieldValueSetters.forEach(setter -> setter.accept(instance, row));
 
-        return instance;
+        return get(row);
     }
 }

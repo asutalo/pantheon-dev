@@ -33,6 +33,14 @@ public class Student implements BaseStudent {
         this.id = id;
     }
 
+    public Student(Integer id, String name, Type type, Diploma diploma, List<Course> courses) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.diploma = diploma;
+        this.courses = courses;
+    }
+
     public Student(String name, Type type, Diploma diploma, List<Course> courses) {
         this.name = name;
         this.type = type;

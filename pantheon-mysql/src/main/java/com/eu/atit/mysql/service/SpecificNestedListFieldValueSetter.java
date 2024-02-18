@@ -34,4 +34,19 @@ class SpecificNestedListFieldValueSetter<T> extends SpecificNestedFieldValueSett
             fieldValueSetter.accept(setFieldOn, new ArrayList<>(List.of(instance)));
         }
     }
+
+
+    @Override
+    public void acceptExact(T setFieldOn,  Map<String, Object> row, List<Class<?>> observedClasses) {
+        Object o = row.get(fieldValueSetter.getFieldName());
+        if(o == null){
+            fieldValueSetter.accept(setFieldOn, new ArrayList<>());
+        } else {
+            ArrayList<Object> objects = new ArrayList<>();
+            for (Map<String, Object> stringObjectMap : ((List<Map<String, Object>>) o)) {
+                objects.add(resultSetToInstance.getExact(stringObjectMap, observedClasses));
+            }
+            fieldValueSetter.accept(setFieldOn, objects);
+        }
+    }
 }

@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -78,13 +79,6 @@ public class ITest {
                     callable(ITestBaseDiploma.class, Diploma.class, Student.class, Type.class),
                     callable(ITestBaseDiploma.class, DiplomaCN.class, StudentCN.class, TypeCN.class)
             );
-        }
-
-        @ParameterizedTest
-        @MethodSource("commonTestsProvider")
-        void instanceOfT_shouldConvertMapToInstanceOfModel(Callable<? extends ITestBase> iTestBase) throws Exception {
-            ITestBase testBase = iTestBase.call();
-            testBase.instanceOfT_shouldConvertMapToInstanceOfModel();
         }
 
         @ParameterizedTest
@@ -192,6 +186,45 @@ public class ITest {
             Student actual = all.getFirst();
             Assertions.assertEquals(testStudent, actual);
         }
+
+        @Test
+        public void instanceOfT_shouldConvertMapToInstanceOfModel()  {
+            Type someT = new Type(11,"testTypeName");
+            Course someC = new Course(33, "someCourse");
+            Course someOtherC = new Course(44, "someOtherCourse");
+            String someName = "someName";
+            int someId = 112;
+            Student expected = new Student(someId, someName, someT, null, List.of(someC, someOtherC));
+            Diploma diploma = new Diploma(expected, Boolean.TRUE);
+            expected.setDiploma(diploma);
+
+            Map<String, Object> fieldsAndValues = Map.of(
+                    "id", someId,
+                    "name", someName,
+                    "type", Map.of(
+                            "id", someT.getId(),
+                            "name", someT.getName()),
+                    "diploma", Map.of(
+                            "student", Map.of(
+                                    "id", someId
+                            ),
+                            "obtained", diploma.obtained()
+                    ),
+                    "courses", List.of(
+                            Map.of(
+                                    "id", someC.getId(),
+                                    "name", someC.getName()
+                            ),
+                            Map.of(
+                                    "id", someOtherC.getId(),
+                                    "name", someOtherC.getName()
+                            )
+                    )
+            );
+
+            Student actual = ITestBase.init(Student.class, fieldsAndValues);
+            Assertions.assertEquals(expected, actual);
+        }
     }
 
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -231,6 +264,45 @@ public class ITest {
 
             StudentCN actual = all.getFirst();
             Assertions.assertEquals(testStudent, actual);
+        }
+
+        @Test
+        public void instanceOfT_shouldConvertMapToInstanceOfModel()  {
+            TypeCN someT = new TypeCN(11,"testTypeName");
+            CourseCN someC = new CourseCN(33, "someCourse");
+            CourseCN someOtherC = new CourseCN(44, "someOtherCourse");
+            String someName = "someName";
+            int someId = 112;
+            StudentCN expected = new StudentCN(someId, someName, someT, null, List.of(someC, someOtherC));
+            DiplomaCN diploma = new DiplomaCN(expected, Boolean.TRUE);
+            expected.setDiploma(diploma);
+
+            Map<String, Object> fieldsAndValues = Map.of(
+                    "i", someId,
+                    "n", someName,
+                    "t", Map.of(
+                            "i", someT.getId(),
+                            "n", someT.getName()),
+                    "diplomaCN", Map.of(
+                            "s", Map.of(
+                                    "i", someId
+                            ),
+                            "o", diploma.obtained()
+                    ),
+                    "courses", List.of(
+                            Map.of(
+                                    "i", someC.getId(),
+                                    "n", someC.getName()
+                            ),
+                            Map.of(
+                                    "i", someOtherC.getId(),
+                                    "n", someOtherC.getName()
+                            )
+                    )
+            );
+
+            StudentCN actual = ITestBase.init(StudentCN.class, fieldsAndValues);
+            Assertions.assertEquals(expected, actual);
         }
     }
 

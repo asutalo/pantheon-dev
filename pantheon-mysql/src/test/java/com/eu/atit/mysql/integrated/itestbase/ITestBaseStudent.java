@@ -4,6 +4,7 @@ import com.eu.atit.mysql.integrated.model.base.BaseCourse;
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.integrated.model.base.BaseType;
+import com.eu.atit.mysql.integrated.model.no_column_names.*;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
 
@@ -49,31 +51,6 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         initMySqlService(tClass);
         initMySqlService(dClass);
         initMySqlService(cClass);
-    }
-
-    //todo repurpose for two new tests
-    public void shouldFetchStudentWithDiploma() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        int startingStudentCount = getAll(sClass).size();
-
-        S testStudent = insertS();
-        Assertions.assertTrue(testStudent.getId() > 0);
-
-        D testDiploma = dClass.getDeclaredConstructor(sClass, Boolean.class).newInstance(testStudent, Boolean.TRUE);
-
-        insert(testDiploma, dClass);
-
-        List<S> actualSs = getAll(sClass);
-        Assertions.assertTrue(actualSs.size() > startingStudentCount);
-        Assertions.assertEquals(1, actualSs.size());
-
-        testStudent.setDiploma(testDiploma);
-        testStudent.setCourses(List.of(getNulledC()));
-        testDiploma.setStudent(getNulledS(testStudent.getId()));
-        Assertions.assertEquals(testStudent, actualSs.getFirst());
-    }
-
-    public void shouldFetchStudentWithCourses() {
-        Assertions.fail();
     }
 
     @Override
@@ -139,23 +116,8 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
         getOneWithFilterTest(someSs, sClass);
     }
 
-    private S insertS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SQLException {
-        S testStudent = sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance("testStudentName", TEST_TYPE, null, List.of());
-
-        insert(testStudent, sClass);
-        return testStudent;
-    }
-
-    private S getNulledS(int id) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return sClass.getDeclaredConstructor(Integer.class).newInstance(id);
-    }
-
     private S getS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         return sClass.getDeclaredConstructor(String.class, tClass, dClass, List.class).newInstance(name, TEST_TYPE, null, List.of());
-    }
-
-    private C getNulledC() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        return cClass.getDeclaredConstructor(Integer.class, String.class).newInstance(null, null);
     }
 
     private S getS() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

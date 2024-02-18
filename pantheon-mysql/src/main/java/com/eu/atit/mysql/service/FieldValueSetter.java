@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.mysql.service.annotations.MySqlField;
+
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 
@@ -8,11 +10,13 @@ import java.util.function.BiConsumer;
  */
 public class FieldValueSetter implements BiConsumer<Object, Object> {
     private final Field field;
+    private final String fieldName;
 
     /**
      * @param field reflection of the variable that is to be used to set the value in the object
      */
     FieldValueSetter(Field field) {
+        fieldName = field.getName();
         this.field = field;
     }
 
@@ -34,5 +38,9 @@ public class FieldValueSetter implements BiConsumer<Object, Object> {
         return "FieldValueSetter{" +
                 "field=" + field +
                 '}';
+    }
+
+    public String getFieldName() {
+        return fieldName;
     }
 }
