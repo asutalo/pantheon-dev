@@ -61,13 +61,13 @@ public final class DiplomaCN implements BaseDiploma {
     }
 
     @Override
-    public <BS extends BaseStudent> void setStudent(BS student) {
-        s = (StudentCN) student;
+    public BaseStudent getStudent() {
+        return s;
     }
 
     @Override
-    public BaseStudent getStudent() {
-        return s;
+    public <BS extends BaseStudent> void setStudent(BS student) {
+        s = (StudentCN) student;
     }
 
     @Override

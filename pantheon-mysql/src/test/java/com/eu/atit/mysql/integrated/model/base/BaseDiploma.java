@@ -5,6 +5,7 @@ public interface BaseDiploma extends WithNestedId {
 
     void setObtained(Boolean obtained);
 
-    <BS extends BaseStudent> void setStudent(BS student);
     BaseStudent getStudent();
+
+    <BS extends BaseStudent> void setStudent(BS student);
 }

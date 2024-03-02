@@ -4,7 +4,6 @@ import com.eu.atit.mysql.integrated.model.base.BaseCourse;
 import com.eu.atit.mysql.integrated.model.base.BaseDiploma;
 import com.eu.atit.mysql.integrated.model.base.BaseStudent;
 import com.eu.atit.mysql.integrated.model.base.BaseType;
-import com.eu.atit.mysql.integrated.model.no_column_names.*;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.eu.atit.mysql.integrated.itestbase.ITestBase.*;
 

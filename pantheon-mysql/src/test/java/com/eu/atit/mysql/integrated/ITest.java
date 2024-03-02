@@ -157,6 +157,7 @@ public class ITest {
             super.setUpDb(Student.class, Type.class, Diploma.class, Course.class);
             super.initMySqlService(StudentCourse.class);
         }
+
         //todo dedupe in shouldFetchStudentWithDiploma method
         @Test
         public void shouldFetchFullStudentObject() throws SQLException {
@@ -188,8 +189,8 @@ public class ITest {
         }
 
         @Test
-        public void instanceOfT_shouldConvertMapToInstanceOfModel()  {
-            Type someT = new Type(11,"testTypeName");
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            Type someT = new Type(11, "testTypeName");
             Course someC = new Course(33, "someCourse");
             Course someOtherC = new Course(44, "someOtherCourse");
             String someName = "someName";
@@ -267,8 +268,8 @@ public class ITest {
         }
 
         @Test
-        public void instanceOfT_shouldConvertMapToInstanceOfModel()  {
-            TypeCN someT = new TypeCN(11,"testTypeName");
+        public void instanceOfT_shouldConvertMapToInstanceOfModel() {
+            TypeCN someT = new TypeCN(11, "testTypeName");
             CourseCN someC = new CourseCN(33, "someCourse");
             CourseCN someOtherC = new CourseCN(44, "someOtherCourse");
             String someName = "someName";

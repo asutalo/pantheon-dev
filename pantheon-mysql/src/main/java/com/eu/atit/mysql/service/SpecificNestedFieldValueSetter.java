@@ -31,9 +31,9 @@ class SpecificNestedFieldValueSetter<T> {
         }
     }
 
-    public void acceptExact(T setFieldOn,  Map<String, Object> row, List<Class<?>> observedClasses) {
+    public void acceptExact(T setFieldOn, Map<String, Object> row, List<Class<?>> observedClasses) {
         Object o = row.get(fieldValueSetter.getFieldName());
-        if(o == null){
+        if (o == null) {
             fieldValueSetter.accept(setFieldOn, null);
         } else {
             fieldValueSetter.accept(setFieldOn, resultSetToInstance.getExact((Map<String, Object>) o, observedClasses));

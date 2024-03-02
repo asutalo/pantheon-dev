@@ -15,5 +15,6 @@ public @interface MySqlField {
     String column() default "";
 
     boolean primary() default false;
+
     boolean known() default false;
 }

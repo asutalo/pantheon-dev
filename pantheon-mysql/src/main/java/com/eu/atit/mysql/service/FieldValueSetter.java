@@ -1,7 +1,5 @@
 package com.eu.atit.mysql.service;
 
-import com.eu.atit.mysql.service.annotations.MySqlField;
-
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 

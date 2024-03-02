@@ -37,6 +37,7 @@ class ResultSetToInstance<T> {
         specificFieldValueSetters.forEach(setter -> setter.acceptExact(instance, t));
         return instance;
     }
+
     T getExact(Map<String, Object> t, List<Class<?>> observedClasses) {
         T instance = instantiator.get();
         specificFieldValueSetters.forEach(setter -> setter.acceptExact(instance, t));
