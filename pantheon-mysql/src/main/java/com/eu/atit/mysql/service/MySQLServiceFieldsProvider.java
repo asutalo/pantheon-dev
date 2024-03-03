@@ -57,26 +57,6 @@ class MySQLServiceFieldsProvider {
         return new FieldValueSetter(field);
     }
 
-    //todo does not work for nesting
-    <T> Map<String, FieldValueSetter> getNonPrimaryFieldValueSetterMap(Class<T> tClass) {
-        Map<String, FieldValueSetter> nonPrimaryFieldValueSetterMap = new HashMap<>();
-
-        for (Field field : tClass.getDeclaredFields()) {
-            field.setAccessible(true);
-            MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-
-            if (mySqlFieldInfo != null) {
-                if (!mySqlFieldInfo.primary()) {
-                    nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter(field));
-                } else {
-                    nonPrimaryFieldValueSetterMap.put(field.getName(), new FieldValueSetter(field));
-                }
-            }
-        }
-
-        return nonPrimaryFieldValueSetterMap;
-    }
-
     <T> List<SpecificFieldValueSetter<T>> getSpecificFieldValueSetters(Class<T> tClass) {
         List<SpecificFieldValueSetter<T>> setters = new ArrayList<>();
         String tableName = getTableNameLowercase(tClass);

@@ -103,17 +103,6 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
     @Override
     public T instanceOfT(Map<String, Object> values) {
         return mySQLModelDescriptor.getResultSetToInstance().getExact(values);
-
-//        T instance = mySQLModelDescriptor.getInstantiator().get();
-//
-//        values.forEach((key, val) -> {
-//            FieldValueSetter fieldValueSetter = mySQLModelDescriptor.getAllExceptPrimaryFieldValueSetterMap().get(key);
-//            if (fieldValueSetter != null) {
-//                fieldValueSetter.accept(instance, val);
-//            }
-//        });
-//
-//        return instance;
     }
 
     private QueryBuilder filteredSelect(Map<String, Object> filter) {

@@ -11,8 +11,6 @@ import java.util.Map;
 
 public class MySQLModelDescriptor<T> {
     private final String tableName;
-    private final Instantiator<T> instantiator;
-
     /*
      * only used to set ID on the pojo which is returned from here
      * enables us to set an exact value directly onto the primary key, i.e. int obtained as a result of an insert statement
@@ -25,9 +23,6 @@ public class MySQLModelDescriptor<T> {
     // map of aliases pointing to each Fields' MySqlValue
     private final Map<String, FieldMySqlValue> aliasFieldMySqlValueMap = new HashMap<>();
 
-    //todo obsolete
-    private final Map<String, FieldValueSetter> allExceptPrimaryFieldValueSetterMap; //todo replace will list of ALL setters
-
     private final FilteredSelect filteredSelect;
 
     private final ResultSetToInstance<T> resultSetToInstance;
@@ -35,14 +30,12 @@ public class MySQLModelDescriptor<T> {
 
     private final InsertionExecutor<T> insertionExecutor;
 
-    public MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
+    MySQLModelDescriptor(MySQLServiceFieldsProvider mySQLServiceFieldsProvider, TypeLiteral<T> modelTypeLiteral) {
         Class<T> modelClass = (Class<T>) modelTypeLiteral.getRawType();
         tableName = mySQLServiceFieldsProvider.getTableName(modelClass);
-        instantiator = mySQLServiceFieldsProvider.getInstantiator(modelClass);
         primaryKeyFieldMySqlValue = mySQLServiceFieldsProvider.getPrimaryKeyFieldMySqlValue(modelClass);
         primaryKeyFieldValueSetter = mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(modelClass);
         aliasFieldMySqlValueMap.putAll(mySQLServiceFieldsProvider.getAliasFieldMySqlValues(modelClass));
-        allExceptPrimaryFieldValueSetterMap = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(modelClass);
         filteredSelect = mySQLServiceFieldsProvider.getFilteredSelect(modelClass);
         resultSetToInstance = mySQLServiceFieldsProvider.getResultSetToInstance(modelClass);
         mySqlValuesFilter = mySQLServiceFieldsProvider.getMySqlValuesFilter(modelClass);
@@ -59,20 +52,12 @@ public class MySQLModelDescriptor<T> {
         return resultSetToInstance;
     }
 
-    Instantiator<T> getInstantiator() {
-        return instantiator;
-    }
-
     FieldMySqlValue getPrimaryKeyFieldMySqlValue() {
         return primaryKeyFieldMySqlValue;
     }
 
     Map<String, FieldMySqlValue> getAliasFieldMySqlValueMap() {
         return aliasFieldMySqlValueMap;
-    }
-
-    Map<String, FieldValueSetter> getAllExceptPrimaryFieldValueSetterMap() {
-        return allExceptPrimaryFieldValueSetterMap;
     }
 
     FieldValueSetter getPrimaryKeyFieldValueSetter() {
