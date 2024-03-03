@@ -15,7 +15,9 @@ public @interface Nested {
     /**
      * in an outward relationship the link is the name of the column in the parent that points to the main ID column of the child
      */
+    //todo test properly
     String link() default ""; //todo replace link with @MySqlField-column
+    //todo test properly
 
     boolean eager() default false;
 
@@ -23,6 +25,8 @@ public @interface Nested {
      * used only for nested Lists, i.e. n:n relationship
      * the name of the connecting table, if not specified then it is inferred from the parent class_listed class
      */
+    //todo test properly
+
     String connection() default "";
 
     /**
@@ -30,6 +34,8 @@ public @interface Nested {
      * represents the ID of the parent in the connecting table
      * if not specified then it is inferred as name of the parent class_ID column
      */
+    //todo test properly
+
     String from() default "";
 
     /**
@@ -37,5 +43,7 @@ public @interface Nested {
      * represents the ID of the child in the connecting table
      * if not specified then it is inferred as name of the child class_ID column
      */
+    //todo test properly
+
     String to() default "";
 }

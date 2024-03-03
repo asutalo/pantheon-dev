@@ -202,7 +202,7 @@ class MySQLServiceFieldsProvider {
         FieldValueGetter nestedPrimaryKeyValueGetter = getNestedPrimaryKeyFieldValueGetter(modelClass);
 
         boolean hasDescendantWithList = getJoinInfos(modelClass).stream().anyMatch(JoinInfo::hasAnyList);
-        if (getSpecificListFieldValueOverrides(modelClass).size() > 0 || hasDescendantWithList) {
+        if (!getSpecificListFieldValueOverrides(modelClass).isEmpty() || hasDescendantWithList) {
             fieldsMerger = new FieldsMerger(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : getPrimaryKeyFieldValueGetter(modelClass), myNestedModelsDTOs(modelClass, observedClasses));
         } else {
             fieldsMerger = new DeadEnd(nestedPrimaryKeyValueGetter != null ? nestedPrimaryKeyValueGetter : getPrimaryKeyFieldValueGetter(modelClass), myNestedModelsDTOs(modelClass, observedClasses));
@@ -322,7 +322,7 @@ class MySQLServiceFieldsProvider {
                 if (nestingInfo.inward()) {
                     joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList));
                 }
-            } else {
+            } else { //todo currently works only for N:N, cannot read 1:N
                 String connectingTable = nestingInfo.connection().isEmpty() ? connectingTable(getTableName(modelClass), targetTableName) : nestingInfo.connection();
                 String connectingTableLowercase = connectingTable.toLowerCase();
                 String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(getTableNameLowercase(joiningWithClass), nestedPrimaryKeyFieldName) : nestingInfo.from();
