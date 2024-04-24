@@ -27,6 +27,8 @@ class SelectQueryResultProcessor implements Function<PreparedStatement, List<Map
                     processRow(columnLabelsAndIndexes, fetchedRows, resultSet);
                 }
             }
+
+            //todo configurable logging of rows/query
             System.out.println("-------------------------");
             System.out.println("Fetched rows:");
             System.out.println(fetchedRows);

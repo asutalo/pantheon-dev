@@ -116,7 +116,8 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
             }
         });
 
-        if (filterMySqlValues.isEmpty()) throw new IllegalStateException("Provided filters do not match any attribute");
+        if (filterMySqlValues.isEmpty())
+            throw new IllegalStateException("Provided filters do not match any attribute");
 
         QueryBuilder queryBuilder = filteredSelect();
         queryBuilder.where();
@@ -124,7 +125,8 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
         while (iterator.hasNext()) {
             queryBuilder.keyIsVal(iterator.next());
-            if (iterator.hasNext()) queryBuilder.and();
+            if (iterator.hasNext())
+                queryBuilder.and();
         }
         return queryBuilder;
     }

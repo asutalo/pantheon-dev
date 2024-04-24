@@ -111,7 +111,7 @@ public class ITestBaseStudent<S extends BaseStudent, T extends BaseType, D exten
 
     @Override
     public void get_shouldFetchSpecificRecord_withFilter() throws SQLException {
-        getOneWithFilterTest(someSs, sClass);
+        getOneWithFilterTest(someSs, sClass, lowercaseTableNameOf(sClass) + ".id", lowercaseTableNameOf(sClass) + ".name", someSs.getFirst().getName());
     }
 
     private S getS(String name) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

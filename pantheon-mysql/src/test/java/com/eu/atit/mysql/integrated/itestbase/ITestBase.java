@@ -130,6 +130,16 @@ public interface ITestBase {
         });
     }
 
+    static <X extends WithId & WithName> void getOneWithFilterTest(List<X> toInserts, Class<X> ofClass, String idColumn, String nameColumn, String name) throws SQLException {
+        insertAllAndVerifyOne(toInserts, ofClass, (integer, xMySQLService) -> {
+            try {
+                return xMySQLService.get(Map.of(idColumn, integer, nameColumn, name));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     private static <X extends WithId> void insertAllAndVerifyOne(List<X> toInserts, Class<X> ofClass, BiFunction<Integer, MySQLService<X>, X> getActual) throws SQLException {
         List<Integer> insertIds = insertAll(toInserts, ofClass);
         Integer expectedId = insertIds.getFirst();
