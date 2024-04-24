@@ -45,7 +45,7 @@ class InsertQueryResultProcessorFunctionTest {
     }
 
     @Test
-    void apply_shouldThrowRuntimeException() throws SQLException {
+    void apply_shouldWrapSqlExceptionsIntoRuntimeException() throws SQLException {
         when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         Assertions.assertThrows(RuntimeException.class, () -> insertQueryResultProcessorFunction.apply(mockPreparedStatement));
     }

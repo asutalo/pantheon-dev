@@ -17,7 +17,6 @@ public class MySqlClient implements DataClient {
     private final InsertQueryKnownPrimaryKeyResultProcessorFunction insertQueryKnownPrimaryKeyResultProcessorFunction;
     private final OtherDmlQueryResultProcessorFunction otherDmlQueryResultProcessorFunction;
 
-
     public MySqlClient(Connector connector) {
         this.connector = connector;
 
@@ -40,26 +39,13 @@ public class MySqlClient implements DataClient {
         return execute(queryBuilder, insertQueryKnownPrimaryKeyResultProcessorFunction);
     }
 
-    public int executeInsertQueryWithKnownPrimaryKey(QueryBuilder queryBuilder, Connection connection) throws SQLException {
-        return execute(queryBuilder, insertQueryKnownPrimaryKeyResultProcessorFunction, connection);
-    }
-
     public int executeOtherDmlQuery(QueryBuilder queryBuilder) throws SQLException {
         return execute(queryBuilder, otherDmlQueryResultProcessorFunction);
     }
 
-    public int executeInsertQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
-        return execute(queryBuilder, insertQueryResultProcessorFunction, connection);
-    }
-
-    public int executeOtherDmlQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
-        return execute(queryBuilder, otherDmlQueryResultProcessorFunction, connection);
-    }
-
-    //todo decide if it should remain public
-    public void executeSql(String[] sqls) throws SQLException {
+    public void executeSql(String[] queries) throws SQLException {
         Connection connection = connector.connect();
-        for (String sql : sqls) {
+        for (String sql : queries) {
             connection.prepareStatement(sql).execute();
         }
 
@@ -93,5 +79,17 @@ public class MySqlClient implements DataClient {
 
     public void rollbackTransaction(Connection connection) throws SQLException {
         connection.rollback();
+    }
+
+    public int executeInsertQueryWithKnownPrimaryKey(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, insertQueryKnownPrimaryKeyResultProcessorFunction, connection);
+    }
+
+    public int executeInsertQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, insertQueryResultProcessorFunction, connection);
+    }
+
+    public int executeOtherDmlQuery(QueryBuilder queryBuilder, Connection connection) throws SQLException {
+        return execute(queryBuilder, otherDmlQueryResultProcessorFunction, connection);
     }
 }

@@ -67,6 +67,20 @@ class MySqlClientTest {
     }
 
     @Test
+    void prepAndExecuteInsertQuery_InsertQueryKnownPrimaryKeyResultProcessorFunction() throws SQLException {
+        MySqlClient spy = spy(mySqlClient);
+
+        int expected = 1;
+
+        doReturn(expected).when(spy).execute(any(), any());
+
+        int actual = spy.executeInsertQueryWithKnownPrimaryKey(mockQueryBuilder);
+
+        verify(spy).execute(eq(mockQueryBuilder), any(InsertQueryKnownPrimaryKeyResultProcessorFunction.class));
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void prepAndExecuteOtherDmlQuery_OtherDmlQueryResultProcessorFunction() throws SQLException {
         MySqlClient spy = spy(mySqlClient);
 
@@ -104,6 +118,20 @@ class MySqlClientTest {
         int actual = spy.executeOtherDmlQuery(mockQueryBuilder, mockConnection);
 
         verify(spy).execute(eq(mockQueryBuilder), any(OtherDmlQueryResultProcessorFunction.class), eq(mockConnection));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void prepAndExecuteInsertQuery_InsertQueryKnownPrimaryKeyResultProcessorFunction_withConnection() throws SQLException {
+        MySqlClient spy = spy(mySqlClient);
+
+        int expected = 1;
+
+        doReturn(expected).when(spy).execute(any(), any(), any());
+
+        int actual = spy.executeInsertQueryWithKnownPrimaryKey(mockQueryBuilder, mockConnection);
+
+        verify(spy).execute(eq(mockQueryBuilder), any(InsertQueryKnownPrimaryKeyResultProcessorFunction.class), eq(mockConnection));
         assertEquals(expected, actual);
     }
 
