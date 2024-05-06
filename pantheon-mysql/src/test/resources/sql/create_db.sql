@@ -1,4 +1,4 @@
-create table course
+create table Course
 (
     id   int auto_increment,
     name varchar(255) not null,
@@ -8,10 +8,10 @@ create table course
         unique (name)
 );
 
-alter table course
+alter table Course
     add primary key (id);
 
-create table type
+create table Type
 (
     id   int auto_increment,
     name varchar(255) not null,
@@ -21,10 +21,10 @@ create table type
         unique (name)
 );
 
-alter table type
+alter table Type
     add primary key (id);
 
-create table student
+create table Student
 (
     id      int auto_increment,
     name    varchar(255) not null,
@@ -32,31 +32,31 @@ create table student
     constraint student_id_uindex
         unique (id),
     constraint student_type_id_fk
-        foreign key (type_id) references type (id)
+        foreign key (type_id) references Type (id)
 );
 
-alter table student
+alter table Student
     add primary key (id);
 
-create table diploma
+create table Diploma
 (
     id       int                  not null,
     obtained tinyint(1) default 0 null,
     constraint diploma_id_uindex
         unique (id),
     constraint diploma_student_id_fk
-        foreign key (id) references student (id)
+        foreign key (id) references Student (id)
 );
 
-alter table diploma
+alter table Diploma
     add primary key (id);
 
-create table student_course
+create table Student_Course
 (
     student_id int not null,
     course_id  int not null,
     constraint student_course_course_id_fk
-        foreign key (course_id) references course (id),
+        foreign key (course_id) references Course (id),
     constraint student_course_student_id_fk
-        foreign key (student_id) references student (id)
+        foreign key (student_id) references Student (id)
 );

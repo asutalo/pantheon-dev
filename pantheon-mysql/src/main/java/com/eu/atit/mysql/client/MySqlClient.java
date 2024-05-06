@@ -43,6 +43,7 @@ public class MySqlClient implements DataClient {
         return execute(queryBuilder, otherDmlQueryResultProcessorFunction);
     }
 
+    //todo lowercase table names in queries... mysql in windows is case insensitive, linux is not
     public void executeSql(String[] queries) throws SQLException {
         Connection connection = connector.connect();
         for (String sql : queries) {
