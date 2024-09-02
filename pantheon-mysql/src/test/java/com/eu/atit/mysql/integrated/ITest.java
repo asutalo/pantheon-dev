@@ -22,14 +22,24 @@ import java.util.stream.Stream;
 public class ITest {
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
-        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose up --detach").start().waitFor();
-
+        //linux
+//        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose up --detach").start().waitFor();
+        //win
+//        new ProcessBuilder("cmd.exe", "/C", "docker-compose up --detach").start().waitFor();
+        //mac
+        new ProcessBuilder("sh",  "-c", "docker-compose up --detach").start().waitFor();
         Thread.sleep(5000);
     }
 
     @AfterAll
     static void cleanUp() throws IOException, InterruptedException {
-        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose down").start().waitFor();
+        //linux
+//        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose down").start().waitFor();
+        //win
+//        new ProcessBuilder("cmd.exe", "/C", "docker-compose down").start().waitFor();
+        //mac
+        new ProcessBuilder("sh", "-c", "docker-compose down").start().waitFor();
+
     }
 
     private static <T extends ITestBase> Callable<T> callable(Class<T> tClass, Class<?>... setUpParams) {
