@@ -1,4 +1,4 @@
 dependencies {
     api project(':pantheon')
-    api 'com.mysql:mysql-connector-j:9.0.0'
-}s
+    api 'com.mysql:mysql-connector-j:9.2.0'
+}
