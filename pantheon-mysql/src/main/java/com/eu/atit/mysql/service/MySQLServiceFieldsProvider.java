@@ -230,7 +230,7 @@ class MySQLServiceFieldsProvider {
 
             if (isList(f.getGenericType())) {
                 crossroads = new ListRoad(fieldsMerger, new FieldValueGetter(f));
-            } else if (getJoinInfos(type).stream().anyMatch(JoinInfo::hasAnyList)) {
+            } else if (getJoinInfos(type).stream().anyMatch(JoinInfo::hasAnyList)) { //todo isto kao else
 
                 crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(f));
 
