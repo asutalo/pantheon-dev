@@ -23,11 +23,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class MySQLServiceFieldsProvider {
-    private static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
-    private static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
-    private static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
-    private static final String NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR = "Nesting direction needs to be singular";
-    private static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
+    static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
+    static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
+    static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
+    private static final String NESTING_DIRECTION_NEEDS_TO_BE_IN_ONE_DIRECTION = "Nesting direction needs to be in one direction";
+    static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
 
     <T> String getTableName(Class<T> tClass) {
         Table table = tClass.getAnnotation(Table.class);
@@ -258,12 +258,9 @@ class MySQLServiceFieldsProvider {
         return setters;
     }
 
-    private String getPrimaryKeyFieldName(Class<?> ofClass) {
+    String getPrimaryKeyFieldName(Class<?> ofClass) {
         Field field = getDeclaredPrimaryField(ofClass);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
-        if (mySqlFieldInfo == null) {
-            return field.getName();
-        }
         String fieldName = mySqlFieldInfo.column();
 
         if (fieldName.isBlank()) {
@@ -347,7 +344,7 @@ class MySQLServiceFieldsProvider {
         return joinInfos;
     }
 
-    private <T> Field getDeclaredPrimaryField(Class<T> tClass) {
+    <T> Field getDeclaredPrimaryField(Class<T> tClass) {
         List<Field> primaryKeys = Arrays.stream(tClass.getDeclaredFields()).filter(field -> {
             MySqlField annotation = field.getAnnotation(MySqlField.class);
             return annotation != null && annotation.primary();
@@ -413,7 +410,7 @@ class MySQLServiceFieldsProvider {
 
     private void validateNestingDirection(Nested nestingInfo, boolean isList) {
         if (!isList && nestingInfo.outward() == nestingInfo.inward()) {
-            throw new RuntimeException(NESTING_DIRECTION_NEEDS_TO_BE_SINGULAR);
+            throw new RuntimeException(NESTING_DIRECTION_NEEDS_TO_BE_IN_ONE_DIRECTION);
         }
     }
 

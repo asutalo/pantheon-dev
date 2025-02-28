@@ -14,9 +14,7 @@ public class DomainsTestBase {
     }
 
     Field getField() {
-        Field testField = SimpleTestClass.class.getDeclaredFields()[0];
-        testField.setAccessible(true);
-        return testField;
+        return SimpleTestClass.class.getDeclaredFields()[0];
     }
 
     Constructor<SimpleTestClass> getTestClassDefaultConstructor() throws NoSuchMethodException {

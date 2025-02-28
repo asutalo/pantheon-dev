@@ -16,6 +16,7 @@ public class FieldValueSetter implements BiConsumer<Object, Object> {
      * @param field reflection of the variable that is to be used to set the value in the object
      */
     FieldValueSetter(Field field) {
+        field.setAccessible(true);
         fieldName = field.getName();
         this.field = field;
     }
