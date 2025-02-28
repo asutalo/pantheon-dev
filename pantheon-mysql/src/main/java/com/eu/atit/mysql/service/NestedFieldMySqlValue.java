@@ -16,6 +16,7 @@ public class NestedFieldMySqlValue extends FieldMySqlValue {
     private String fieldName(Field field, String nestedFieldName) {
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         if (mySqlFieldInfo == null) {
+            System.out.println("There was a parent without MySqlField annotation... check NestedFieldMySqlValue.class");
             return field.getName();
         }
         String fieldName = mySqlFieldInfo.column();

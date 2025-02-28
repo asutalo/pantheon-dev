@@ -19,13 +19,13 @@ public class StudentCN implements BaseStudent {
     private String n;
 
     @MySqlField(type = MysqlType.INT, column = "type_id")
-    @Nested(outward = true, eager = true)
+    @Nested(outward = true, eager = true, link = "type_id")
     private TypeCN t;
 
     @Nested(inward = true, eager = true)
     private DiplomaCN diplomaCN;
 
-    @Nested(eager = true)
+    @Nested(eager = true, from = "course_id", to = "student_id", connection = "Student_Course")
     private List<CourseCN> courses;
 
     public StudentCN() {

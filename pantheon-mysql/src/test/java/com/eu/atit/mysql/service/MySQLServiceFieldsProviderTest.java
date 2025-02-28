@@ -4,6 +4,7 @@ import com.eu.atit.mysql.service.annotations.MySqlField;
 import com.mysql.cj.MysqlType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import com.eu.atit.pantheon.annotation.data.Nested;
 
 import java.util.List;
 
@@ -14,7 +15,13 @@ class MySQLServiceFieldsProviderTest {
     private static final String COLUMN_NAME = "column";
 
     private final MySQLServiceFieldsProvider mySQLServiceFieldsProvider = new MySQLServiceFieldsProvider();
-    
+
+    @Test
+    void getJoinInfos_shouldThrowExceptionWhenInwardAndOutwardNesting() {
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class,
+                () -> mySQLServiceFieldsProvider.getJoinInfos(ClassWithInvalidNesting.class));
+        Assertions.assertEquals(MySQLServiceFieldsProvider.NESTING_DIRECTION_NEEDS_TO_BE_IN_ONE_DIRECTION, exception.getMessage());
+    }
 
     @Test
     void getDeclaredPrimaryField_shouldThrowExceptionWhenNoPrimaryKeyFound() {
@@ -99,70 +106,8 @@ class MySQLServiceFieldsProviderTest {
     void getPrimaryKeyFieldValueSetter_shouldThrowExceptionWhenNoPrimaryKeyFound() {
         Assertions.assertThrows(RuntimeException.class, () -> mySQLServiceFieldsProvider.getPrimaryKeyFieldValueSetter(NoneArePrimary.class));
     }
-
-//    @Test
-//    void getSpecificFieldValueSetters_shouldProvideFieldValueSettersForAllAnnotatedFields() {
-//        int fieldsInTestTarget = 3;
-//
-//        List<SpecificFieldValueSetter<TestTarget>> specificFieldValueSetters = mySQLServiceFieldsProvider.getSpecificFieldValueSetters(TestTarget.class);
-//        Assertions.assertEquals(fieldsInTestTarget, specificFieldValueSetters.size());
-//
-//        Assertions.assertFalse(specificFieldValueSetters.stream().anyMatch(setter -> setter.getFieldName().equals("notAnnotated")));
-//
-//        Assertions.assertTrue(specificFieldValueSetters.stream().anyMatch(setter -> setter.getFieldName().equals(COLUMN_NAME)));
-//        Assertions.assertTrue(specificFieldValueSetters.stream().anyMatch(setter -> !setter.getFieldName().equals(COLUMN_NAME)));
-//
-//
-//        String testTarget = "testtarget_";
-//        Assertions.assertTrue(specificFieldValueSetters.stream().anyMatch(setter -> setter.getAliasFieldName().equals(testTarget + COLUMN_NAME)));
-////        Assertions.assertTrue(specificFieldValueSetters.stream().anyMatch(setter -> setter.fieldNameAndAlias().equals(new Pair<>(COLUMN_NAME, testTarget + COLUMN_NAME))));
-//    }
-
-//    @Test
-//    void validateClass_shouldThrowExceptionWhenNoDefaultConstructor() {
-//        RuntimeException runtimeException = Assertions.assertThrows(RuntimeException.class, () -> mySQLServiceFieldsProvider.validateClass(TestTargetNoEmptyConstructor.class));
-//        Assertions.assertEquals(MySQLServiceFieldsProvider.FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR, runtimeException.getMessage());
-//    }
-//
-//    @Test
-//    void validateClass_shouldThrowExceptionWhenNoPrimaryKeyFound() {
-//        RuntimeException runtimeException = Assertions.assertThrows(RuntimeException.class, () -> mySQLServiceFieldsProvider.validateClass(NoneArePrimary.class));
-//        Assertions.assertEquals(MySQLServiceFieldsProvider.NO_PRIMARY_KEY_FOUND, runtimeException.getMessage());
-//    }
-//
-//    @Test
-//    void validateClass_shouldThrowExceptionWhenMultiplePrimaryKeyFound() {
-//        RuntimeException runtimeException = Assertions.assertThrows(RuntimeException.class, () -> mySQLServiceFieldsProvider.validateClass(MultiPrimary.class));
-//        Assertions.assertEquals(MySQLServiceFieldsProvider.THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY, runtimeException.getMessage());
-//    }
-
-//    @Test
-//    void getNonPrimaryFieldValueSetterMap_shouldReturnAllNonPrimaryAndNonAnnotatedFieldValueSetters() {
-//        Map<String, FieldValueSetter<TestTarget>> actual = mySQLServiceFieldsProvider.getNonPrimaryFieldValueSetterMap(TestTarget.class);
-//
-//        int nonIdFieldsInTestTarget = 3;
-//        Assertions.assertEquals(nonIdFieldsInTestTarget, countFields(actual));
-//        Assertions.assertFalse(actual.containsKey("stringField"));
-//    }
-
-    @Test
-    void getColumnsAndAliases() {
-        //todo
-//        String someTable = "someTable";
-//        SpecificFieldValueSetter mockSpecificFieldValueSetter = mock(SpecificFieldValueSetter.class);
-//        Pair<String, String> mockPair = mock(Pair.class);
-//        Pair<String, String> mockOtherPair = mock(Pair.class);
-//        when(mockSpecificFieldValueSetter.fieldNameAndAlias(someTable)).thenReturn(mockPair).thenReturn(mockOtherPair);
-//
-//        Assertions.assertEquals(List.of(mockPair, mockOtherPair), mySQLServiceFieldsProvider.getColumnsAndAliases(someTable, List.of(mockSpecificFieldValueSetter, mockSpecificFieldValueSetter)));
-    }
-
-//    private int countFields(Map<String, FieldValueSetter<TestTarget>> actual) {
-//        int size = actual.size();
-//
-//        if (actual.containsKey("__$lineHits$__")) size--;
-//        return size;
-//    }
+    
+    
 
     static class TestTarget {
         @MySqlField(type = MysqlType.VARCHAR, primary = true)
@@ -216,5 +161,10 @@ class MySQLServiceFieldsProviderTest {
     static class ListAsPrimaryKey {
         @MySqlField(type = MysqlType.VARCHAR, primary = true)
         private final List<String> listField = List.of("value1", "value2");
+    }
+
+    static class ClassWithInvalidNesting {
+        @Nested(inward = true, outward = true)
+        private final String invalidField = "invalid";
     }
 }

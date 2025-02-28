@@ -26,7 +26,7 @@ class MySQLServiceFieldsProvider {
     static final String NO_PRIMARY_KEY_FOUND = "No primary key found";
     static final String THERE_CAN_BE_ONLY_ONE_PRIMARY_KEY = "There can be only one primary key";
     static final String FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR = "Failed to locate an empty constructor for %s";
-    private static final String NESTING_DIRECTION_NEEDS_TO_BE_IN_ONE_DIRECTION = "Nesting direction needs to be in one direction";
+    static final String NESTING_DIRECTION_NEEDS_TO_BE_IN_ONE_DIRECTION = "Nesting direction needs to be in one direction";
     static final String PRIMARY_KEY_CANNOT_BE_A_LIST = "Primary key cannot be a List";
 
     <T> String getTableName(Class<T> tClass) {
@@ -104,7 +104,7 @@ class MySQLServiceFieldsProvider {
         List<FieldMySqlValue> getters = new ArrayList<>();
 
         for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
-            if (!isPrimary(field) || isPrimaryKeyValueKnown(field)) {
+            if (!isPrimary(field) || field.getAnnotation(MySqlField.class).known()) {
                 getters.add(fieldToFieldMySqlValue(tClass, field));
             }
         }
@@ -309,10 +309,10 @@ class MySQLServiceFieldsProvider {
                     joinInfos.add(new JoinInfo(targetTableName, targetTableLowercase, nestedPrimaryKeyFieldName, modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName(), columnNameAndAliases, hasAnyList));
                 }
             } else { //todo currently works only for N:N, cannot read 1:N
-                String connectingTable = nestingInfo.connection().isEmpty() ? connectingTable(getTableName(modelClass), targetTableName) : nestingInfo.connection();
+                String connectingTable = connectingTable(nestingInfo, modelClass, targetTableName);
                 String connectingTableLowercase = connectingTable.toLowerCase();
-                String foreignKeyFrom = nestingInfo.from().isEmpty() ? connectingTable(getTableNameLowercase(joiningWithClass), nestedPrimaryKeyFieldName) : nestingInfo.from();
-                String foreignKeyTo = nestingInfo.to().isEmpty() ? connectingTable(modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName()) : nestingInfo.to();
+                String foreignKeyFrom = getForeignKey(nestingInfo.from(), getTableNameLowercase(joiningWithClass), nestedPrimaryKeyFieldName);
+                String foreignKeyTo = getForeignKey(nestingInfo.to(), modelClassNameLowerCase, getPrimaryKeyFieldMySqlValue(modelClass).getFieldName());
 
                 JoinInfo joinToConnectingTable = new JoinInfo(connectingTable, connectingTableLowercase, foreignKeyTo, modelClassNameLowerCase, nestedPrimaryKeyFieldName, columnNameAndAliases, true, hasAnyList, modelClass, joiningWithClass);
                 joinInfos.add(joinToConnectingTable);
@@ -331,6 +331,13 @@ class MySQLServiceFieldsProvider {
 
 
         return joinInfos;
+    }
+
+    private String getForeignKey(String nestingInfo, String table, String primaryKey) {
+        if (nestingInfo.isEmpty())
+            return connectingTable(table, primaryKey);
+        else
+            return nestingInfo;
     }
 
     <T> Field getDeclaredPrimaryField(Class<T> tClass) {
@@ -377,11 +384,7 @@ class MySQLServiceFieldsProvider {
     private boolean isPrimary(Field field) {
         MySqlField annotation = field.getAnnotation(MySqlField.class);
 
-        return annotation != null && annotation.primary();
-    }
-
-    private boolean isPrimaryKeyValueKnown(Field field) {
-        return isPrimary(field) && field.getAnnotation(MySqlField.class).known();
+        return annotation.primary();
     }
 
     //todo expand to support infinite nesting, right now it's only 1 level deep
@@ -423,6 +426,13 @@ class MySQLServiceFieldsProvider {
 
     private <T> List<Field> getDeclaredNestedMySqlFields(Class<T> tClass) {
         return Arrays.stream(tClass.getDeclaredFields()).filter(field -> field.getAnnotation(Nested.class) != null && field.getAnnotation(MySqlField.class) != null).collect(Collectors.toList());
+    }
+
+    private String connectingTable(Nested nestingInfo, Class<?> modelClass, String targetTableName) {
+        if (nestingInfo.connection().isEmpty())
+            return connectingTable(getTableName(modelClass), targetTableName);
+        else
+            return nestingInfo.connection();
     }
 
     private <T> ResultSetToInstance<T> getResultSetToInstance(Class<T> modelClass, List<Class<T>> observedClasses) {
