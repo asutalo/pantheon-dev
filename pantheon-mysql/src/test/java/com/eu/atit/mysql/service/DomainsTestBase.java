@@ -18,9 +18,7 @@ public class DomainsTestBase {
     }
 
     Constructor<SimpleTestClass> getTestClassDefaultConstructor() throws NoSuchMethodException {
-        Constructor<SimpleTestClass> declaredConstructor = SimpleTestClass.class.getDeclaredConstructor();
-        declaredConstructor.setAccessible(true);
-        return declaredConstructor;
+        return SimpleTestClass.class.getDeclaredConstructor();
     }
 
     Constructor<DoomedToFailSimpleTestClass> getDoomedToFailDefaultConstructor() throws NoSuchMethodException {

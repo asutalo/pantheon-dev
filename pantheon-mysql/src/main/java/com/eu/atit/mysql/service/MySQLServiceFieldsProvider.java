@@ -44,7 +44,6 @@ class MySQLServiceFieldsProvider {
     <T> Instantiator<T> getInstantiator(Class<T> tClass) { //todo turn into a full class, there's different usages of instantiator in several places
         try {
             Constructor<T> declaredConstructor = tClass.getDeclaredConstructor();
-            declaredConstructor.setAccessible(true);
             return new Instantiator<>(declaredConstructor);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(String.format(FAILED_TO_LOCATE_AN_EMPTY_CONSTRUCTOR, tClass), e);
@@ -53,7 +52,6 @@ class MySQLServiceFieldsProvider {
 
     <T> FieldValueSetter getPrimaryKeyFieldValueSetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
-        field.setAccessible(true);
         return new FieldValueSetter(field);
     }
 
@@ -61,7 +59,6 @@ class MySQLServiceFieldsProvider {
         List<SpecificFieldValueSetter<T>> setters = new ArrayList<>();
         String tableName = getTableNameLowercase(tClass);
         for (Field field : getDeclaredSqlFieldsOnly(tClass)) {
-            field.setAccessible(true);
             MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
 
             String fieldName = mySqlFieldInfo.column();
@@ -78,11 +75,9 @@ class MySQLServiceFieldsProvider {
     FieldMySqlValue getPrimaryKeyFieldMySqlValue(Class<?> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         if (field.getAnnotation(Nested.class) != null) {
-            field.setAccessible(true);
             return new NestedPrimaryFieldMySqlValue(getPrimaryKeyFieldMySqlValue(field.getType()), field);
         }
 
-        field.setAccessible(true);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String fieldName = mySqlFieldInfo.column();
         String tableName = getTableNameLowercase(tClass);
@@ -121,7 +116,6 @@ class MySQLServiceFieldsProvider {
         List<Pair<FieldMySqlValue, FieldValueGetter>> nestedFieldsMySqlValues = new ArrayList<>();
         List<Field> fields = getDeclaredNestedMySqlFields(tClass);
         fields.forEach(nestedField -> {
-            nestedField.setAccessible(true);
 
             MySqlField mySqlField = nestedField.getAnnotation(MySqlField.class);
             if (mySqlField.primary()) {
@@ -154,7 +148,6 @@ class MySQLServiceFieldsProvider {
     private <T> FieldValueGetter getNestedPrimaryKeyFieldValueGetter(Class<T> tClass) {
         Field field = getDeclaredPrimaryField(tClass);
         if (field.getAnnotation(Nested.class) != null) {
-            field.setAccessible(true);
             return new NestedFieldValueGetter(field, getPrimaryKeyFieldValueGetter(field.getType()));
         }
 
@@ -164,7 +157,6 @@ class MySQLServiceFieldsProvider {
     private <T> SpecificFieldValueSetter<T> getPrimaryKeyValueSetter(Class<T> tClass) {
         String tableName = getTableNameLowercase(tClass);
         Field field = getDeclaredPrimaryField(tClass);
-        field.setAccessible(true);
 
         if (field.getAnnotation(Nested.class) != null) {
             return (SpecificFieldValueSetter<T>) new LazyNestedObjectValueSetter<>(field, tableName, getInstantiator(field.getType()), getPrimaryKeyValueSetter(field.getType()));
@@ -185,7 +177,6 @@ class MySQLServiceFieldsProvider {
         List<Field> nestedLists = getDeclaredNestedFields(tClass).stream().filter(field -> isList(field.getGenericType())).toList();
 
         for (Field field : nestedLists) {
-            field.setAccessible(true);
             overrides.add(new Pair<>(new SpecificListFieldValueOverride<>(field), new SpecificListFieldValueOverride<>(field)));
         }
 
@@ -214,9 +205,8 @@ class MySQLServiceFieldsProvider {
     private List<FieldsMergerDTO> myNestedModelsDTOs(Class<?> tClass, List<Class<?>> observedClasses) {
         List<Field> flatNested = getDeclaredNestedFields(tClass);
 
-        return flatNested.stream().map(f -> {
-            f.setAccessible(true);
-            Class<?> type = joiningWith(f, f.getGenericType(), isList(f.getGenericType()));
+        return flatNested.stream().map(field -> {
+            Class<?> type = joiningWith(field, field.getGenericType(), isList(field.getGenericType()));
 
             Crossroads crossroads;
 
@@ -228,16 +218,16 @@ class MySQLServiceFieldsProvider {
                 fieldsMerger = getFieldsMerger(type, observedClasses);
             }
 
-            if (isList(f.getGenericType())) {
-                crossroads = new ListRoad(fieldsMerger, new FieldValueGetter(f));
+            if (isList(field.getGenericType())) {
+                crossroads = new ListRoad(fieldsMerger, new FieldValueGetter(field));
             } else if (getJoinInfos(type).stream().anyMatch(JoinInfo::hasAnyList)) { //todo isto kao else
 
-                crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(f));
+                crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(field));
 
             } else {
-                crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(f));
+                crossroads = new SingleRoad(fieldsMerger, new FieldValueGetter(field));
             }
-            return new FieldsMergerDTO(new FieldValueSetter(f), crossroads);
+            return new FieldsMergerDTO(new FieldValueSetter(field), crossroads);
         }).toList();
     }
 
@@ -247,7 +237,6 @@ class MySQLServiceFieldsProvider {
         for (Field field : getDeclaredNestedFields(tClass)) {
             Type genericType = field.getGenericType();
             Class<T> actualTypeArgument = (Class<T>) joiningWith(field, genericType, isList(genericType));
-            field.setAccessible(true);
             if (isList(genericType)) {
                 setters.add(new SpecificNestedListFieldValueSetter<>(field, getResultSetToInstance(actualTypeArgument, observedClasses), getInstantiator(actualTypeArgument), getPrimaryKeyValueSetter(actualTypeArgument)));
             } else {
@@ -359,12 +348,10 @@ class MySQLServiceFieldsProvider {
     }
 
     private FieldValueGetter fieldToFieldValueGetter(Field field) {
-        field.setAccessible(true);
         return new FieldValueGetter(field);
     }
 
     private <T> FieldMySqlValue fieldToFieldMySqlValue(Class<T> tClass, Field field) {
-        field.setAccessible(true);
         MySqlField mySqlFieldInfo = field.getAnnotation(MySqlField.class);
         String tableName = getTableNameLowercase(tClass);
         String fieldName = mySqlFieldInfo.column();

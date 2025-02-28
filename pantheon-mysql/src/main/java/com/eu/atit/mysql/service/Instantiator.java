@@ -17,6 +17,7 @@ class Instantiator<T> implements Supplier<T> {
      * @param declaredConstructor - the default empty constructor to be used to provide an instance
      */
     Instantiator(Constructor<T> declaredConstructor) {
+        declaredConstructor.setAccessible(true);
         this.declaredConstructor = declaredConstructor;
     }
 

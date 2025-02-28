@@ -1,5 +1,8 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+import com.google.common.base.Objects;
+
 import java.lang.reflect.Field;
 
 /**
@@ -23,5 +26,27 @@ public class FieldValueGetter {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(FAILED_TO_GET_VALUE_FROM_FIELD, e);
         }
+    }
+
+    @IgnoreCoverage
+    @Override
+    public String toString() {
+        return "FieldValueGetter{" +
+                "field=" + field +
+                '}';
+    }
+
+    @IgnoreCoverage
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldValueGetter that = (FieldValueGetter) o;
+        return Objects.equal(field, that.field);
+    }
+
+    @IgnoreCoverage
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(field);
     }
 }

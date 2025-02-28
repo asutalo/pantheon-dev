@@ -9,12 +9,8 @@ import java.lang.reflect.Field;
  */
 public class NestedFieldMySqlValue extends FieldMySqlValue {
     public NestedFieldMySqlValue(FieldMySqlValue nestedPrimaryKeyFieldMySqlValue, Field parentField) {
-        super();
-        field = nestedPrimaryKeyFieldMySqlValue.getField();
-        mysqlType = nestedPrimaryKeyFieldMySqlValue.getMysqlType();
+        super(nestedPrimaryKeyFieldMySqlValue.getField(), parentField.getName(), nestedPrimaryKeyFieldMySqlValue.getVariableName(), nestedPrimaryKeyFieldMySqlValue.getMysqlType());
         fieldName = fieldName(parentField, nestedPrimaryKeyFieldMySqlValue.getFieldName());
-        variableName = parentField.getName();
-        aliasName = nestedPrimaryKeyFieldMySqlValue.getVariableName();
     }
 
     private String fieldName(Field field, String nestedFieldName) {

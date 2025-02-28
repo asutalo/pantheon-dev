@@ -2,42 +2,35 @@ package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.MySqlValue;
 import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+import com.google.common.base.Objects;
 import com.mysql.cj.MysqlType;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
  * Function to convert a variable from an object into a MySqlValue
  */
 //todo can we simplify this class and the extensions of it?
 public class FieldMySqlValue {
-    Field field;//todo replace with FieldValueGetter to simplify
+    Field field;//reflection of the variable that is used to fetch the value for MySqlValue
+    FieldValueGetter fieldValueGetter;
     String fieldName;
     String variableName;
     String aliasName;
-    MysqlType mysqlType;
+    MysqlType mysqlType;    //desired MySql type for the value of the field to have
 
-    FieldMySqlValue() {
-    }
-
-    /**
-     * @param field     reflection of the variable that is used to fetch the value for MySqlValue
-     * @param mysqlType desired MySql type for the value of the field to have
-     */
     FieldMySqlValue(Field field, MysqlType mysqlType, String tableName) {
+        fieldValueGetter = new FieldValueGetter(field);
         this.field = field;
         this.mysqlType = mysqlType;
+        fieldValueGetter = new FieldValueGetter(field);
         fieldName = field.getName();
         variableName = fieldName;
         aliasName = alias(tableName, fieldName);
     }
 
-    /**
-     * @param field     reflection of the variable that is used to fetch the value for MySqlValue
-     * @param mysqlType desired MySql type for the value of the field to have
-     */
     FieldMySqlValue(Field field, MysqlType mysqlType, String fieldName, String tableName) {
+        fieldValueGetter = new FieldValueGetter(field);
         this.field = field;
         this.mysqlType = mysqlType;
         this.fieldName = fieldName;
@@ -45,17 +38,21 @@ public class FieldMySqlValue {
         aliasName = alias(tableName, fieldName);
     }
 
+    public FieldMySqlValue(Field field, String variableName, String aliasName, MysqlType mysqlType) {
+        fieldValueGetter = new FieldValueGetter(field);
+        this.field = field;
+        this.variableName = variableName;
+        this.aliasName = aliasName;
+        this.mysqlType = mysqlType;
+    }
+
     private String alias(String tableName, String fieldName) {
         return tableName + "." + fieldName;
     }
 
     public MySqlValue apply(Object valueOf) {
-        try {
-            Object fieldValue = field.get(valueOf);
-            return new MySqlValue(mysqlType, fieldName, fieldValue);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch field value for " + fieldName, e);
-        }
+        Object fieldValue = fieldValueGetter.apply(valueOf);
+        return new MySqlValue(mysqlType, fieldName, fieldValue);
     }
 
     MySqlValue of(Object val) {
@@ -77,27 +74,15 @@ public class FieldMySqlValue {
     @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         FieldMySqlValue that = (FieldMySqlValue) o;
-
-        if (!Objects.equals(field, that.field)) return false;
-        if (!Objects.equals(fieldName, that.fieldName)) return false;
-        if (!Objects.equals(variableName, that.variableName)) return false;
-        if (!Objects.equals(aliasName, that.aliasName)) return false;
-        return mysqlType == that.mysqlType;
+        return Objects.equal(field, that.field) && Objects.equal(fieldValueGetter, that.fieldValueGetter) && Objects.equal(fieldName, that.fieldName) && Objects.equal(variableName, that.variableName) && Objects.equal(aliasName, that.aliasName) && mysqlType == that.mysqlType;
     }
 
     @IgnoreCoverage
     @Override
     public int hashCode() {
-        int result = field != null ? field.hashCode() : 0;
-        result = 31 * result + (fieldName != null ? fieldName.hashCode() : 0);
-        result = 31 * result + (variableName != null ? variableName.hashCode() : 0);
-        result = 31 * result + (aliasName != null ? aliasName.hashCode() : 0);
-        result = 31 * result + (mysqlType != null ? mysqlType.hashCode() : 0);
-        return result;
+        return Objects.hashCode(field, fieldValueGetter, fieldName, variableName, aliasName, mysqlType);
     }
 
     @IgnoreCoverage
@@ -105,6 +90,7 @@ public class FieldMySqlValue {
     public String toString() {
         return "FieldMySqlValue{" +
                 "field=" + field +
+                ", fieldValueGetter=" + fieldValueGetter +
                 ", fieldName='" + fieldName + '\'' +
                 ", variableName='" + variableName + '\'' +
                 ", aliasName='" + aliasName + '\'' +
