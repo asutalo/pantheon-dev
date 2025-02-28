@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -65,6 +67,7 @@ public class JoinInfo {
         return hasAnyList;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "JoinInfo{" +
@@ -81,6 +84,7 @@ public class JoinInfo {
                 '}';
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -104,6 +108,7 @@ public class JoinInfo {
         return Objects.equals(child, joinInfo.child);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = targetTableName != null ? targetTableName.hashCode() : 0;

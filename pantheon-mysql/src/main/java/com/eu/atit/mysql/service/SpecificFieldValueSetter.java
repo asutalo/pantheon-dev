@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ class SpecificFieldValueSetter<T> {
         fieldValueSetter.accept(setFieldOn, row.get(actualFieldName));
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "SpecificFieldValueSetter{" +

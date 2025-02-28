@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 
@@ -31,6 +33,7 @@ public class FieldValueSetter implements BiConsumer<Object, Object> {
         return field;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "FieldValueSetter{" +

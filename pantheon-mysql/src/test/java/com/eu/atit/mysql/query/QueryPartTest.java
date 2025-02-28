@@ -11,9 +11,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 class QueryPartTest {
+    static class TestQueryPart implements QueryPart {}
+
     @Test
     void defaultApply() throws SQLException {
-        QueryPart queryPart = mock(QueryPart.class, Mockito.CALLS_REAL_METHODS);
+        QueryPart queryPart = new TestQueryPart();
         String expectedQuery = "query";
 
         Assertions.assertEquals(expectedQuery, queryPart.apply(expectedQuery));

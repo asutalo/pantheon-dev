@@ -20,6 +20,7 @@ import static com.eu.atit.mysql.query.From.FROM;
 import static com.eu.atit.mysql.query.Insert.*;
 import static com.eu.atit.mysql.query.Join.*;
 import static com.eu.atit.mysql.query.KeyVal.IS_VAL;
+import static com.eu.atit.mysql.query.LeftJoin.LEFT_JOIN;
 import static com.eu.atit.mysql.query.QueryBuilder.QUERY_END;
 import static com.eu.atit.mysql.query.SelectWithAliases.*;
 import static com.eu.atit.mysql.query.Update.SET;
@@ -52,13 +53,19 @@ class QueryBuilderTest {
     void buildSelectAllQuery() {
         String someOtherTable = "someOtherTable";
 
-        String expectedQuery = SelectAll.SELECT + FROM + SOME_TABLE + AS + SOME_TABLE.toLowerCase() + JOIN + someOtherTable + AS + someOtherTable.toLowerCase() + ON + SOME_TABLE.toLowerCase() + DOT + SOME_OTHER_KEY + EQUALS + someOtherTable.toLowerCase() + DOT + SOME_KEY + WHERE + SOME_WHERE_KEY + IS_VAL + AND + SOME_OTHER_KEY + IS_VAL + QUERY_END;
+        String expectedQuery = SelectAll.SELECT + FROM + SOME_TABLE + AS + SOME_TABLE.toLowerCase() +
+                JOIN + someOtherTable + AS + someOtherTable.toLowerCase() + ON +
+                SOME_TABLE.toLowerCase() + DOT + SOME_OTHER_KEY + EQUALS + someOtherTable.toLowerCase() + DOT + SOME_KEY +
+                LEFT_JOIN + someOtherTable + AS + someOtherTable.toLowerCase() + ON +
+                SOME_TABLE.toLowerCase() + DOT + SOME_OTHER_KEY + EQUALS + someOtherTable.toLowerCase() + DOT + SOME_KEY +
+                WHERE + SOME_WHERE_KEY + IS_VAL + AND + SOME_OTHER_KEY + IS_VAL + QUERY_END;
         when(mockMySqlValue.getKey()).thenReturn(SOME_WHERE_KEY).thenReturn(SOME_OTHER_KEY);
 
         QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.selectAll();
         queryBuilder.from(SOME_TABLE);
         queryBuilder.join(someOtherTable, SOME_KEY, SOME_TABLE, SOME_OTHER_KEY);
+        queryBuilder.leftJoin(someOtherTable, SOME_KEY, SOME_TABLE, SOME_OTHER_KEY);
         queryBuilder.where();
         queryBuilder.keyIsVal(mockMySqlValue);
         queryBuilder.and();

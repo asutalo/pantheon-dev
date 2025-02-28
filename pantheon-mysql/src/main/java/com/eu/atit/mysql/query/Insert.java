@@ -81,6 +81,7 @@ public class Insert implements QueryPart {
         return Objects.equals(valuesDecorator, insert.valuesDecorator);
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = valuesForQuery != null ? valuesForQuery.hashCode() : 0;
@@ -90,6 +91,8 @@ public class Insert implements QueryPart {
         return result;
     }
 
+
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "Insert{" +

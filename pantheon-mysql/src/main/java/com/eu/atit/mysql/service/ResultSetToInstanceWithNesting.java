@@ -1,5 +1,7 @@
 package com.eu.atit.mysql.service;
 
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,7 @@ class ResultSetToInstanceWithNesting<T> extends ResultSetToInstance<T> {
         return instance;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "ResultSetToInstanceWithNesting{}";

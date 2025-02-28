@@ -1,6 +1,7 @@
 package com.eu.atit.mysql.service;
 
 import com.eu.atit.mysql.query.MySqlValue;
+import com.eu.atit.pantheon.annotation.misc.IgnoreCoverage;
 import com.mysql.cj.MysqlType;
 
 import java.lang.reflect.Field;
@@ -73,6 +74,7 @@ public class FieldMySqlValue {
         return aliasName;
     }
 
+    @IgnoreCoverage
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,6 +89,7 @@ public class FieldMySqlValue {
         return mysqlType == that.mysqlType;
     }
 
+    @IgnoreCoverage
     @Override
     public int hashCode() {
         int result = field != null ? field.hashCode() : 0;
@@ -97,6 +100,7 @@ public class FieldMySqlValue {
         return result;
     }
 
+    @IgnoreCoverage
     @Override
     public String toString() {
         return "FieldMySqlValue{" +
