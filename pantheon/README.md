@@ -1,5 +1,7 @@
 # Pantheon
 
+![Logo](/logo.png)
+
 This repo serves as the glue for the *Pantheon* "framework".
 
 Should contain only generic interfaces and their annotations, generic annotations, and helper classes which are used by
