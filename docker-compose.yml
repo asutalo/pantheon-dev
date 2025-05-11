@@ -1,5 +1,6 @@
 version: '3'
-
+# use
+# unix-socker: desktop-linux
 services:
   mysql-container:
     image: mysql:8.1.0
