@@ -12,34 +12,31 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 public class ITest {
+    private static final String composeFilePath = Objects.requireNonNull(ITest.class
+                    .getClassLoader()
+                    .getResource("podman/compose.yml"))
+                .getPath();
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
         //linux
-//        new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose -f compose.yml up --detach").start().waitFor();
-//        win
-//        new ProcessBuilder("cmd.exe", "/C", "docker-compose up --detach").start().waitFor();
-//        mac
-//        new ProcessBuilder("sh",  "-c", "docker-compose up --detach").start().waitFor();
-        Thread.sleep(5000);
+        int processExitCode = new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose -f " + composeFilePath + " up --detach").start().waitFor();
+
+        if (processExitCode == 0) {
+            System.out.println("Podman is running and responsive.");
+            Thread.sleep(15000);
+        } else {
+            throw new RuntimeException("Podman is not running or not available.");
+        }
     }
 
     @AfterAll
     static void cleanUp() throws IOException, InterruptedException {
-        //linux
-//        new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose down").start().waitFor();
-        //win
-//        new ProcessBuilder("cmd.exe", "/C", "docker-compose down").start().waitFor();
-        //mac
-//        new ProcessBuilder("sh", "-c", "docker-compose down").start().waitFor();
-
+        new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose -f " + composeFilePath + " down").start().waitFor();
     }
 
     private static <T extends ITestBase> Callable<T> callable(Class<T> tClass, Class<?>... setUpParams) {
