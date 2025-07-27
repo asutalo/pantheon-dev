@@ -23,7 +23,7 @@ public class ITest {
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
         //linux
-        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose up --detach").start().waitFor();
+//        new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose -f compose.yml up --detach").start().waitFor();
 //        win
 //        new ProcessBuilder("cmd.exe", "/C", "docker-compose up --detach").start().waitFor();
 //        mac
@@ -34,7 +34,7 @@ public class ITest {
     @AfterAll
     static void cleanUp() throws IOException, InterruptedException {
         //linux
-        new ProcessBuilder("/usr/bin/bash", "-c", "docker-compose down").start().waitFor();
+//        new ProcessBuilder("/usr/bin/bash", "-c", "podman-compose down").start().waitFor();
         //win
 //        new ProcessBuilder("cmd.exe", "/C", "docker-compose down").start().waitFor();
         //mac

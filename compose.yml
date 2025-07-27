@@ -1,0 +1,12 @@
+version: '3'
+services:
+  mysql-container:
+    image: docker.io/library/mysql:9.4.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test-db
+    ports:
+      - "3308:3306"
+    volumes:
+      - "./conf/my.conf:/etc/mysql/conf.d/config-file.cnf"
+      - "./data:/var/lib/mysql:rw"

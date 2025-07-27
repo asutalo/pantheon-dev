@@ -1,3 +1,5 @@
+# this docker compose is only used for local testing at the moment, at some point when a CI/CD is brought in, configurable
+# env variables will be used where appropriate and expected (i.e. port numbers, usernames, passwords, db names
 version: '3'
 # use
 # unix-socker: desktop-linux
@@ -16,6 +18,7 @@ services:
     volumes:
       - "./conf/my.conf:/etc/mysql/conf.d/config-file.cnf"
       - "./data:/var/lib/mysql:rw"
+# the section below is just a reminder of what this would look like if there was an app running along with the DB image
 #  app:
 #    image: asutalo/at-it:latest
 #    ports:
