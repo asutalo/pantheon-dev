@@ -106,7 +106,7 @@ class GenericParameterlessJsonEndpointTest {
 
         assertEquals(CREATED, response.getStatusCode());
         assertEquals(SOME_OTHER_STRING, response.getMessage());
-        assertEquals(Map.of(LOCATION, List.of(expectedLocation)), response.getHeaders());
+        assertEquals(Map.of(LOCATION, List.of(expectedLocation), "Content-Type", List.of("application/json")), response.getHeaders());
     }
 
     @Test
