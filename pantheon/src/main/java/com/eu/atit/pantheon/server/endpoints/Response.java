@@ -6,9 +6,7 @@ import java.util.Map;
 public interface Response {
     int getStatusCode();
 
-    String getMessage();
+    byte[] getBody();
 
-    default Map<String, List<String>> getHeaders() {
-        return Map.of();
-    }
+    Map<String, List<String>> getHeaders();
 }

@@ -4,7 +4,7 @@ import com.eu.atit.pantheon.helper.Pair;
 import com.eu.atit.pantheon.json.TestClass;
 import com.eu.atit.pantheon.json.provider.EndpointFieldsProvider;
 import com.eu.atit.pantheon.json.provider.EndpointFieldsProviderCache;
-import com.eu.atit.pantheon.server.endpoints.Response;
+import com.eu.atit.pantheon.json.response.JsonResponse;
 import com.eu.atit.pantheon.server.response.exception.InternalServerErrorException;
 import com.eu.atit.pantheon.service.Service;
 import com.eu.atit.pantheon.service.ServiceProvider;
@@ -85,7 +85,7 @@ class GenericParameterlessJsonEndpointTest {
         doReturn(SOME_STRING).when(genericParameterlessJsonEndpoint).toString(mockObject);
         when(mockDataAccessService.getAll()).thenReturn(List.of(mockObject, mockObject));
 
-        Response response = genericParameterlessJsonEndpoint.get(EMPTY_MAP, EMPTY_MAP, mock(Headers.class));
+        JsonResponse response = genericParameterlessJsonEndpoint.get(EMPTY_MAP, EMPTY_MAP, mock(Headers.class));
 
         assertEquals(OK, response.getStatusCode());
         assertEquals(String.format("[\n\t%s,\n\t%s\n]", SOME_STRING, SOME_STRING), response.getMessage());
@@ -102,7 +102,7 @@ class GenericParameterlessJsonEndpointTest {
         doReturn(locationPair).when(genericParameterlessJsonEndpoint).getLocation(mockObject);
         doReturn(SOME_OTHER_STRING).when(genericParameterlessJsonEndpoint).withBracers(SOME_STRING);
 
-        Response response = genericParameterlessJsonEndpoint.post(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
+        JsonResponse response = genericParameterlessJsonEndpoint.post(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
 
         assertEquals(CREATED, response.getStatusCode());
         assertEquals(SOME_OTHER_STRING, response.getMessage());

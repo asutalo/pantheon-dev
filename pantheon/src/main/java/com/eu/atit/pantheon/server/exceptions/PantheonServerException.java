@@ -1,6 +1,11 @@
 package com.eu.atit.pantheon.server.exceptions;
 
+import com.eu.atit.pantheon.server.endpoints.BaseResponse;
 import com.eu.atit.pantheon.server.endpoints.Response;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Standard wrapper for Server exceptions to conform to a Response object
@@ -17,5 +22,15 @@ public class PantheonServerException extends RuntimeException implements Respons
 
     public int getStatusCode() {
         return statusCode;
+    }
+
+    @Override
+    public byte[] getBody() {
+        return super.getMessage().getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public Map<String, List<String>> getHeaders() {
+        return Map.of("Content-Type", List.of("text/plain; charset=UTF-8"));
     }
 }

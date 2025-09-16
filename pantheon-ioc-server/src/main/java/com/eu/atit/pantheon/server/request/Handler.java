@@ -48,8 +48,9 @@ public class Handler implements HttpHandler {
         httpExchange.getResponseHeaders().putAll(response.getHeaders());
 
         OutputStream outputStream = httpExchange.getResponseBody();
-        httpExchange.sendResponseHeaders(response.getStatusCode(), response.getMessage().length());
-        outputStream.write(response.getMessage().getBytes(StandardCharsets.UTF_8));
+        byte[] body = response.getBody();
+        httpExchange.sendResponseHeaders(response.getStatusCode(), body.length);
+        outputStream.write(body);
         outputStream.flush();
         outputStream.close();
     }

@@ -1,8 +1,7 @@
 package com.eu.atit.pantheon.json.endpoint;
 
 import com.eu.atit.pantheon.helper.Pair;
-import com.eu.atit.pantheon.server.endpoints.Response;
-import com.eu.atit.pantheon.server.response.SimpleResponse;
+import com.eu.atit.pantheon.json.response.JsonResponse;
 import com.eu.atit.pantheon.server.response.exception.InternalServerErrorException;
 import com.eu.atit.pantheon.server.response.exception.UnprocessableEntityException;
 import com.google.inject.TypeLiteral;
@@ -22,11 +21,11 @@ public class GenericParameterisedJsonEndpoint<T, Q> extends GenericJsonEndpoint<
      * Fetches the element specified in query path
      */
     @Override
-    public Response get(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
+    public JsonResponse get(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
         try {
             T instance = service.get(uriParams);
 
-            return new SimpleResponse(OK, toString(instance));
+            return new JsonResponse(OK, toString(instance));
         } catch (Exception e) {
             throw new InternalServerErrorException();
         }
@@ -36,7 +35,7 @@ public class GenericParameterisedJsonEndpoint<T, Q> extends GenericJsonEndpoint<
      * Deletes the element specified in query path
      */
     @Override
-    public Response delete(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
+    public JsonResponse delete(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
         try {
             T toDelete = service.get(uriParams);
 
@@ -44,7 +43,7 @@ public class GenericParameterisedJsonEndpoint<T, Q> extends GenericJsonEndpoint<
 
             Pair<String, String> locationPair = getLocation(toDelete);
 
-            return new SimpleResponse(ACCEPTED, String.valueOf(withBracers(locationPair.right())));
+            return new JsonResponse(ACCEPTED, String.valueOf(withBracers(locationPair.right())));
         } catch (Exception e) {
             throw new UnprocessableEntityException(); //todo proper exception response code
         }
@@ -54,7 +53,7 @@ public class GenericParameterisedJsonEndpoint<T, Q> extends GenericJsonEndpoint<
      * Updates the element specified in query path
      */
     @Override
-    public Response put(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
+    public JsonResponse put(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
         try {
             T toUpdate = service.get(uriParams);
 
@@ -64,7 +63,7 @@ public class GenericParameterisedJsonEndpoint<T, Q> extends GenericJsonEndpoint<
 
             service.update(toUpdate);
 
-            return new SimpleResponse(ACCEPTED, toString(toUpdate));
+            return new JsonResponse(ACCEPTED, toString(toUpdate));
 
         } catch (Exception e) {
             throw new UnprocessableEntityException(); //todo proper exception response code

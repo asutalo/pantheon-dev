@@ -5,7 +5,7 @@ import com.eu.atit.pantheon.json.TestClass;
 import com.eu.atit.pantheon.json.provider.EndpointFieldsProvider;
 import com.eu.atit.pantheon.json.provider.EndpointFieldsProviderCache;
 import com.eu.atit.pantheon.json.provider.functions.FieldValueSetter;
-import com.eu.atit.pantheon.server.endpoints.Response;
+import com.eu.atit.pantheon.json.response.JsonResponse;
 import com.eu.atit.pantheon.server.response.exception.InternalServerErrorException;
 import com.eu.atit.pantheon.server.response.exception.UnprocessableEntityException;
 import com.eu.atit.pantheon.service.ServiceProviderRegistry;
@@ -68,7 +68,7 @@ class GenericParameterisedJsonEndpointTest {
         doReturn(SOME_STRING).when(genericParameterisedJsonEndpoint).toString(any());
         when(mockDataAccessService.get(EMPTY_MAP)).thenReturn(testClass);
 
-        Response response = genericParameterisedJsonEndpoint.get(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
+        JsonResponse response = genericParameterisedJsonEndpoint.get(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
 
         Assertions.assertEquals(OK, response.getStatusCode());
         Assertions.assertEquals(SOME_STRING, response.getMessage());
@@ -82,7 +82,7 @@ class GenericParameterisedJsonEndpointTest {
         doReturn(SOME_STRING).when(genericParameterisedJsonEndpoint).withBracers(SOME_STRING);
         doReturn(locationPair).when(genericParameterisedJsonEndpoint).getLocation(testClass);
 
-        Response response = genericParameterisedJsonEndpoint.delete(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
+        JsonResponse response = genericParameterisedJsonEndpoint.delete(EMPTY_MAP, SOME_REQUEST_BODY, mock(Headers.class));
 
         verify(mockDataAccessService).delete(testClass);
         Assertions.assertEquals(ACCEPTED, response.getStatusCode());
@@ -98,7 +98,7 @@ class GenericParameterisedJsonEndpointTest {
         doReturn(Map.of(SOME_STRING, mockFieldValueSetter, SOME_OTHER_STRING, mockFieldValueSetter)).when(genericParameterisedJsonEndpoint).setters();
         doReturn(SOME_STRING).when(genericParameterisedJsonEndpoint).toString(testClass);
 
-        Response response = genericParameterisedJsonEndpoint.put(EMPTY_MAP, Map.of(SOME_STRING, updatedVal, SOME_OTHER_STRING, otherUpdatedVal), mock(Headers.class));
+        JsonResponse response = genericParameterisedJsonEndpoint.put(EMPTY_MAP, Map.of(SOME_STRING, updatedVal, SOME_OTHER_STRING, otherUpdatedVal), mock(Headers.class));
 
         Assertions.assertEquals(ACCEPTED, response.getStatusCode());
         Assertions.assertEquals(SOME_STRING, response.getMessage());

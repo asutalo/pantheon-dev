@@ -6,6 +6,7 @@ import com.eu.atit.pantheon.server.endpoint.Registry;
 import com.eu.atit.pantheon.server.endpoints.Response;
 import com.eu.atit.pantheon.server.request.parsing.ParsingService;
 import com.eu.atit.pantheon.server.request.validation.Validator;
+import com.eu.atit.pantheon.server.response.TextResponse;
 import com.eu.atit.pantheon.server.response.exception.IocServerException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -110,8 +111,8 @@ class HandlerTest {
             }
 
             @Override
-            public String getMessage() {
-                return expectedMessage;
+            public byte[] getBody() {
+                return expectedMessage.getBytes(StandardCharsets.UTF_8);
             }
 
             @Override
