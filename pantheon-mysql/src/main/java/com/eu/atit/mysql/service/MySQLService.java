@@ -110,6 +110,7 @@ public class MySQLService<T> implements DataService<T, QueryBuilder> {
 
         filter.forEach((key, val) -> {
             FieldMySqlValue fieldMySqlValue = mySQLModelDescriptor.getAliasFieldMySqlValueMap().get(key); // todo mySQLModelDescriptor.getAliasFieldMySqlValueMap() as global variable in this class?
+            //todo why null check?
             if (fieldMySqlValue != null) {
                 //todo if val == List add multiple filters chained with OR
                 filterMySqlValues.add(fieldMySqlValue.of(val));
