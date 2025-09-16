@@ -3,5 +3,8 @@ include 'pantheon'
 include 'pantheon-ioc-server'
 include 'pantheon-mysql'
 include 'pantheon-json'
+include 'pantheon-file'
 include 'mortgage-tracker-backend'
 include 'student-service'
+
+include 'pantheon-file'
