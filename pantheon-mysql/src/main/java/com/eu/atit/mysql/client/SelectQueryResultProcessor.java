@@ -61,3 +61,54 @@ class SelectQueryResultProcessor implements Function<PreparedStatement, List<Map
         result.add(row);
     }
 }
+
+// todo refactor to stream data from DB instead of collecting it in memory
+//class SelectQueryResultProcessor implements Function<PreparedStatement, Stream<Map<String, Object>>> {
+//    @Override
+//    public Stream<Map<String, Object>> apply(PreparedStatement preparedStatement) {
+//        try {
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//            if (!resultSet.next()) {
+//                return Stream.empty();
+//            }
+//            Map<String, Integer> columnLabelsAndIndexes = columnLabelsAndIndexes(resultSet);
+//
+//            Iterator<Map<String, Object>> rowIterator = new Iterator<>() {
+//                boolean hasCurrent = true;
+//
+//                @Override
+//                public boolean hasNext() {
+//                    return hasCurrent;
+//                }
+//
+//                @Override
+//                public Map<String, Object> next() {
+//                    try {
+//                        Map<String, Object> row = new HashMap<>();
+//                        for (Entry<String, Integer> entry : columnLabelsAndIndexes.entrySet()) {
+//                            row.put(entry.getKey(), resultSet.getObject(entry.getValue()));
+//                        }
+//                        // Advance cursor
+//                        hasCurrent = resultSet.next();
+//                        return row;
+//                    } catch (SQLException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            };
+//
+//            // Important: Close resources when stream is closed!
+//            todo important  prepared statements are closed automatically in the mysql client, this needs changing as we MUST let the stream close the resources
+//            return StreamSupport.stream(
+//                            Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED), false)
+//                    .onClose(() -> {
+//                        try { resultSet.close(); preparedStatement.close(); } catch (SQLException ignored) {}
+//                    });
+//
+//        } catch (SQLException sqlException) {
+//            throw new RuntimeException(sqlException);
+//        }
+//    }
+//
+//    // ...columnLabelsAndIndexes (as before)...
+//}
