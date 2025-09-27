@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <script src="shared/script/vue.global.js"></script>
+    <title>Root</title>
+</head>
+<body>
+<div id="app">
+    <iframe :src="currentFrame" class="fullscreen-iframe" title="Content"></iframe>
+
+    <div class="button-container">
+        <button class="previous" @click="goToPrevious">←</button>
+        <button class="next" @click="goToNext">→</button>
+    </div>
+</div>
+
+<script src="script/index.js"></script>
+</body>
+</html>

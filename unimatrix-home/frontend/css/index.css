@@ -1,0 +1,25 @@
+/* Ensure root HTML element and body take full height */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Make the app container fill the screen */
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Style the iframe to fill the entire page */
+.fullscreen-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
