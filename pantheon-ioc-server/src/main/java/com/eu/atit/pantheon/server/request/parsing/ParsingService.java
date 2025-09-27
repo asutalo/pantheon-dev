@@ -16,8 +16,8 @@ public class ParsingService {
     private static final String QUERY_PARAM_SEPARATOR = "&";
     static final String PATH_SEPARATOR = "/";
     private static final String PATH_AND_QUERY_SEPARATOR = "\\?(?![^(]*\\))";
-    private static final String EQUALS = "=";
-    private static final String STAR = "*";
+    public static final String EQUALS = "=";
+    public static final String STAR = "*";
 
     public static ParsingService getInstance() {
         return INSTANCE;

@@ -9,20 +9,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import static com.eu.atit.pantheon.server.request.parsing.ParsingService.EQUALS;
+import static com.eu.atit.pantheon.server.request.parsing.ParsingService.STAR;
+
 public class FileEndpoint extends Endpoint{
     private final Path basePath;
     private final String mimeType;
-    public FileEndpoint(String uriDefinition, String basePath, String mimeType) {
-        super(uriDefinition);
+    private static final String filePathKey = "filePath";
+    public FileEndpoint(String baseUri, String basePath, String mimeType) {
+        super(uriDefinition(baseUri));
         this.basePath = Path.of(basePath);
         this.mimeType = mimeType;
+    }
+    
+    private static String uriDefinition(String baseUri) {
+        return (baseUri.endsWith("/") ? baseUri : baseUri + "/") + "(" + filePathKey + EQUALS + STAR +  ")";
     }
 
     @Override
     public FileResponse get(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
-        byte[] bytes = null;
+        byte[] bytes;
         try {
-            bytes = Files.readAllBytes(basePath.resolve("disk3/Antonio mob 9 September 2025/Pictures/file_00000000c7a8620a963bc6f168fda0ec.png"));
+            bytes = Files.readAllBytes(basePath.resolve(uriParams.get(filePathKey).toString()));
         } catch (IOException e) {
             System.out.println(e);
             throw new RuntimeException(e);
