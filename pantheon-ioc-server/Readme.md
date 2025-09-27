@@ -45,6 +45,13 @@ Additionally, the Endpoint methods will provide you with a Map of Uri params, th
 format), and Headers. The headers are an Immutable Map however in case you need to add headers to your Response, you can
 do so by overriding the `getHeaders` method. The Server will add your custom headers to the response.
 
+## Special URI params
+The URI can contain a special `path` param in the form of `*` signifying that the remaining path should be parsed as the
+path parameter. For example `/file/(filePath=*)` will match `/file/path/to/file` and the `filePath` param will be
+`path/to/file`. The `*` sign can be used like this only once in the URI, however using it will not prevent you from using
+other path params before it, or query params after it.
+
+
 ## Sample implementation
 
 ````

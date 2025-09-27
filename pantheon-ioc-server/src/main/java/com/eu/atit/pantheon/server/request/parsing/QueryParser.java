@@ -1,5 +1,6 @@
 package com.eu.atit.pantheon.server.request.parsing;
 
+import java.util.Iterator;
 import java.util.Map;
 
 class QueryParser implements Parser {
@@ -10,8 +11,8 @@ class QueryParser implements Parser {
     }
 
     @Override
-    public void accept(Map<String, Object> stringObjectMap, String s) {
-        String value = s.split("=")[1];
+    public void accept(Map<String, Object> stringObjectMap, Iterator<String> s) {
+        String value = s.next().split("=")[1];
         stringObjectMap.put(key, value);
     }
 

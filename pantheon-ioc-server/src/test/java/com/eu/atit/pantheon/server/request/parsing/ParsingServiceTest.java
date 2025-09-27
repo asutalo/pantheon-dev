@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -69,6 +70,19 @@ class ParsingServiceTest {
                                 new IgnoredParser(),
                                 new IgnoredParser(),
                                 new PathParser("modelId")
+                        )),
+                Arguments.of("/file/(filePath=*)",
+                        List.of(
+                                new IgnoredParser(),
+                                new IgnoredParser(),
+                                new PathSplatParser("filePath")
+                        )),
+                Arguments.of("/file/(filePath=*)?color=(.*)",
+                        List.of(
+                                new IgnoredParser(),
+                                new IgnoredParser(),
+                                new PathSplatParser("filePath"),
+                                new QueryParser("color")
                         ))
         );
     }
@@ -85,7 +99,11 @@ class ParsingServiceTest {
                 Arguments.of("/endpoint/(id=(\\d)\\?)", "/endpoint/(\\d)\\?"),
                 Arguments.of(
                         "/endpoint/car/make/model/(modelId=\\d\\d\\d)\\?color=(.+)&finish=(.+)",
-                        "/endpoint/car/make/model/\\d\\d\\d\\?color=.+&finish=.+")
+                        "/endpoint/car/make/model/\\d\\d\\d\\?color=.+&finish=.+"),
+                Arguments.of("/file/(filePath=*)",
+                        "/file/" + PathSplatParser.SPLAT_REGEX),
+                Arguments.of("/file/(filePath=*)?color=(.+)&finish=(.+)",
+                        "/file/" + PathSplatParser.SPLAT_REGEX + "?color=.+&finish=.+")
         );
     }
 
@@ -150,6 +168,11 @@ class ParsingServiceTest {
         assertThrows(BadRequestException.class, () -> ParsingService.getInstance().parseRequestBody(mockHttpExchange));
     }
 
+    @Test
+    void getUriParsers_shouldThrowExceptionForSplatFollowedByPathParams() {
+        assertThrows(Exception.class, () -> ParsingService.getInstance().getUriParsers("/(path=*)/something"));
+    }
+
     @ParameterizedTest
     @MethodSource("argumentsForGetUriParsers")
     void getUriParsers(String uriDefinition, List<Parser> expectedParsers) {
@@ -179,6 +202,12 @@ class ParsingServiceTest {
     @MethodSource("argumentsForRequestUri")
     void parseRequestUri(String uriString, int expectedParsers) {
         List<Parser> parsers = new ArrayList<>();
+        if(expectedParsers > 0) {
+            doAnswer(invocationOnMock -> {
+                ((Iterator<String>)invocationOnMock.getArgument(1)).next();
+                return null;
+            }).when(mockParser).accept(any(), any());
+        }
 
         for (int i = 0; i < expectedParsers; i++) {
             parsers.add(mockParser);

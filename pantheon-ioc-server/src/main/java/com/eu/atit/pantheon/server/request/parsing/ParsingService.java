@@ -14,9 +14,10 @@ import static java.util.Arrays.asList;
 public class ParsingService {
     private static final ParsingService INSTANCE = new ParsingService();
     private static final String QUERY_PARAM_SEPARATOR = "&";
-    private static final String PATH_SEPARATOR = "/";
+    static final String PATH_SEPARATOR = "/";
     private static final String PATH_AND_QUERY_SEPARATOR = "\\?(?![^(]*\\))";
     private static final String EQUALS = "=";
+    private static final String STAR = "*";
 
     public static ParsingService getInstance() {
         return INSTANCE;
@@ -26,9 +27,21 @@ public class ParsingService {
         List<Parser> parsers = new ArrayList<>();
         String[] pathAndQuery = splitPathAndQuery(uriDefinition);
 
-        for (String pathPart : separatedPath(pathAndQuery)) {
+        Iterator<String> pathIterator = asList(separatedPath(pathAndQuery)).iterator();
+
+        while (pathIterator.hasNext()) {
+            String pathPart = pathIterator.next();
             if (isRegexMarker(pathPart)) {
-                parsers.add(new PathParser(pathRegexFieldName(stripParenthesis(pathPart).split(EQUALS))));
+                String[] pathRegexNameAndPattern = stripParenthesis(pathPart).split(EQUALS);
+                if (isSplat(pathRegexNameAndPattern[1])) {
+                    if (pathIterator.hasNext()) {
+                        throw new IllegalArgumentException("Cannot have path parameters after splat (regex pattern of \"*\"");
+                    } else {
+                        parsers.add(new PathSplatParser(pathRegexFieldName(pathRegexNameAndPattern)));
+                    }
+                } else {
+                    parsers.add(new PathParser(pathRegexFieldName(pathRegexNameAndPattern)));
+                }
             } else {
                 parsers.add(new IgnoredParser());
             }
@@ -56,7 +69,13 @@ public class ParsingService {
         while (iterator.hasNext()) {
             String pathParam = iterator.next();
             if (isRegexMarker(pathParam)) {
-                parsedUriStringBuilder.append(pathRegex(stripParenthesis(pathParam)));
+                String pathRegex = pathRegex(stripParenthesis(pathParam));
+                if(isSplat(pathRegex)) {
+                    parsedUriStringBuilder.append(PathSplatParser.SPLAT_REGEX);
+                }
+                else {
+                    parsedUriStringBuilder.append(pathRegex);
+                }
             } else {
                 parsedUriStringBuilder.append(pathParam);
             }
@@ -93,18 +112,22 @@ public class ParsingService {
     }
 
     public Map<String, Object> parseRequestUri(String decodedUriString, List<Parser> parsers) {
+        ArrayList<Parser> internalParsers = new ArrayList<>(parsers);
+
         String[] pathAndQuery = splitPathAndQuery(decodedUriString);
-
-        List<String> uriParams = new ArrayList<>(asList(separatedPath(pathAndQuery)));
-
-        if (hasQueryParams(pathAndQuery)) {
-            uriParams.addAll(asList(queryParameters(pathAndQuery)));
-        }
 
         Map<String, Object> parsedParams = new HashMap<>();
 
-        for (int i = 0; i < uriParams.size(); i++) {
-            parsers.get(i).accept(parsedParams, uriParams.get(i));
+        if (hasQueryParams(pathAndQuery)) {
+            Iterator<String> queryParamsIterator = asList(queryParameters(pathAndQuery)).iterator();
+            while (queryParamsIterator.hasNext()) {
+                internalParsers.removeLast().accept(parsedParams, queryParamsIterator);
+            }
+        }
+
+        Iterator<String> pathParamsIterator = asList(separatedPath(pathAndQuery)).iterator();
+        for (int i = 0; i < internalParsers.size(); i++) {
+            internalParsers.get(i).accept(parsedParams, pathParamsIterator);
         }
 
         return parsedParams;
@@ -138,6 +161,10 @@ public class ParsingService {
 
     private boolean isRegexMarker(String pathPart) {
         return pathPart.contains(EQUALS);
+    }
+
+    private boolean isSplat(String regexPart) {
+        return regexPart.equals(STAR);
     }
 
     private String[] splitPathAndQuery(String uriDefinition) {

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 class QueryParserTest {
@@ -15,8 +17,10 @@ class QueryParserTest {
         Map<String, Object> actualMap = new HashMap<>();
         Map<String, Object> expectedMap = Map.of(key, val);
 
-        new QueryParser(key).accept(actualMap, toParse);
+        Iterator<String> testIterator = List.of(toParse).iterator();
+        new QueryParser(key).accept(actualMap, testIterator);
 
         Assertions.assertEquals(expectedMap, actualMap);
+        Assertions.assertFalse(testIterator.hasNext());
     }
 }
