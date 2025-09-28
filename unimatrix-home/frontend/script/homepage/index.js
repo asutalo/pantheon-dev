@@ -26,7 +26,7 @@ const app = Vue.createApp({
         },
         // Fetch the frame list from the JSON file
         fetchFrames() {
-            fetch('../../info/unimatrix-home/frames.json')
+            fetch('../../info/homepage/frames.json')
                 .then(response => response.json())
                 .then(data => {
                     this.frames = data.frames;
