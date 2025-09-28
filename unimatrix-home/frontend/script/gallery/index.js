@@ -9,7 +9,7 @@ const app = Vue.createApp({
     },
     methods: {
         fetchPhotos() {
-            fetch('data/photos.json')
+            fetch('../../info/gallery/photos.json')
                 .then(response => response.json())
                 .then(data => {
                     this.photos = data.photos || [];
