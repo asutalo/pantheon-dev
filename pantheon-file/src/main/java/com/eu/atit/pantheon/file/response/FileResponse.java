@@ -28,6 +28,7 @@ public class FileResponse extends BaseResponse {
         public static final String JAVASCRIPT = "application/javascript";
 
         public static final String ZIP = "application/zip";
+        public static final String JSON = "application/json";
         public static final String TAR = "application/x-tar";
         public static final String GZIP = "application/gzip";
         public static final String OCTET_STREAM = "application/octet-stream";
