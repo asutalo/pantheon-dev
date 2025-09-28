@@ -16,7 +16,7 @@ public class FileEndpoint extends Endpoint{
     private final Path basePath;
     private final String mimeType;
     static final String filePathKey = "filePath";
-    public static final String filePathRegex = "(?:" + filePathKey + "=" + STAR + ")";
+    public static final String filePathRegex = "(" + filePathKey + "=" + STAR + ")";
     public FileEndpoint(String baseUri, String basePath, String mimeType) {
         super(uriDefinition(baseUri));
         this.basePath = Path.of(endWIthSlash(basePath));
