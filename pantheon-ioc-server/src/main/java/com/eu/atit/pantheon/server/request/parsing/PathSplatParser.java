@@ -11,8 +11,8 @@ class PathSplatParser extends PathParser {
     public static final String SPLAT_REGEX = "(?![.])"                  // not starting with dot
             + "(?:[a-zA-Z0-9_-]+/)*"     // zero or more path segments (letters, numbers, _, -, no dot)
             + "[a-zA-Z0-9_-]+"           // filename part (no dot yet, can't be empty)
-            + "(?:\\.[a-zA-Z0-9_-]+)?"   // optional extension, only one dot in final segment
-            + "(?=[\\?]|$)";              // must be followed by ? or end of string
+            + "\\.[a-zA-Z0-9_-]+"        // extension required: must include single dot in last segment
+            + "(?=[\\?]|$)";             // must be followed by ? or end of string
 //            + "(?=[/?]|$)";              // must be followed by /, ? or end of string
 
     public PathSplatParser(String key) {
