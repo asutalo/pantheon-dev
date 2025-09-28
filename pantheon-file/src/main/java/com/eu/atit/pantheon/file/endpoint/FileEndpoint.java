@@ -15,26 +15,32 @@ import static com.eu.atit.pantheon.server.request.parsing.ParsingService.STAR;
 public class FileEndpoint extends Endpoint{
     private final Path basePath;
     private final String mimeType;
-    private static final String filePathKey = "filePath";
+    static final String filePathKey = "filePath";
     public static final String filePathRegex = "(?:" + filePathKey + "=" + STAR + ")";
     public FileEndpoint(String baseUri, String basePath, String mimeType) {
         super(uriDefinition(baseUri));
-        this.basePath = Path.of(basePath);
+        this.basePath = Path.of(endWIthSlash(basePath));
         this.mimeType = mimeType;
     }
     
     private static String uriDefinition(String baseUri) {
-        return (baseUri.endsWith("/") ? baseUri : baseUri + "/") + filePathRegex;
+        return endWIthSlash(baseUri) + filePathRegex;
+    }
+
+    private static String endWIthSlash(String s) {
+        return (s.endsWith("/") ? s : s + "/");
     }
 
     @Override
     public FileResponse get(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
-        byte[] bytes;
         try {
-            bytes = Files.readAllBytes(basePath.resolve(uriParams.get(filePathKey).toString()));
+            return new FileResponse(200, readFile(uriParams.get(filePathKey).toString()), mimeType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new FileResponse(200, bytes, mimeType);
+    }
+
+    byte[] readFile(String filePath) throws IOException {
+        return Files.readAllBytes(basePath.resolve(filePath));
     }
 }

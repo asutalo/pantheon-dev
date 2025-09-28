@@ -1,22 +1,37 @@
 package com.eu.atit.pantheon.file.endpoint;
 
+import com.eu.atit.pantheon.file.response.FileResponse;
+import com.sun.net.httpserver.Headers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.eu.atit.pantheon.file.endpoint.FileEndpoint.filePathKey;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 class FileEndpointTest {
+    private final String someBaseUri = "/someFile";
+    private final String someBasePath = "/somePath";
+    private final String someMimeType = "someMimeType";
+    private final FileEndpoint fileEndpoint = new FileEndpoint(someBaseUri, someBasePath, someMimeType);
+
     @Test
     void shouldExpandBaseUri() {
-        String baseUri = "/someFile";
-        FileEndpoint fileEndpoint = new FileEndpoint(baseUri, "/somePath", "someMimeType");
         String uriDefinition = fileEndpoint.uriDefinition();
 
-        Assertions.assertTrue(uriDefinition.startsWith(baseUri));
-        Assertions.assertEquals(FileEndpoint.filePathRegex, uriDefinition.replace(baseUri + "/", ""));
+        Assertions.assertTrue(uriDefinition.startsWith(someBaseUri));
+        Assertions.assertEquals(FileEndpoint.filePathRegex, uriDefinition.replace(someBaseUri + "/", ""));
     }
 
 
@@ -43,6 +58,17 @@ class FileEndpointTest {
         FileEndpoint testEndpoint = new FileEndpoint(uriDefinition, "/somePath", "someMimeType");
 
         Assertions.assertEquals(shouldMatch, testEndpoint.match(matching));
+    }
 
+    @Test
+    void shouldRespondWithExpectedFileAndMimeType() throws IOException {
+        FileEndpoint spy = spy(fileEndpoint);
+        String expectedPathSuffix = "/someSuffix";
+        byte[] expectedContent = "someString".getBytes(StandardCharsets.UTF_8);
+        doReturn(expectedContent).when(spy).readFile(expectedPathSuffix);
+
+        FileResponse fileResponse = spy.get(Map.of(filePathKey, expectedPathSuffix, "otherKey", "otherVal"), Map.of(), new Headers());
+        Assertions.assertEquals(expectedContent, fileResponse.getBody());
+        Assertions.assertEquals(List.of(someMimeType), fileResponse.getHeaders().get("Content-Type"));
     }
 }
