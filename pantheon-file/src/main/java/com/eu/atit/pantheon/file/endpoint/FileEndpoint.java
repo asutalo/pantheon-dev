@@ -9,13 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static com.eu.atit.pantheon.server.request.parsing.ParsingService.EQUALS;
 import static com.eu.atit.pantheon.server.request.parsing.ParsingService.STAR;
 
+// Convenience class for a basic File Endpoint, serving files based on relative path from path params and single mime type
 public class FileEndpoint extends Endpoint{
     private final Path basePath;
     private final String mimeType;
     private static final String filePathKey = "filePath";
+    public static final String filePathRegex = "(?:" + filePathKey + "=" + STAR + ")";
     public FileEndpoint(String baseUri, String basePath, String mimeType) {
         super(uriDefinition(baseUri));
         this.basePath = Path.of(basePath);
@@ -23,7 +24,7 @@ public class FileEndpoint extends Endpoint{
     }
     
     private static String uriDefinition(String baseUri) {
-        return (baseUri.endsWith("/") ? baseUri : baseUri + "/") + "(" + filePathKey + EQUALS + STAR +  ")";
+        return (baseUri.endsWith("/") ? baseUri : baseUri + "/") + filePathRegex;
     }
 
     @Override
@@ -32,7 +33,6 @@ public class FileEndpoint extends Endpoint{
         try {
             bytes = Files.readAllBytes(basePath.resolve(uriParams.get(filePathKey).toString()));
         } catch (IOException e) {
-            System.out.println(e);
             throw new RuntimeException(e);
         }
         return new FileResponse(200, bytes, mimeType);
