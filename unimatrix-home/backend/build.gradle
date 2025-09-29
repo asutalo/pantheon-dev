@@ -1,4 +1,5 @@
 dependencies {
     implementation project(':pantheon-ioc-server')
     implementation project(':pantheon-file')
+    implementation project(':pantheon-json')
 }

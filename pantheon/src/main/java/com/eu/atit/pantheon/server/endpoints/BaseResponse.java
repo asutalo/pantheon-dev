@@ -19,8 +19,8 @@ public abstract class BaseResponse implements Response {
 
     @Override
     public Map<String, List<String>> getHeaders() {
-        Map<String, List<String>> combined = new HashMap<>(baseHeaders());
-        combined.putAll(headers);
+        Map<String, List<String>> combined = new HashMap<>(headers);
+        combined.putAll(baseHeaders());
         return combined;
     }
 
