@@ -34,13 +34,17 @@ public class FileEndpoint extends Endpoint{
     @Override
     public FileResponse get(Map<String, Object> uriParams, Map<String, Object> requestBody, Headers requestHeaders) {
         try {
-            return new FileResponse(200, readFile(uriParams.get(filePathKey).toString()), mimeType);
+            return new FileResponse(200, readFile(resolve(uriParams, filePathKey)), mimeType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    byte[] readFile(String filePath) throws IOException {
-        return Files.readAllBytes(basePath.resolve(filePath));
+    Path resolve(Map<String, Object> uriParams, String filePathKey) {
+        return basePath.resolve(uriParams.get(filePathKey).toString());
+    }
+
+    byte[] readFile(Path filePath) throws IOException {
+        return Files.readAllBytes(filePath);
     }
 }

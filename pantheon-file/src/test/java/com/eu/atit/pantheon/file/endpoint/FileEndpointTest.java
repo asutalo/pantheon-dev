@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -62,10 +63,14 @@ class FileEndpointTest {
     void shouldRespondWithExpectedFileAndMimeType() throws IOException {
         FileEndpoint spy = spy(fileEndpoint);
         String expectedPathSuffix = "/someSuffix";
+        Path somePath = Path.of(someBasePath, expectedPathSuffix);
         byte[] expectedContent = "someString".getBytes(StandardCharsets.UTF_8);
-        doReturn(expectedContent).when(spy).readFile(expectedPathSuffix);
+        Map<String, Object> uriParams = Map.of(filePathKey, expectedPathSuffix, "otherKey", "otherVal");
 
-        FileResponse fileResponse = spy.get(Map.of(filePathKey, expectedPathSuffix, "otherKey", "otherVal"), Map.of(), new Headers());
+        doReturn(somePath).when(spy).resolve(uriParams, filePathKey);
+        doReturn(expectedContent).when(spy).readFile(somePath);
+
+        FileResponse fileResponse = spy.get(uriParams, Map.of(), new Headers());
         Assertions.assertEquals(expectedContent, fileResponse.getBody());
         Assertions.assertEquals(List.of(someMimeType), fileResponse.getHeaders().get("Content-Type"));
     }
