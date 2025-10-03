@@ -58,11 +58,19 @@ public class Server {
      * The server listens for incoming connections and handles them by passing them down to
      * {@link Handler} which will parse and execute the request.
      */
-    public void start() throws IOException {
-        httpServer.bind(new InetSocketAddress("localhost", port), queueSize);
+    public void start(InetSocketAddress socketAddress) throws IOException {
+        httpServer.bind(socketAddress, queueSize);
         httpServer.createContext("/", new Handler(validator, parsingService, registry, endpointProcessor));
         httpServer.setExecutor(threadPoolExecutor);
         httpServer.start();
+    }
+
+    public void start() throws IOException {
+        start(new InetSocketAddress(port));
+    }
+
+    public void startLocalhost() throws IOException {
+        start(new InetSocketAddress("localhost", port));
     }
 
     public void registerEndpoint(IoCEndpoint endpoint) {
