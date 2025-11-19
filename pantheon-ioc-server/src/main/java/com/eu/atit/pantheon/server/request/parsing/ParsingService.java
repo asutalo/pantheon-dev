@@ -121,7 +121,9 @@ public class ParsingService {
         if (hasQueryParams(pathAndQuery)) {
             Iterator<String> queryParamsIterator = asList(queryParameters(pathAndQuery)).iterator();
             while (queryParamsIterator.hasNext()) {
-                internalParsers.removeLast().accept(parsedParams, queryParamsIterator);
+                int last = internalParsers.size() - 1;
+                internalParsers.get(last).accept(parsedParams, queryParamsIterator);
+                internalParsers.remove(last);
             }
         }
 
