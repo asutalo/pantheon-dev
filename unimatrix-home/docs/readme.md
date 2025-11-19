@@ -1,1 +1,0 @@
-![docslogo.png](docslogo.png)
