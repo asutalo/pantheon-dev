@@ -4,15 +4,16 @@ plugins {
 }
 
 subprojects {
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 
     group 'com.eu.atit'
 
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
     repositories {
         mavenCentral()
@@ -33,9 +34,18 @@ subprojects {
     test {
         useJUnitPlatform()
     }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifactId = project.name
+            }
+        }
+    }
 }
 
 wrapper {
-    gradleVersion = "7.5.2"
+    gradleVersion = "9.2.1"
     distributionType = Wrapper.DistributionType.ALL
 }
