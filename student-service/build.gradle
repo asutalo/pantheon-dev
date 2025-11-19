@@ -1,4 +1,0 @@
-dependencies {
-    implementation project(':pantheon-json')
-    implementation project(':pantheon-mysql')
-}
