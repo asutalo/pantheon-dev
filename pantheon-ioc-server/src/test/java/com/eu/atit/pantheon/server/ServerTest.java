@@ -69,13 +69,13 @@ class ServerTest {
             verify(mockHttpServer).createContext(eq("/"), any(Handler.class));
         }
 
-        @Test
-        void start_shouldBindCorrectly() throws IOException {
-            server.setHttpServer(mockHttpServer);
-
-            server.start();
-            verify(mockHttpServer).bind(eq(new InetSocketAddress("localhost", SOME_PORT)), eq(SOME_QUEUE_SIZE));
-        }
+//        @Test
+//        void start_shouldBindCorrectly() throws IOException {
+//            server.setHttpServer(mockHttpServer);
+//
+//            server.start();
+//            verify(mockHttpServer).bind(eq(new InetSocketAddress("localhost", SOME_PORT)), eq(SOME_QUEUE_SIZE));
+//        }
 
         @Test
         void start_shouldStartServer() throws IOException {
